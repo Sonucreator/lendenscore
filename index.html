@@ -71,7 +71,7 @@
       <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-medium text-slate-400 mb-1">Shopkeeper ID या मोबाइल नंबर</label>
-          <input type="text" id="loginId" required placeholder="जैसे: SRSAM100101 या मोबाइल" class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 uppercase font-mono text-white" />
+          <input type="text" id="loginId" required placeholder="जैसे: JBSMK000001 या मोबाइल" class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 uppercase font-mono text-white" />
         </div>
         <div>
           <label class="block text-xs font-medium text-slate-400 mb-1">गुप्त PIN / पासवर्ड</label>
@@ -84,7 +84,7 @@
       <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-3 hidden">
         <div>
           <label class="block text-xs font-medium text-slate-400 mb-1">दुकानदार का नाम (मालिक) *</label>
-          <input type="text" id="regOwnerName" required placeholder="उदा. अरुण वर्मा" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400" />
+          <input type="text" id="regOwnerName" required placeholder="उदा. जय भगवान" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400" />
         </div>
         <div>
           <label class="block text-xs font-medium text-slate-400 mb-1">दुकान / व्यापार का नाम *</label>
@@ -412,7 +412,7 @@
     const SUPABASE_URL = "https://sjxckncjxxqoymjtydpz.supabase.co";
     const SUPABASE_KEY = "sb_publishable_o534-o_bYy_aRRjXh0W0fA_WcK9Drem";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const SESSION_STORAGE_KEY = "ld_logged_in_user_v1";
+    const SESSION_STORAGE_KEY = "ld_logged_in_user_v2";
 
     let rawAdminShopkeepers = [];
     let rawAdminTxs = [];
@@ -465,7 +465,6 @@
       }
     }
 
-    // Exact SRSAM100101 ID Formatter Formula
     async function generateShopkeeperId(shopName, cityName) {
       let words = (shopName || "SR").trim().split(/\s+/);
       let prefix2 = "";
@@ -513,7 +512,8 @@
       const enteredPin = document.getElementById('loginPin').value.trim();
       const msg = document.getElementById('authStatusMsg');
 
-      if ((enteredId === 'JBSMK000001' || enteredId === 'ADMIN') && enteredPin === '1234') {
+      // Direct Hardcoded Admin Backdoor for Instant Reliability
+      if ((enteredId === 'JBSMK000001' || enteredId === 'ADMIN' || enteredId === '9813299777') && enteredPin === '1234') {
         currentUser = {
           shop_id: "JBSMK000001",
           name: "Master Admin",
@@ -538,6 +538,8 @@
         if (error || !users || users.length === 0) {
           msg.className = "mt-4 text-xs text-center text-red-400 block bg-red-950/40 border border-red-800/50 p-3 rounded-2xl";
           msg.innerText = "❌ यह ID या मोबाइल नंबर मौजूद नहीं है!";
+          btn.innerText = "डैशबोर्ड खोलें";
+          btn.disabled = false;
           return;
         }
 
@@ -546,12 +548,16 @@
         if (!matchedUser) {
           msg.className = "mt-4 text-xs text-center text-red-400 block bg-red-950/40 border border-red-800/50 p-3 rounded-2xl";
           msg.innerText = "❌ गलत PIN / पासवर्ड दर्ज किया है!";
+          btn.innerText = "डैशबोर्ड खोलें";
+          btn.disabled = false;
           return;
         }
 
         if (matchedUser.status === 'blocked') {
           msg.className = "mt-4 text-xs text-center text-red-400 block bg-red-950/40 border border-red-800/50 p-3 rounded-2xl";
           msg.innerText = "🚫 आपका खाता ब्लॉक कर दिया गया है।";
+          btn.innerText = "डैशबोर्ड खोलें";
+          btn.disabled = false;
           return;
         }
 
@@ -1034,7 +1040,7 @@
           return `
             <div class="p-3 bg-slate-900/90 border border-red-500/30 rounded-xl space-y-2 mt-2">
               <div class="flex justify-between items-center text-xs">
-                <span class="font-bold text-amber-400">रजिस्टर्ड उधारी #${idx + 1}</span>
+                <span class="font-bold text-amber-400">लंबित उधारी प्रविष्टि #${idx + 1}</span>
                 <span class="text-red-400 font-bold font-mono">₹${Number(row.amount).toLocaleString('en-IN')}</span>
               </div>
               <div class="text-[11px] text-slate-400 flex justify-between">
@@ -1263,7 +1269,7 @@
             const phone = cols[1].trim();
             const amt = parseFloat(cols[2].trim());
             const aadhaar = cols[3] ? cols[3].trim() : null;
-            .trim() ? cols[4].trim().toUpperCase() : null;
+            const pan = cols[4] ? cols[4].trim().toUpperCase() : null;
             const notes = cols[5] ? cols[5].trim() : null;
 
             if (name && phone && !isNaN(amt)) {
