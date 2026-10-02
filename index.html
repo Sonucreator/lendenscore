@@ -573,7 +573,7 @@
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
           // VAPID KEY DAALNE KI JAGAH YAHAN HAI 👇
-          const token = await messaging.getToken({ vapidKey: 'YOUR_VAPID_KEY_HERE' });
+          const token = await messaging.getToken({ vapidKey: 'BB58YX9-2cqmdp421w6yeo34T8RDmwxalOFD_HT4sNm4Kh8hNWPPyZXiNgeHAJoy21euPfKUDVshGWuRRUZOTBU' });
           
           if (token && currentUser && currentUser.shop_id) {
             await supabaseClient
