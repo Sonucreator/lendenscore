@@ -16,6 +16,10 @@
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
+  <!-- Firebase App & Messaging SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+
   <style>
     body {
       -webkit-tap-highlight-color: transparent;
@@ -57,6 +61,9 @@
         </div>
 
         <div id="userBadge" class="hidden flex items-center gap-3">
+          <button onclick="requestNotificationPermission()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 p-2 rounded-xl text-xs transition cursor-pointer flex items-center gap-1" title="नोटिफिकेशन चालू करें">
+            <i data-lucide="bell-ring" class="w-4 h-4"></i>
+          </button>
           <div class="text-xs bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-full flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span id="shopkeeperDisplayCode" class="font-mono font-bold text-amber-300"></span>
@@ -227,38 +234,38 @@
       <!-- SECTION A: SHOPKEEPERS MASTER -->
       <div id="secShopkeepers" class="space-y-5">
         
-        <!-- नया दुकानदार रजिस्टर करने का फॉर्म (SEPARATED COLUMNS) -->
+        <!-- नया दुकानदार रजिस्टर करने का फॉर्म (Fixed Visuals) -->
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
           <h2 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2">
             <i data-lucide="user-plus" class="w-4 h-4"></i> नया दुकानदार रजिस्टर करें (Admin Access)
           </h2>
           <form onsubmit="adminRegisterShopkeeper(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
             <div>
-              <label class="block text-[10px] text-slate-400 mb-1">दुकान का नाम (Shop Name) *</label>
-              <input type="text" id="newShop_ShopName" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-amber-400" />
+              <label class="block text-[11px] font-semibold text-slate-300 mb-1">दुकान का नाम (Shop Name) *</label>
+              <input type="text" id="newShop_ShopName" required placeholder="जैसे: श्री राधे ज्वैलर्स" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-amber-400" />
             </div>
             <div>
-              <label class="block text-[10px] text-slate-400 mb-1">मालिक का नाम (Owner Name) *</label>
-              <input type="text" id="newShop_OwnerName" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-amber-400" />
+              <label class="block text-[11px] font-semibold text-slate-300 mb-1">मालिक का नाम (Owner Name) *</label>
+              <input type="text" id="newShop_OwnerName" required placeholder="जैसे: अजय वर्मा" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-amber-400" />
             </div>
             <div>
-              <label class="block text-[10px] text-slate-400 mb-1">ईमेल (Email) *</label>
-              <input type="email" id="newShop_Email" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-amber-400" />
+              <label class="block text-[11px] font-semibold text-slate-300 mb-1">ईमेल (Email) *</label>
+              <input type="email" id="newShop_Email" required placeholder="shop@gmail.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-amber-400" />
             </div>
             <div>
-              <label class="block text-[10px] text-slate-400 mb-1">मोबाइल नंबर *</label>
-              <input type="tel" id="newShop_Phone" required maxlength="10" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none font-mono focus:border-amber-400" />
+              <label class="block text-[11px] font-semibold text-slate-300 mb-1">मोबाइल नंबर *</label>
+              <input type="tel" id="newShop_Phone" required maxlength="10" placeholder="10-अंकों का नंबर" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none font-mono focus:border-amber-400" />
             </div>
             <div>
-              <label class="block text-[10px] text-slate-400 mb-1">शहर (City) *</label>
-              <input type="text" id="newShop_City" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none uppercase focus:border-amber-400" />
+              <label class="block text-[11px] font-semibold text-slate-300 mb-1">शहर (City) *</label>
+              <input type="text" id="newShop_City" required placeholder="SAMALKHA" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none uppercase focus:border-amber-400" />
             </div>
             <div>
-              <label class="block text-[10px] text-slate-400 mb-1">लॉगिन पिन (PIN) *</label>
-              <input type="text" id="newShop_Pin" required maxlength="4" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none font-mono focus:border-amber-400" />
+              <label class="block text-[11px] font-semibold text-slate-300 mb-1">लॉगिन पिन (PIN) *</label>
+              <input type="text" id="newShop_Pin" required maxlength="4" placeholder="4-अंकों का पिन" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none font-mono focus:border-amber-400" />
             </div>
-            <button type="submit" class="md:col-span-1 lg:col-span-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition cursor-pointer shadow mt-1">
-              नया खाता बनाएं
+            <button type="submit" class="md:col-span-1 lg:col-span-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl text-xs transition cursor-pointer shadow mt-2">
+              + नया खाता बनाएं
             </button>
           </form>
         </section>
@@ -473,7 +480,6 @@
       <h3 class="text-sm font-bold text-amber-400">दुकानदार विवरण संपादित करें (Edit)</h3>
       <input type="hidden" id="editShopRowId" />
       
-      <!-- Naye 2 alag boxes -->
       <div>
         <label class="block text-[10px] text-slate-400 mb-1">दुकान का नाम (Shop Name)</label>
         <input type="text" id="editShop_ShopNameInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
@@ -500,8 +506,8 @@
         <input type="text" id="editShop_PinInput" maxlength="4" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono" />
       </div>
       <div class="flex gap-2 pt-2">
-        <button onclick="saveShopkeeperEdit()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer">अपडेट सेव करें</button>
-        <button onclick="closeEditShopModal()" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs cursor-pointer">रद्द करें</button>
+        <button type="button" onclick="saveShopkeeperEdit()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer">अपडेट सेव करें</button>
+        <button type="button" onclick="closeEditShopModal()" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs cursor-pointer">रद्द करें</button>
       </div>
     </div>
   </div>
@@ -524,8 +530,8 @@
         <input type="text" id="editCustomerPanInput" maxlength="10" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase outline-none font-mono" />
       </div>
       <div class="flex gap-2 pt-2">
-        <button onclick="saveCustomerEdit()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer">ग्राहक अपडेट सेव करें</button>
-        <button onclick="closeEditCustomerModal()" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs cursor-pointer">रद्द करें</button>
+        <button type="button" onclick="saveCustomerEdit()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer">ग्राहक अपडेट सेव करें</button>
+        <button type="button" onclick="closeEditCustomerModal()" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs cursor-pointer">रद्द करें</button>
       </div>
     </div>
   </div>
@@ -542,12 +548,47 @@
     const SUPABASE_KEY = "sb_publishable_o534-o_bYy_aRRjXh0W0fA_WcK9Drem";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAWXEsrIsVnis90OysP_o1HJxvb7MsA0_o",
+      authDomain: "lendenregistry.firebaseapp.com",
+      projectId: "lendenregistry",
+      storageBucket: "lendenregistry.firebasestorage.app",
+      messagingSenderId: "352293736048",
+      appId: "1:352293736048:web:b2f6de441f64470bd12eb5"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+
     let rawAdminShopkeepers = []; 
     let rawAdminTxs = []; 
     let rawAppeals = []; 
     let rawAuditLogs = []; 
     let currentUser = null; 
     let searchMode = 'ALL';
+
+    // Notification Permission Lene aur Token Save karne ka function
+    async function requestNotificationPermission() {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          // VAPID KEY DAALNE KI JAGAH YAHAN HAI 👇
+          const token = await messaging.getToken({ vapidKey: 'YOUR_VAPID_KEY_HERE' });
+          
+          if (token && currentUser && currentUser.shop_id) {
+            await supabaseClient
+              .from('shopkeepers')
+              .update({ fcm_token: token })
+              .eq('shop_id', currentUser.shop_id);
+            alert("✓ पुश नोटिफिकेशन सफलता से चालू हो गए हैं!");
+          }
+        } else {
+          alert("नोटिफिकेशन की अनुमति नहीं दी गई।");
+        }
+      } catch (err) {
+        console.error("FCM Token Error:", err);
+      }
+    }
 
     async function signInWithGoogle() {
       const btnMsg = document.getElementById('authStatusMsg'); 
@@ -565,7 +606,7 @@
         const userName = session.user.user_metadata.full_name || "Owner";
         
         if (userEmail === MASTER_ADMIN_EMAIL) { 
-            currentUser = { shop_id: "JBSMK000001", name: "Master Admin", email: userEmail, role: "admin", status: "active" }; 
+            currentUser = { shop_id: "JBSMK000001", owner_name: "Master Admin", name: "Master Admin", email: userEmail, role: "admin", status: "active" }; 
             initDashboard(); 
             return; 
         }
@@ -576,8 +617,8 @@
           const autoCode = "SRSAM" + Math.floor(1000 + Math.random() * 9000); 
           await supabaseClient.from('shopkeepers').insert([{ 
               shop_id: autoCode, 
-              shop_name: 'New Shop', 
-              name: userName, 
+              name: 'New Shop', 
+              owner_name: userName, 
               email: userEmail, 
               city: "SAMALKHA", 
               phone: "0000000000", 
@@ -661,7 +702,6 @@
     }
     
     function openAppealModal() { document.getElementById('appealModal').classList.remove('hidden'); }
-    
     function closeAppealModal() { document.getElementById('appealModal').classList.add('hidden'); }
     
     async function submitAppeal() {
@@ -734,7 +774,7 @@
         renderAdminAll();
       } else {
         document.getElementById('shopkeeperDashboard').classList.remove('hidden');
-        document.getElementById('dashShopTitle').innerText = currentUser.shop_name || currentUser.name || displayId; 
+        document.getElementById('dashShopTitle').innerText = currentUser.name || currentUser.owner_name || displayId; 
         renderShopkeeperView();
       }
       lucide.createIcons();
@@ -778,10 +818,11 @@
     async function adminRegisterShopkeeper(e) {
       e.preventDefault();
       const autoCode = "SRSAM" + Math.floor(1000 + Math.random() * 9000); 
+      
       const { error } = await supabaseClient.from('shopkeepers').insert([{
         shop_id: autoCode,
-        shop_name: document.getElementById('newShop_ShopName').value.trim(),
-        name: document.getElementById('newShop_OwnerName').value.trim(),
+        name: document.getElementById('newShop_ShopName').value.trim(),
+        owner_name: document.getElementById('newShop_OwnerName').value.trim(),
         email: document.getElementById('newShop_Email').value.trim(),
         phone: document.getElementById('newShop_Phone').value.trim(),
         city: document.getElementById('newShop_City').value.trim().toUpperCase(),
@@ -795,7 +836,7 @@
           renderAdminAll(); 
           logActivity("ADMIN", "Registered shop: " + autoCode); 
       } else { 
-          alert("❌ एरर: " + error.message); 
+          alert("❌ नया खाता बनाने में एरर: " + error.message); 
       }
     }
 
@@ -815,27 +856,33 @@
     }
 
     async function saveShopkeeperEdit() {
-      const rowId = document.getElementById('editShopRowId').value;
-      const sName = document.getElementById('editShop_ShopNameInput').value.trim();
-      const oName = document.getElementById('editShop_OwnerNameInput').value.trim();
-      const city = document.getElementById('editShop_CityInput').value.trim().toUpperCase();
-      const phone = document.getElementById('editShop_PhoneInput').value.trim();
-      const pin = document.getElementById('editShop_PinInput').value.trim();
-      const email = document.getElementById('editShop_EmailInput').value.trim();
+      try {
+          const rowId = document.getElementById('editShopRowId').value;
+          const sName = document.getElementById('editShop_ShopNameInput').value.trim();
+          const oName = document.getElementById('editShop_OwnerNameInput').value.trim();
+          const city = document.getElementById('editShop_CityInput').value.trim().toUpperCase();
+          const phone = document.getElementById('editShop_PhoneInput').value.trim();
+          const pin = document.getElementById('editShop_PinInput').value.trim();
+          const email = document.getElementById('editShop_EmailInput').value.trim();
 
-      const { error } = await supabaseClient.from('shopkeepers').update({ 
-          shop_name: sName, 
-          name: oName, 
-          city: city, 
-          phone: phone, 
-          pin: pin, 
-          email: email 
-      }).eq('id', rowId);
-      
-      if(!error) { 
-          alert('✓ विवरण सफलतापूर्वक अपडेट कर दिया गया है!'); 
-          closeEditShopModal(); 
-          renderAdminAll(); 
+          const { error } = await supabaseClient.from('shopkeepers').update({ 
+              name: sName, 
+              owner_name: oName, 
+              city: city, 
+              phone: phone, 
+              pin: pin, 
+              email: email 
+          }).eq('id', rowId);
+          
+          if(!error) { 
+              alert('✓ विवरण सफलतापूर्वक अपडेट कर दिया गया है!'); 
+              closeEditShopModal(); 
+              renderAdminAll(); 
+          } else {
+              alert('❌ डेटाबेस एरर: ' + error.message);
+          }
+      } catch (err) {
+          alert('सिस्टम एरर: ' + err.message);
       }
     }
 
@@ -852,21 +899,27 @@
     }
 
     async function saveCustomerEdit() {
-      const phoneKey = document.getElementById('editCustomerPhoneKey').value; 
-      const newName = document.getElementById('editCustomerNameInput').value.trim(); 
-      const newAadhaar = document.getElementById('editCustomerAadhaarInput').value.trim(); 
-      const newPan = document.getElementById('editCustomerPanInput').value.trim().toUpperCase();
-      
-      const { error } = await supabaseClient.from('transactions').update({ 
-          customer_name: newName, 
-          customer_aadhaar: newAadhaar || null, 
-          customer_pan: newPan || null 
-      }).eq('customer_phone', phoneKey);
-      
-      if(!error) { 
-          alert('✓ ग्राहक अपडेट सेव हो गया!'); 
-          closeEditCustomerModal(); 
-          renderAdminAll(); 
+      try {
+          const phoneKey = document.getElementById('editCustomerPhoneKey').value; 
+          const newName = document.getElementById('editCustomerNameInput').value.trim(); 
+          const newAadhaar = document.getElementById('editCustomerAadhaarInput').value.trim(); 
+          const newPan = document.getElementById('editCustomerPanInput').value.trim().toUpperCase();
+          
+          const { error } = await supabaseClient.from('transactions').update({ 
+              customer_name: newName, 
+              customer_aadhaar: newAadhaar || null, 
+              customer_pan: newPan || null 
+          }).eq('customer_phone', phoneKey);
+          
+          if(!error) { 
+              alert('✓ ग्राहक अपडेट सेव हो गया!'); 
+              closeEditCustomerModal(); 
+              renderAdminAll(); 
+          } else {
+              alert('❌ एरर: ' + error.message);
+          }
+      } catch(err) {
+          alert('सिस्टम एरर: ' + err.message);
       }
     }
 
@@ -923,20 +976,25 @@
     }
 
     function renderFilteredAdminShopkeepers(query) {
-      document.getElementById('adminShopkeepersList').innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || (s.name||'').toLowerCase().includes(query) || (s.shop_name||'').toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
+      document.getElementById('adminShopkeepersList').innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || (s.owner_name||'').toLowerCase().includes(query) || (s.name||'').toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
         let statusBadge = s.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
         let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber'; 
         let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
+        
+        let safeShopName = (s.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        let safeOwnerName = (s.owner_name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        let safeEmail = (s.email || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
         return `
         <tr class="text-slate-300">
           <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
-          <td><b class="text-white">${s.shop_name || '-'}</b><br><span class="text-[10px] text-slate-400">${s.name || '-'}</span></td>
+          <td><b class="text-white">${s.name || '-'}</b><br><span class="text-[10px] text-slate-400">${s.owner_name || '-'}</span></td>
           <td class="text-slate-400">${s.email || '-'}</td>
           <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
           <td class="font-mono text-slate-400">${s.phone || '-'}</td>
           <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${s.status}</span></td>
           <td class="text-right pr-2 space-x-1">
-            <button onclick="openEditShopModal('${s.id}', '${(s.shop_name || '').replace(/'/g, "\\'")}', '${(s.name || '').replace(/'/g, "\\'")}', '${s.city || 'SAM'}', '${s.phone || ''}', '${s.pin || ''}', '${(s.email || '').replace(/'/g, "\\'")}')" class="bg-blue-900/60 text-blue-300 px-2 py-1 rounded text-[11px] cursor-pointer">Edit</button>
+            <button onclick="openEditShopModal('${s.id}', '${safeShopName}', '${safeOwnerName}', '${s.city || 'SAM'}', '${s.phone || ''}', '${s.pin || ''}', '${safeEmail}')" class="bg-blue-900/60 text-blue-300 px-2 py-1 rounded text-[11px] cursor-pointer">Edit</button>
             <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-900/60 text-${actionBtnColor}-300 px-2 py-1 rounded text-[11px] cursor-pointer">${actionBtnText}</button>
             <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-[11px] cursor-pointer">Del</button>
           </td>
@@ -966,6 +1024,8 @@
       document.getElementById('adminCustomersList').innerHTML = custList.map(c => {
         const uniqueShopsCount = c.shopsSet.size; 
         const score = calculateSmartScore(c.unpaidDays, c.dues, uniqueShopsCount);
+        let safeName = (c.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
         return `
           <tr class="text-slate-300">
             <td class="py-3 px-2 font-bold text-white">${c.name} ${uniqueShopsCount >= 2 ? '<span class="text-[10px] bg-red-600 text-white px-1.5 py-0.5 rounded font-mono ml-1">2x</span>' : ''}</td>
@@ -976,7 +1036,7 @@
             <td class="text-slate-300 text-[11px]">${formatOverdueAge(c.unpaidDays)}</td>
             <td><span class="font-mono text-xs ${uniqueShopsCount >= 2 ? 'text-red-400 font-bold' : ''}">${score}/100</span></td>
             <td><span class="text-[10px] ${c.dues > 0 ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'} px-2 py-0.5 rounded-full font-bold uppercase">${c.dues > 0 ? 'PENDING' : 'CLEARED'}</span></td>
-            <td class="text-right pr-2 space-x-1"><button onclick="openEditCustomerModal('${c.phone}', '${c.name.replace(/'/g, "\\'")}', '${c.aadhaar}', '${c.pan}')" class="bg-blue-900/60 text-blue-300 px-2 py-1 rounded text-[11px] cursor-pointer">Edit</button></td>
+            <td class="text-right pr-2 space-x-1"><button onclick="openEditCustomerModal('${c.phone}', '${safeName}', '${c.aadhaar}', '${c.pan}')" class="bg-blue-900/60 text-blue-300 px-2 py-1 rounded text-[11px] cursor-pointer">Edit</button></td>
           </tr>`;
       }).join('') || `<tr><td colspan="9" class="text-center py-6 text-slate-500">कोई ग्राहक नहीं।</td></tr>`;
     }
@@ -1118,7 +1178,7 @@
             <h4 class="font-black text-lg">स्कोर: <span class="${score >= 90 ? 'text-emerald-400' : score >= 50 ? 'text-amber-400' : 'text-red-400'}">${score}</span> / 100</h4>
         </div>
         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
-            <div class="font-bold">${custName} ${uniqueShopsCount >= 2 ? '<span class="text-red-400 ml-1">⚠️️ (Multi-Shop)</span>' : ''}</div>
+            <div class="font-bold">${custName} ${uniqueShopsCount >= 2 ? '<span class="text-red-400 ml-1">⚠ (Multi-Shop)</span>' : ''}</div>
             <div class="text-slate-400 font-mono">📱 ${custPhone}</div>
         </div>
         <div class="grid grid-cols-2 gap-2 text-xs">
