@@ -234,7 +234,7 @@
       <!-- SECTION A: SHOPKEEPERS MASTER -->
       <div id="secShopkeepers" class="space-y-5">
         
-        <!-- नया दुकानदार रजिस्टर करने का फॉर्म (Fixed Visuals) -->
+        <!-- नया दुकानदार रजिस्टर करने का फॉर्म -->
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
           <h2 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2">
             <i data-lucide="user-plus" class="w-4 h-4"></i> नया दुकानदार रजिस्टर करें (Admin Access)
@@ -567,28 +567,26 @@
     let currentUser = null; 
     let searchMode = 'ALL';
 
-    // Notification Permission Lene aur Token Save karne ka function
-    // यह रहा वो छोटा सा फंक्शन जो आपको अपनी बड़ी फाइल में कहीं भी नीचे जोड़ देना है
-window.sendPushNotification = async function() {
-  try {
-    const response = await fetch('https://sjxckncjxxqoymjtydpz.supabase.co/functions/v1/send-notification', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer sb_publishable_o534-o_bYy_aRRjXhOW0fA_Wck9Drem`
+    window.sendPushNotification = async function() {
+      try {
+        const response = await fetch('https://sjxckncjxxqoymjtydpz.supabase.co/functions/v1/send-notification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer sb_publishable_o534-o_bYy_aRRjXhOW0fA_Wck9Drem`
+          }
+        });
+        const result = await response.json();
+        console.log("Notification Response:", result);
+      } catch (err) {
+        console.error("Error:", err);
       }
-    });
-    const result = await response.json();
-    console.log("Notification Response:", result);
-  } catch (err) {
-    console.error("Error:", err);
-  }
-};
+    };
+
     async function requestNotificationPermission() {
       try {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
-          // VAPID KEY DAALNE KI JAGAH YAHAN HAI 👇
           const token = await messaging.getToken({ vapidKey: 'BB58YX9-2cqmdp421w6yeo34T8RDmwxalOFD_HT4sNm4Kh8hNWPPyZXiNgeHAJoy21euPfKUDVshGWuRRUZOTBU' });
           
           if (token && currentUser && currentUser.shop_id) {
@@ -634,6 +632,7 @@ window.sendPushNotification = async function() {
           await supabaseClient.from('shopkeepers').insert([{ 
               shop_id: autoCode, 
               name: 'New Shop', 
+              shop_name: 'New Shop',
               owner_name: userName, 
               email: userEmail, 
               city: "SAMALKHA", 
@@ -790,7 +789,7 @@ window.sendPushNotification = async function() {
         renderAdminAll();
       } else {
         document.getElementById('shopkeeperDashboard').classList.remove('hidden');
-        document.getElementById('dashShopTitle').innerText = currentUser.name || currentUser.owner_name || displayId; 
+        document.getElementById('dashShopTitle').innerText = currentUser.shop_name || currentUser.name || currentUser.owner_name || displayId; 
         renderShopkeeperView();
       }
       lucide.createIcons();
@@ -834,10 +833,12 @@ window.sendPushNotification = async function() {
     async function adminRegisterShopkeeper(e) {
       e.preventDefault();
       const autoCode = "SRSAM" + Math.floor(1000 + Math.random() * 9000); 
+      const shopNameVal = document.getElementById('newShop_ShopName').value.trim();
       
       const { error } = await supabaseClient.from('shopkeepers').insert([{
         shop_id: autoCode,
-        name: document.getElementById('newShop_ShopName').value.trim(),
+        shop_name: shopNameVal,
+        name: shopNameVal,
         owner_name: document.getElementById('newShop_OwnerName').value.trim(),
         email: document.getElementById('newShop_Email').value.trim(),
         phone: document.getElementById('newShop_Phone').value.trim(),
@@ -847,7 +848,7 @@ window.sendPushNotification = async function() {
       }]);
       
       if(!error) { 
-          alert("✓ नया दुकानदार सफलता से जुड़ गया! ID: " + autoCode); 
+          alert("✓ नया दुकानदार सफलता से जुड़ गया! ID: " + autoCode); 
           e.target.reset(); 
           renderAdminAll(); 
           logActivity("ADMIN", "Registered shop: " + autoCode); 
@@ -882,6 +883,7 @@ window.sendPushNotification = async function() {
           const email = document.getElementById('editShop_EmailInput').value.trim();
 
           const { error } = await supabaseClient.from('shopkeepers').update({ 
+              shop_name: sName,
               name: sName, 
               owner_name: oName, 
               city: city, 
@@ -992,19 +994,20 @@ window.sendPushNotification = async function() {
     }
 
     function renderFilteredAdminShopkeepers(query) {
-      document.getElementById('adminShopkeepersList').innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || (s.owner_name||'').toLowerCase().includes(query) || (s.name||'').toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
+      document.getElementById('adminShopkeepersList').innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || (s.owner_name||'').toLowerCase().includes(query) || (s.shop_name||'').toLowerCase().includes(query) || (s.name||'').toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
         let statusBadge = s.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
         let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber'; 
         let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
         
-        let safeShopName = (s.shop_name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        let displayShopName = s.shop_name || s.name || '-';
+        let safeShopName = displayShopName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         let safeOwnerName = (s.owner_name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
         let safeEmail = (s.email || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
         return `
         <tr class="text-slate-300">
           <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
-          <td><b class="text-white">${s.shop_name || s.name || '-'}</b><br><span class="text-[10px] text-slate-400">${s.owner_name || '-'}</span></td>
+          <td><b class="text-white">${displayShopName}</b><br><span class="text-[10px] text-slate-400">${s.owner_name || '-'}</span></td>
           <td class="text-slate-400">${s.email || '-'}</td>
           <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
           <td class="font-mono text-slate-400">${s.phone || '-'}</td>
@@ -1066,7 +1069,7 @@ window.sendPushNotification = async function() {
           <td class="font-mono text-amber-300/80">${t.customer_aadhaar || t.customer_pan || '-'}</td>
           <td class="text-amber-400 font-bold font-mono">₹${Number(t.amount).toLocaleString('en-IN')}</td>
           <td>${new Date(t.created_at).toLocaleDateString('hi-IN')}</td>
-          <td><span class="text-[10px] ${t.status === 'cleared' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'} px-2 py-0.5 rounded-full font-bold">${t.status.toUpperCase()}</span></td>
+          <td><span class="text-[10px] ${t.status === 'cleared' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-400'} px-2 py-0.5 rounded-full font-bold">${t.status.toUpperCase()}</span></td>
           <td class="text-right pr-2 space-x-1"><button onclick="adminDeleteTx('${t.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-[11px] cursor-pointer">Del</button></td>
         </tr>`).join('') || `<tr><td colspan="8" class="text-center py-6 text-slate-500">कोई लेन-देन नहीं।</td></tr>`;
     }
@@ -1185,7 +1188,7 @@ window.sendPushNotification = async function() {
       let score = calculateSmartScore(maxOverdueDays, totalUnpaid, uniqueShopsCount);
 
       if (hasUnpaid) {
-        let riskBadge = score >= 90 ? `<span class="text-xs bg-emerald-600 text-white px-3 py-1 rounded-full uppercase">✓ LOW RISK</span>` : (score >= 50 ? `<span class="text-xs bg-amber-600 text-white px-3 py-1 rounded-full uppercase">⚠️ CAUTION</span>` : `<span class="text-xs bg-red-600 text-white px-3 py-1 rounded-full uppercase">🚨 HIGH RISK</span>`);
+        let riskBadge = score >= 90 ? `<span class="text-xs bg-emerald-600 text-white px-3 py-1 rounded-full uppercase">✓ LOW RISK</span>` : (score >= 50 ? `<span class="text-xs bg-amber-600 text-white px-3 py-1 rounded-full uppercase">⚠️️ CAUTION</span>` : `<span class="text-xs bg-red-600 text-white px-3 py-1 rounded-full uppercase">🚨 HIGH RISK</span>`);
         card.className = `mt-4 p-5 rounded-2xl border text-white shadow-xl space-y-3 ${score >= 90 ? "bg-emerald-950/30 border-emerald-500/60" : (score >= 50 ? "bg-amber-950/30 border-amber-500/60" : "bg-red-950/40 border-red-500/60")}`;
         
         card.innerHTML = `
