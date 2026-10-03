@@ -15,10 +15,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <!-- Firebase App & Messaging SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
 
   <style>
     body {
@@ -50,20 +46,7 @@
       </div>
 
       <div class="flex items-center gap-3">
-        <div class="relative flex items-center gap-1">
-          <button onclick="checkGlobalBroadcast()" class="relative bg-slate-800 hover:bg-slate-700 text-amber-400 p-2 rounded-xl text-xs transition cursor-pointer" title="ग्लोबल अलर्ट">
-            <i data-lucide="bell" class="w-4 h-4"></i>
-            <span id="broadcastDot" class="hidden absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
-          </button>
-          <button onclick="clearGlobalBroadcast()" class="bg-slate-900 hover:bg-red-950 text-slate-400 hover:text-red-300 p-2 rounded-xl text-xs transition cursor-pointer border border-slate-800" title="ग्लोबल नोटिफिकेशन हटाएं">
-            <i data-lucide="bell-off" class="w-4 h-4"></i>
-          </button>
-        </div>
-
         <div id="userBadge" class="hidden flex items-center gap-3">
-          <button onclick="requestNotificationPermission()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 p-2 rounded-xl text-xs transition cursor-pointer flex items-center gap-1" title="नोटिफिकेशन चालू करें">
-            <i data-lucide="bell-ring" class="w-4 h-4"></i>
-          </button>
           <div class="text-xs bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-full flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span id="shopkeeperDisplayCode" class="font-mono font-bold text-amber-300"></span>
@@ -103,9 +86,6 @@
         <div>
           <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
           <p class="text-[11px] text-slate-400">सेंट्रल कम्युनिटी रजिस्ट्री • लाइव क्लाउड डेटा सिंक</p>
-        </div>
-        <div class="flex gap-2">
-          <button onclick="openAppealModal()" class="bg-slate-800 hover:bg-slate-750 border border-slate-700 text-blue-400 font-bold px-3 py-2 rounded-xl text-xs transition cursor-pointer">अपील / सुधार भेजें</button>
         </div>
       </section>
 
@@ -228,13 +208,10 @@
         <button id="adminTab3" onclick="switchAdminSection('transactions')" class="pb-2.5 text-slate-400 cursor-pointer">बल्क CSV व लेन-देन</button>
         <button id="adminTab4" onclick="switchAdminSection('analytics')" class="pb-2.5 text-slate-400 cursor-pointer">एनालिटिक्स & चार्ट्स</button>
         <button id="adminTab5" onclick="switchAdminSection('audit')" class="pb-2.5 text-slate-400 cursor-pointer">एक्टिविटी लॉग</button>
-        <button id="adminTab6" onclick="switchAdminSection('settings')" class="pb-2.5 text-slate-400 cursor-pointer">इंजन रूल्स & ब्रॉडकास्ट</button>
       </div>
 
       <!-- SECTION A: SHOPKEEPERS MASTER -->
       <div id="secShopkeepers" class="space-y-5">
-        
-        <!-- नया दुकानदार रजिस्टर करने का फॉर्म -->
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
           <h2 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2">
             <i data-lucide="user-plus" class="w-4 h-4"></i> नया दुकानदार रजिस्टर करें (Admin Access)
@@ -296,12 +273,6 @@
       <!-- SECTION B: ALL CUSTOMERS MASTER -->
       <div id="secCustomers" class="hidden space-y-5">
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
-          <div class="flex justify-between items-center">
-            <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-              <i data-lucide="contact" class="w-4 h-4 text-emerald-400"></i> सभी ग्राहक व अपील रिक्वेस्ट (Dispute Center)
-            </h2>
-          </div>
-          <div id="adminAppealsBox" class="space-y-2 mb-4"></div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
               <thead class="text-slate-400 uppercase border-b border-slate-800 bg-slate-950/40 font-mono">
@@ -331,37 +302,12 @@
               <h2 class="text-sm font-bold text-slate-100 flex items-center gap-2">
                 <i data-lucide="folder-input" class="w-4 h-4 text-blue-400"></i> एडमिन मास्टर बल्क CSV अपलोड
               </h2>
-              <p class="text-[11px] text-slate-400 mt-0.5">फॉर्मेट: ShopID, Name, Mobile, Amount, Aadhaar, PAN, Date, Notes</p>
             </div>
-            <button onclick="downloadAdminSampleCSV()" class="text-[11px] text-amber-400 hover:underline flex items-center gap-1 font-bold cursor-pointer">
-              <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> सैंपल CSV
-            </button>
           </div>
           <label class="inline-flex bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs items-center gap-2 cursor-pointer transition shadow">
             <i data-lucide="upload" class="w-4 h-4"></i> CSV फ़ाइल चुनें और अपलोड करें
             <input type="file" id="adminCsvInput" accept=".csv" onchange="importAdminCSV(event)" class="hidden" />
           </label>
-        </section>
-
-        <!-- ADMIN DIRECT TRANSACTION FORM -->
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
-          <h2 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2">
-            <i data-lucide="file-plus" class="w-4 h-4"></i> एडमिन डायरेक्ट लेन-देन दर्ज करें
-          </h2>
-          <form onsubmit="adminAddTransactionDirect(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
-            <input type="text" id="admTxShopCode" placeholder="दुकान ID *" required class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 uppercase font-mono text-white outline-none focus:border-amber-400" />
-            <input type="text" id="admTxCustName" placeholder="ग्राहक का नाम *" required class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-amber-400" />
-            <input type="tel" id="admTxPhone" placeholder="मोबाइल नंबर *" required maxlength="10" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 font-mono text-white outline-none focus:border-amber-400" />
-            <input type="text" id="admTxAadhaar" placeholder="पहचान संख्या" maxlength="12" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 font-mono text-white outline-none focus:border-amber-400" />
-            <input type="text" id="admTxPan" placeholder="पैन कार्ड" maxlength="10" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 uppercase font-mono text-white outline-none focus:border-amber-400" />
-            <input type="number" id="admTxAmount" placeholder="रकम (₹) *" required class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-amber-400 font-bold outline-none focus:border-amber-400 font-mono" />
-            <div>
-              <label class="block text-[10px] text-slate-400 mb-1">उधारी की तारीख</label>
-              <input type="date" id="admTxDate" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono outline-none focus:border-amber-400" />
-            </div>
-            <input type="text" id="admTxNotes" placeholder="नोट / विवरण" class="md:col-span-2 lg:col-span-3 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-amber-400" />
-            <button type="submit" class="md:col-span-2 lg:col-span-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-400 font-bold py-2.5 rounded-xl text-xs transition cursor-pointer shadow">मास्टर लेन-देन सेव करें</button>
-          </form>
         </section>
 
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
@@ -425,54 +371,9 @@
         </section>
       </div>
 
-      <!-- SECTION F: SCORING ENGINE RULES & GLOBAL BROADCAST -->
-      <div id="secSettings" class="hidden space-y-5">
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4">
-          <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
-            <i data-lucide="sliders" class="w-4 h-4"></i> क्रेडिट स्कोरिंग इंजन रूल्स (Scoring Rules Configuration)
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-            <div class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl space-y-1">
-              <span class="text-slate-400">30 दिन पुरानी उधारी पेनल्टी</span>
-              <input type="number" id="rule30" value="15" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-amber-400 font-bold" />
-            </div>
-            <div class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl space-y-1">
-              <span class="text-slate-400">90 दिन पुरानी उधारी पेनल्टी</span>
-              <input type="number" id="rule90" value="35" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-red-400 font-bold" />
-            </div>
-            <div class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl space-y-1">
-              <span class="text-slate-400">180 दिन पुरानी उधारी पेनल्टी</span>
-              <input type="number" id="rule180" value="50" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-red-500 font-bold" />
-            </div>
-          </div>
-          <button onclick="alert('✓ स्कोरिंग रूल्स सफलतापूर्वक अपडेट हो गए हैं!')" class="bg-slate-800 hover:bg-slate-750 text-amber-400 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">नियम सेव करें</button>
-        </section>
-
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
-          <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
-            <i data-lucide="megaphone" class="w-4 h-4"></i> ग्लोबल रिस्क ब्रॉडकास्ट नोटिफिकेशन (Global Risk Broadcast)
-          </h2>
-          <textarea id="broadcastInput" rows="3" placeholder="सभी दुकानदारों के लिए चेतावनी या सूचना यहाँ टाइप करें..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white outline-none focus:border-amber-400"></textarea>
-          <button onclick="publishGlobalBroadcast()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer shadow">पूरे नेटवर्क पर ब्रॉडकास्ट भेजें</button>
-        </section>
-      </div>
-
     </div>
 
   </main>
-
-  <!-- ================= APPEAL MODAL ================= -->
-  <div id="appealModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 max-w-md w-full rounded-3xl p-6 space-y-4 shadow-2xl">
-      <h3 class="text-sm font-bold text-amber-400">एडमिन को सुधार या अपील भेजें</h3>
-      <input type="text" id="appealCustPhone" placeholder="संबंधित ग्राहक का मोबाइल नंबर *" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono" />
-      <textarea id="appealReason" rows="3" placeholder="अपील का कारण या सुधार की मांग (जैसे भुगतान हो चुका है)..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white outline-none"></textarea>
-      <div class="flex gap-2">
-        <button onclick="submitAppeal()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer">अपील सबमिट करें</button>
-        <button onclick="closeAppealModal()" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs cursor-pointer">रद्द करें</button>
-      </div>
-    </div>
-  </div>
 
   <!-- ================= EDIT SHOPKEEPER MODAL ================= -->
   <div id="editShopModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur flex items-center justify-center p-4">
@@ -488,7 +389,6 @@
         <label class="block text-[10px] text-slate-400 mb-1">मालिक का नाम (Owner Name)</label>
         <input type="text" id="editShop_OwnerNameInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
       </div>
-
       <div>
         <label class="block text-[10px] text-slate-400 mb-1">शहर (City)</label>
         <input type="text" id="editShop_CityInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase outline-none" />
@@ -512,30 +412,6 @@
     </div>
   </div>
 
-  <!-- ================= EDIT CUSTOMER MODAL ================= -->
-  <div id="editCustomerModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 max-w-md w-full rounded-3xl p-6 space-y-4 shadow-2xl">
-      <h3 class="text-sm font-bold text-amber-400">ग्राहक विवरण संपादित करें (Edit Customer)</h3>
-      <input type="hidden" id="editCustomerPhoneKey" />
-      <div>
-        <label class="block text-[10px] text-slate-400 mb-1">ग्राहक का नाम</label>
-        <input type="text" id="editCustomerNameInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
-      </div>
-      <div>
-        <label class="block text-[10px] text-slate-400 mb-1">पहचान पत्र</label>
-        <input type="text" id="editCustomerAadhaarInput" maxlength="12" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono" />
-      </div>
-      <div>
-        <label class="block text-[10px] text-slate-400 mb-1">पैन कार्ड (PAN)</label>
-        <input type="text" id="editCustomerPanInput" maxlength="10" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase outline-none font-mono" />
-      </div>
-      <div class="flex gap-2 pt-2">
-        <button type="button" onclick="saveCustomerEdit()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer">ग्राहक अपडेट सेव करें</button>
-        <button type="button" onclick="closeEditCustomerModal()" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs cursor-pointer">रद्द करें</button>
-      </div>
-    </div>
-  </div>
-
   <!-- ================= FOOTER ================= -->
   <footer class="bg-slate-900/50 border-t border-slate-800/80 p-3 text-center text-xs text-slate-400">
     <span>LEN-DEN P2P Registry • Supabase लाइव सिंक सक्रिय</span>
@@ -548,61 +424,11 @@
     const SUPABASE_KEY = "sb_publishable_o534-o_bYy_aRRjXh0W0fA_WcK9Drem";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyAWXEsrIsVnis90OysP_o1HJxvb7MsA0_o",
-      authDomain: "lendenregistry.firebaseapp.com",
-      projectId: "lendenregistry",
-      storageBucket: "lendenregistry.firebasestorage.app",
-      messagingSenderId: "352293736048",
-      appId: "1:352293736048:web:b2f6de441f64470bd12eb5"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging();
-
     let rawAdminShopkeepers = []; 
     let rawAdminTxs = []; 
-    let rawAppeals = []; 
     let rawAuditLogs = []; 
     let currentUser = null; 
     let searchMode = 'ALL';
-
-    window.sendPushNotification = async function() {
-      try {
-        const response = await fetch('https://sjxckncjxxqoymjtydpz.supabase.co/functions/v1/send-notification', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer sb_publishable_o534-o_bYy_aRRjXhOW0fA_Wck9Drem`
-          }
-        });
-        const result = await response.json();
-        console.log("Notification Response:", result);
-      } catch (err) {
-        console.error("Error:", err);
-      }
-    };
-
-    async function requestNotificationPermission() {
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          const token = await messaging.getToken({ vapidKey: 'BB58YX9-2cqmdp421w6yeo34T8RDmwxalOFD_HT4sNm4Kh8hNWPPyZXiNgeHAJoy21euPfKUDVshGWuRRUZOTBU' });
-          
-          if (token && currentUser && currentUser.shop_id) {
-            await supabaseClient
-              .from('shopkeepers')
-              .update({ fcm_token: token })
-              .eq('shop_id', currentUser.shop_id);
-            alert("✓ पुश नोटिफिकेशन सफलता से चालू हो गए हैं!");
-          }
-        } else {
-          alert("नोटिफिकेशन की अनुमति नहीं दी गई।");
-        }
-      } catch (err) {
-        console.error("FCM Token Error:", err);
-      }
-    }
 
     async function signInWithGoogle() {
       const btnMsg = document.getElementById('authStatusMsg'); 
@@ -699,7 +525,6 @@
           shopkeepers: rawAdminShopkeepers, 
           transactions: rawAdminTxs, 
           auditLogs: rawAuditLogs, 
-          appeals: rawAppeals, 
           exportDate: new Date().toISOString() 
       };
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2)); 
@@ -714,52 +539,6 @@
 
     async function logActivity(shopId, actionText) { 
         await supabaseClient.from('audit_logs').insert([{ shop_id: shopId, action: actionText, created_at: new Date().toISOString() }]); 
-    }
-    
-    function openAppealModal() { document.getElementById('appealModal').classList.remove('hidden'); }
-    function closeAppealModal() { document.getElementById('appealModal').classList.add('hidden'); }
-    
-    async function submitAppeal() {
-      const phone = document.getElementById('appealCustPhone').value.trim(); 
-      const reason = document.getElementById('appealReason').value.trim();
-      if(!phone || !reason) { 
-          alert('सभी विवरण भरें!'); 
-          return; 
-      }
-      await supabaseClient.from('audit_logs').insert([{ shop_id: currentUser.shop_id, customer_phone: phone, reason: reason, status: 'pending' }]);
-      alert('✓ आपकी अपील एडमिन को भेज दी गई है!'); 
-      logActivity(currentUser.shop_id, `Submitted appeal for customer phone ${phone}`); 
-      closeAppealModal(); 
-      document.getElementById('appealCustPhone').value = ""; 
-      document.getElementById('appealReason').value = "";
-    }
-
-    async function publishGlobalBroadcast() {
-      const msg = document.getElementById('broadcastInput').value.trim(); 
-      if(!msg) return;
-      localStorage.setItem('ld_global_broadcast', JSON.stringify({ message: msg, time: new Date().toISOString() }));
-      alert('✓ ग्लोबल ब्रॉडकास्ट पूरे नेटवर्क पर लाइव कर दिया गया है!'); 
-      document.getElementById('broadcastInput').value = ""; 
-      document.getElementById('broadcastDot').classList.remove('hidden'); 
-      logActivity("ADMIN", "Published Global Broadcast Notification");
-    }
-
-    function checkGlobalBroadcast() {
-      const data = localStorage.getItem('ld_global_broadcast');
-      if(data) {
-        const obj = JSON.parse(data); 
-        alert(`📢 नेटवर्क ग्लोबल अलर्ट:\n\n${obj.message}\n\n(समय: ${new Date(obj.time).toLocaleString('hi-IN')})`); 
-        document.getElementById('broadcastDot').classList.add('hidden'); 
-        localStorage.setItem('ld_broadcast_read', obj.time); 
-      } else { 
-          alert('कोई नया ग्लोबल ब्रॉडकास्ट अलर्ट उपलब्ध नहीं है।'); 
-      }
-    }
-
-    function clearGlobalBroadcast() {
-      localStorage.removeItem('ld_global_broadcast'); 
-      document.getElementById('broadcastDot').classList.add('hidden'); 
-      alert('✓ ग्लोबल नोटिफिकेशन क्लियर / हटा दिया गया है!');
     }
 
     function setSearchMode(mode) {
@@ -793,40 +572,29 @@
         renderShopkeeperView();
       }
       lucide.createIcons();
-      
-      const bData = localStorage.getItem('ld_global_broadcast');
-      if(bData) {
-        const obj = JSON.parse(bData); 
-        if (localStorage.getItem('ld_broadcast_read') !== obj.time) { 
-            document.getElementById('broadcastDot').classList.remove('hidden'); 
-        }
-      }
     }
 
     function switchAdminSection(sec) {
-      ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit', 'secSettings'].forEach((s, idx) => {
+      ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit'].forEach((s, idx) => {
         document.getElementById(s).classList.toggle('hidden', s !== ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)));
         document.getElementById('adminTab' + (idx+1)).className = s === ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)) ? 'pb-2.5 tab-active cursor-pointer' : 'pb-2.5 text-slate-400 cursor-pointer';
       });
     }
 
     async function renderAdminAll() {
-      const [shopsRes, txsRes, appealsRes, logsRes] = await Promise.all([
+      const [shopsRes, txsRes, logsRes] = await Promise.all([
         supabaseClient.from('shopkeepers').select('*').neq('shop_id', 'JBSMK000001').order('created_at', { ascending: false }),
         supabaseClient.from('transactions').select('*').order('created_at', { ascending: false }),
-        supabaseClient.from('appeals').select('*').order('created_at', { ascending: false }),
         supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(50)
       ]);
       
       rawAdminShopkeepers = shopsRes.data || []; 
       rawAdminTxs = txsRes.data || []; 
-      rawAppeals = appealsRes.data || []; 
       rawAuditLogs = logsRes.data || rawAuditLogs;
       
       updateAdminStats(); 
       renderAnalyticsCharts(); 
       renderAuditLogsList(); 
-      renderAdminAppeals(); 
       filterAdminViews();
     }
 
@@ -904,43 +672,6 @@
       }
     }
 
-    function openEditCustomerModal(phoneKey, currentName, currentAadhaar, currentPan) {
-      document.getElementById('editCustomerPhoneKey').value = phoneKey; 
-      document.getElementById('editCustomerNameInput').value = currentName; 
-      document.getElementById('editCustomerAadhaarInput').value = currentAadhaar !== '-' ? currentAadhaar : ''; 
-      document.getElementById('editCustomerPanInput').value = currentPan !== '-' ? currentPan : ''; 
-      document.getElementById('editCustomerModal').classList.remove('hidden');
-    }
-    
-    function closeEditCustomerModal() { 
-        document.getElementById('editCustomerModal').classList.add('hidden'); 
-    }
-
-    async function saveCustomerEdit() {
-      try {
-          const phoneKey = document.getElementById('editCustomerPhoneKey').value; 
-          const newName = document.getElementById('editCustomerNameInput').value.trim(); 
-          const newAadhaar = document.getElementById('editCustomerAadhaarInput').value.trim(); 
-          const newPan = document.getElementById('editCustomerPanInput').value.trim().toUpperCase();
-          
-          const { error } = await supabaseClient.from('transactions').update({ 
-              customer_name: newName, 
-              customer_aadhaar: newAadhaar || null, 
-              customer_pan: newPan || null 
-          }).eq('customer_phone', phoneKey);
-          
-          if(!error) { 
-              alert('✓ ग्राहक अपडेट सेव हो गया!'); 
-              closeEditCustomerModal(); 
-              renderAdminAll(); 
-          } else {
-              alert('❌ एरर: ' + error.message);
-          }
-      } catch(err) {
-          alert('सिस्टम एरर: ' + err.message);
-      }
-    }
-
     function renderAnalyticsCharts() {
       const cityMap = {}; 
       let safeCount = 0, defaultCount = 0;
@@ -963,16 +694,6 @@
 
     function renderAuditLogsList() {
       document.getElementById('auditLogsList').innerHTML = rawAuditLogs.length ? rawAuditLogs.map(l => `<tr><td class="py-2.5 px-2 text-amber-300">${l.shop_id}</td><td>${l.action}</td><td>${new Date(l.created_at).toLocaleString('hi-IN')}</td></tr>`).join('') : `<tr><td colspan="3" class="text-center py-6 text-slate-500">कोई लॉग उपलब्ध नहीं।</td></tr>`;
-    }
-
-    function renderAdminAppeals() {
-      const pending = rawAppeals.filter(a => a.status === 'pending'); 
-      document.getElementById('adminAppealsBox').innerHTML = pending.length ? `<div class="bg-blue-950/40 border border-blue-800/60 p-3 rounded-2xl space-y-2"><span class="text-xs font-bold text-blue-300">📬 लंबित अपीलें (${pending.length})</span>${pending.map(a => `<div class="flex justify-between items-center text-xs bg-slate-950 p-2.5 rounded-xl border border-slate-800"><span>दुकान: <b>${a.shop_id}</b> | फोन: <b>${a.customer_phone}</b> \vert{} कारण: ${a.reason}</span><button onclick="resolveAppeal('${a.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg font-bold cursor-pointer">हल करें</button></div>`).join('')}</div>` : '';
-    }
-
-    async function resolveAppeal(id) { 
-        await supabaseClient.from('appeals').update({ status: 'resolved' }).eq('id', id); 
-        renderAdminAll(); 
     }
 
     function filterAdminViews() { 
@@ -1043,7 +764,6 @@
       document.getElementById('adminCustomersList').innerHTML = custList.map(c => {
         const uniqueShopsCount = c.shopsSet.size; 
         const score = calculateSmartScore(c.unpaidDays, c.dues, uniqueShopsCount);
-        let safeName = (c.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
         return `
           <tr class="text-slate-300">
@@ -1055,7 +775,7 @@
             <td class="text-slate-300 text-[11px]">${formatOverdueAge(c.unpaidDays)}</td>
             <td><span class="font-mono text-xs ${uniqueShopsCount >= 2 ? 'text-red-400 font-bold' : ''}">${score}/100</span></td>
             <td><span class="text-[10px] ${c.dues > 0 ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'} px-2 py-0.5 rounded-full font-bold uppercase">${c.dues > 0 ? 'PENDING' : 'CLEARED'}</span></td>
-            <td class="text-right pr-2 space-x-1"><button onclick="openEditCustomerModal('${c.phone}', '${safeName}', '${c.aadhaar}', '${c.pan}')" class="bg-blue-900/60 text-blue-300 px-2 py-1 rounded text-[11px] cursor-pointer">Edit</button></td>
+            <td class="text-right pr-2 space-x-1"></td>
           </tr>`;
       }).join('') || `<tr><td colspan="9" class="text-center py-6 text-slate-500">कोई ग्राहक नहीं।</td></tr>`;
     }
@@ -1084,27 +804,6 @@
         if(!confirm("हटाना चाहते हैं?")) return; 
         await supabaseClient.from('shopkeepers').delete().eq('id', id); 
         renderAdminAll(); 
-    }
-    
-    async function adminAddTransactionDirect(e) {
-      e.preventDefault(); 
-      const shopId = document.getElementById('admTxShopCode').value.trim().toUpperCase(); 
-      const customDate = document.getElementById('admTxDate').value;
-      
-      await supabaseClient.from('transactions').insert([{ 
-          shop_id: shopId, 
-          customer_name: document.getElementById('admTxCustName').value.trim(), 
-          customer_phone: document.getElementById('admTxPhone').value.trim(), 
-          customer_aadhaar: document.getElementById('admTxAadhaar').value.trim() || null, 
-          customer_pan: document.getElementById('admTxPan').value.trim().toUpperCase() || null, 
-          amount: parseFloat(document.getElementById('admTxAmount').value), 
-          notes: document.getElementById('admTxNotes').value.trim() || null, 
-          status: "pending", 
-          created_at: customDate ? new Date(customDate).toISOString() : new Date().toISOString() 
-      }]);
-      
-      e.target.reset(); 
-      renderAdminAll();
     }
     
     async function adminDeleteTx(txId) { 
@@ -1188,7 +887,7 @@
       let score = calculateSmartScore(maxOverdueDays, totalUnpaid, uniqueShopsCount);
 
       if (hasUnpaid) {
-        let riskBadge = score >= 90 ? `<span class="text-xs bg-emerald-600 text-white px-3 py-1 rounded-full uppercase">✓ LOW RISK</span>` : (score >= 50 ? `<span class="text-xs bg-amber-600 text-white px-3 py-1 rounded-full uppercase">⚠️️ CAUTION</span>` : `<span class="text-xs bg-red-600 text-white px-3 py-1 rounded-full uppercase">🚨 HIGH RISK</span>`);
+        let riskBadge = score >= 90 ? `<span class="text-xs bg-emerald-600 text-white px-3 py-1 rounded-full uppercase">✓ LOW RISK</span>` : (score >= 50 ? `<span class="text-xs bg-amber-600 text-white px-3 py-1 rounded-full uppercase">⚠ CAUTION</span>` : `<span class="text-xs bg-red-600 text-white px-3 py-1 rounded-full uppercase">🚨 HIGH RISK</span>`);
         card.className = `mt-4 p-5 rounded-2xl border text-white shadow-xl space-y-3 ${score >= 90 ? "bg-emerald-950/30 border-emerald-500/60" : (score >= 50 ? "bg-amber-950/30 border-amber-500/60" : "bg-red-950/40 border-red-500/60")}`;
         
         card.innerHTML = `
@@ -1215,12 +914,17 @@
 
     async function handleAddTransaction(e) {
       e.preventDefault(); 
+      const phoneVal = document.getElementById('txCustPhone').value.trim();
+      if (!/^\d{10}$/.test(phoneVal) \vert{}\vert{} /^(\d)\1{9}$/.test(phoneVal)) {
+          alert("❌ कृपया एक वैध और सही 10-अंकों का मोबाइल नंबर दर्ज करें!");
+          return;
+      }
+
       const customDate = document.getElementById('txDate').value;
-      
       const { error } = await supabaseClient.from('transactions').insert([{ 
           shop_id: currentUser.shop_id, 
           customer_name: document.getElementById('txCustName').value.trim(), 
-          customer_phone: document.getElementById('txCustPhone').value.trim(), 
+          customer_phone: phoneVal, 
           amount: parseFloat(document.getElementById('txAmount').value), 
           customer_aadhaar: document.getElementById('txCustAadhaar').value.trim() || null, 
           customer_pan: document.getElementById('txCustPan').value.trim().toUpperCase() || null, 
