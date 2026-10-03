@@ -432,12 +432,13 @@
 
     async function signInWithGoogle() {
       const btnMsg = document.getElementById('authStatusMsg'); 
-      btnMsg.classList.remove('hidden'); 
-      btnMsg.className = "mt-4 text-xs font-bold text-center text-amber-400 block"; 
-      btnMsg.innerText = "Google से कनेक्ट हो रहा है...";
-      
+      if (btnMsg) {
+        btnMsg.classList.remove('hidden'); 
+        btnMsg.className = "mt-4 text-xs font-bold text-center text-amber-400 block"; 
+        btnMsg.innerText = "Google से कनेक्ट हो रहा है...";
+      }
       const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
-      if (error) btnMsg.innerText = "❌ लॉगिन फेल: " + error.message;
+      if (error && btnMsg) btnMsg.innerText = "❌ लॉगिन फेल: " + error.message;
     }
 
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
@@ -482,10 +483,14 @@
         }
       } else if (event === 'SIGNED_OUT') {
         currentUser = null; 
-        document.getElementById('authView').classList.remove('hidden'); 
-        document.getElementById('shopkeeperDashboard').classList.add('hidden'); 
-        document.getElementById('adminDashboard').classList.add('hidden'); 
-        document.getElementById('userBadge').classList.add('hidden');
+        const authView = document.getElementById('authView');
+        const shopDash = document.getElementById('shopkeeperDashboard');
+        const adminDash = document.getElementById('adminDashboard');
+        const userBadge = document.getElementById('userBadge');
+        if (authView) authView.classList.remove('hidden'); 
+        if (shopDash) shopDash.classList.add('hidden'); 
+        if (adminDash) adminDash.classList.add('hidden'); 
+        if (userBadge) userBadge.classList.add('hidden');
       }
     });
 
@@ -534,7 +539,7 @@
       document.body.appendChild(dlAnchor); 
       dlAnchor.click(); 
       dlAnchor.remove(); 
-      logActivity(currentUser.shop_id, "Downloaded Cloud JSON Backup");
+      if(currentUser && currentUser.shop_id) logActivity(currentUser.shop_id, "Downloaded Cloud JSON Backup");
     }
 
     async function logActivity(shopId, actionText) { 
@@ -550,6 +555,7 @@
         }
       });
       const input = document.getElementById('customerSearchInput');
+      if (!input) return;
       if (mode === 'MOBILE') input.placeholder = "10-अंकों का मोबाइल नंबर दर्ज करें..."; 
       else if (mode === 'AADHAAR') input.placeholder = "12-अंकों का पहचान पत्र नंबर दर्ज करें..."; 
       else if (mode === 'PAN') input.placeholder = "पैन कार्ड नंबर दर्ज करें..."; 
@@ -558,17 +564,23 @@
     }
 
     function initDashboard() {
-      document.getElementById('authView').classList.add('hidden'); 
-      document.getElementById('userBadge').classList.remove('hidden');
+      const authView = document.getElementById('authView');
+      const userBadge = document.getElementById('userBadge');
+      if (authView) authView.classList.add('hidden'); 
+      if (userBadge) userBadge.classList.remove('hidden');
       const displayId = currentUser.shop_id || 'ACTIVE'; 
-      document.getElementById('shopkeeperDisplayCode').innerText = displayId;
+      const displayCode = document.getElementById('shopkeeperDisplayCode');
+      if (displayCode) displayCode.innerText = displayId;
 
       if (currentUser.role === 'admin' || displayId === 'JBSMK000001') {
-        document.getElementById('adminDashboard').classList.remove('hidden'); 
+        const adminDash = document.getElementById('adminDashboard');
+        if (adminDash) adminDash.classList.remove('hidden'); 
         renderAdminAll();
       } else {
-        document.getElementById('shopkeeperDashboard').classList.remove('hidden');
-        document.getElementById('dashShopTitle').innerText = currentUser.shop_name || currentUser.name || currentUser.owner_name || displayId; 
+        const shopDash = document.getElementById('shopkeeperDashboard');
+        const dashTitle = document.getElementById('dashShopTitle');
+        if (shopDash) shopDash.classList.remove('hidden');
+        if (dashTitle) dashTitle.innerText = currentUser.shop_name || currentUser.name || currentUser.owner_name || displayId; 
         renderShopkeeperView();
       }
       lucide.createIcons();
@@ -576,8 +588,10 @@
 
     function switchAdminSection(sec) {
       ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit'].forEach((s, idx) => {
-        document.getElementById(s).classList.toggle('hidden', s !== ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)));
-        document.getElementById('adminTab' + (idx+1)).className = s === ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)) ? 'pb-2.5 tab-active cursor-pointer' : 'pb-2.5 text-slate-400 cursor-pointer';
+        const elem = document.getElementById(s);
+        const tab = document.getElementById('adminTab' + (idx+1));
+        if (elem) elem.classList.toggle('hidden', s !== ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)));
+        if (tab) tab.className = s === ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)) ? 'pb-2.5 tab-active cursor-pointer' : 'pb-2.5 text-slate-400 cursor-pointer';
       });
     }
 
@@ -602,6 +616,12 @@
       e.preventDefault();
       const autoCode = "SRSAM" + Math.floor(1000 + Math.random() * 9000); 
       const shopNameVal = document.getElementById('newShop_ShopName').value.trim();
+      const phoneVal = document.getElementById('newShop_Phone').value.trim();
+
+      if (!/^\d{10}$/.test(phoneVal) \vert{}\vert{} /^(\d)\1{9}$/.test(phoneVal)) {
+          alert("❌ कृपया एक वैध और सही 10-अंकों का मोबाइल नंबर दर्ज करें!");
+          return;
+      }
       
       const { error } = await supabaseClient.from('shopkeepers').insert([{
         shop_id: autoCode,
@@ -609,7 +629,7 @@
         name: shopNameVal,
         owner_name: document.getElementById('newShop_OwnerName').value.trim(),
         email: document.getElementById('newShop_Email').value.trim(),
-        phone: document.getElementById('newShop_Phone').value.trim(),
+        phone: phoneVal,
         city: document.getElementById('newShop_City').value.trim().toUpperCase(),
         pin: document.getElementById('newShop_Pin').value.trim(),
         status: 'active'
@@ -650,6 +670,11 @@
           const pin = document.getElementById('editShop_PinInput').value.trim();
           const email = document.getElementById('editShop_EmailInput').value.trim();
 
+          if (!/^\d{10}$/.test(phone) \vert{}\vert{} /^(\d)\1{9}$/.test(phone)) {
+              alert("❌ कृपया एक वैध और सही 10-अंकों का मोबाइल नंबर दर्ज करें!");
+              return;
+          }
+
           const { error } = await supabaseClient.from('shopkeepers').update({ 
               shop_name: sName,
               name: sName, 
@@ -687,13 +712,22 @@
           }
       });
       
-      document.getElementById('cityAnalyticsContainer').innerHTML = Object.keys(cityMap).length ? Object.entries(cityMap).map(([c, amt]) => `<div class="flex justify-between border-b border-slate-900 pb-1"><span>शहर: <b>${c}</b></span><span class="text-amber-400">₹${amt.toLocaleString('en-IN')}</span></div>`).join('') : '<span class="text-slate-500">कोई डेटा उपलब्ध नहीं</span>';
-      
-      document.getElementById('riskRatioContainer').innerHTML = `<div class="flex justify-between border-b border-slate-900 pb-1 text-red-400"><span>सक्रिय डिफ़ॉल्ट खाते:</span><b>${defaultCount}</b></div><div class="flex justify-between pb-1 text-emerald-400"><span>क्लियर सुरक्षित खाते:</span><b>${safeCount}</b></div>`;
+      const cityContainer = document.getElementById('cityAnalyticsContainer');
+      const riskContainer = document.getElementById('riskRatioContainer');
+
+      if (cityContainer) {
+        cityContainer.innerHTML = Object.keys(cityMap).length ? Object.entries(cityMap).map(([c, amt]) => `<div class="flex justify-between border-b border-slate-900 pb-1"><span>शहर: <b>${c}</b></span><span class="text-amber-400">₹${amt.toLocaleString('en-IN')}</span></div>`).join('') : '<span class="text-slate-500">कोई डेटा उपलब्ध नहीं</span>';
+      }
+      if (riskContainer) {
+        riskContainer.innerHTML = `<div class="flex justify-between border-b border-slate-900 pb-1 text-red-400"><span>सक्रिय डिफ़ॉल्ट खाते:</span><b>${defaultCount}</b></div><div class="flex justify-between pb-1 text-emerald-400"><span>क्लियर सुरक्षित खाते:</span><b>${safeCount}</b></div>`;
+      }
     }
 
     function renderAuditLogsList() {
-      document.getElementById('auditLogsList').innerHTML = rawAuditLogs.length ? rawAuditLogs.map(l => `<tr><td class="py-2.5 px-2 text-amber-300">${l.shop_id}</td><td>${l.action}</td><td>${new Date(l.created_at).toLocaleString('hi-IN')}</td></tr>`).join('') : `<tr><td colspan="3" class="text-center py-6 text-slate-500">कोई लॉग उपलब्ध नहीं।</td></tr>`;
+      const auditList = document.getElementById('auditLogsList');
+      if (auditList) {
+        auditList.innerHTML = rawAuditLogs.length ? rawAuditLogs.map(l => `<tr><td class="py-2.5 px-2 text-amber-300">${l.shop_id}</td><td>${l.action}</td><td>${new Date(l.created_at).toLocaleString('hi-IN')}</td></tr>`).join('') : `<tr><td colspan="3" class="text-center py-6 text-slate-500">कोई लॉग उपलब्ध नहीं।</td></tr>`;
+      }
     }
 
     function filterAdminViews() { 
@@ -708,14 +742,22 @@
       const clearedTxs = rawAdminTxs.filter(t => t.status === 'cleared'); 
       const totalDues = pendingTxs.reduce((acc, t) => acc + Number(t.amount || 0), 0);
       
-      document.getElementById('statShopkeepers').innerText = rawAdminShopkeepers.length; 
-      document.getElementById('statPendingDues').innerText = pendingTxs.length; 
-      document.getElementById('statClearedDues').innerText = clearedTxs.length; 
-      document.getElementById('statTotalDues').innerText = '₹' + totalDues.toLocaleString('en-IN');
+      const statShops = document.getElementById('statShopkeepers');
+      const statPending = document.getElementById('statPendingDues');
+      const statCleared = document.getElementById('statClearedDues');
+      const statTotal = document.getElementById('statTotalDues');
+
+      if (statShops) statShops.innerText = rawAdminShopkeepers.length; 
+      if (statPending) statPending.innerText = pendingTxs.length; 
+      if (statCleared) statCleared.innerText = clearedTxs.length; 
+      if (statTotal) statTotal.innerText = '₹' + totalDues.toLocaleString('en-IN');
     }
 
     function renderFilteredAdminShopkeepers(query) {
-      document.getElementById('adminShopkeepersList').innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || (s.owner_name||'').toLowerCase().includes(query) || (s.shop_name||'').toLowerCase().includes(query) || (s.name||'').toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
+      const listElem = document.getElementById('adminShopkeepersList');
+      if (!listElem) return;
+
+      listElem.innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || (s.owner_name||'').toLowerCase().includes(query) || (s.shop_name||'').toLowerCase().includes(query) || (s.name||'').toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
         let statusBadge = s.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
         let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber'; 
         let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
@@ -738,7 +780,7 @@
             <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-900/60 text-${actionBtnColor}-300 px-2 py-1 rounded text-[11px] cursor-pointer">${actionBtnText}</button>
             <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-[11px] cursor-pointer">Del</button>
           </td>
-        </tr>`
+        </tr>`;
       }).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
     }
 
@@ -761,7 +803,10 @@
       
       let custList = Object.values(custMap).filter(c => !query || c.name.toLowerCase().includes(query) || c.phone.includes(query) || c.aadhaar.toLowerCase().includes(query) || c.pan.toLowerCase().includes(query));
       
-      document.getElementById('adminCustomersList').innerHTML = custList.map(c => {
+      const custElem = document.getElementById('adminCustomersList');
+      if (!custElem) return;
+
+      custElem.innerHTML = custList.map(c => {
         const uniqueShopsCount = c.shopsSet.size; 
         const score = calculateSmartScore(c.unpaidDays, c.dues, uniqueShopsCount);
 
@@ -781,7 +826,10 @@
     }
 
     function renderFilteredAdminTransactions(query) {
-      document.getElementById('adminTxList').innerHTML = rawAdminTxs.filter(t => !query || t.shop_id.toLowerCase().includes(query) || t.customer_name.toLowerCase().includes(query) || t.customer_phone.includes(query)).map(t => `
+      const txElem = document.getElementById('adminTxList');
+      if (!txElem) return;
+
+      txElem.innerHTML = rawAdminTxs.filter(t => !query || t.shop_id.toLowerCase().includes(query) || t.customer_name.toLowerCase().includes(query) || t.customer_phone.includes(query)).map(t => `
         <tr class="text-slate-300 ${t.status === 'cleared' ? 'opacity-60 bg-slate-950/40' : ''}">
           <td class="py-3 px-2 font-mono text-amber-300">${t.shop_id}</td>
           <td class="font-bold text-white">${t.customer_name}</td>
@@ -850,11 +898,12 @@
 
     async function searchCustomerScore() {
       const searchInput = document.getElementById('customerSearchInput'); 
+      if (!searchInput) return;
       const q = searchInput.value.trim(); 
       if (!q) return;
       
       const card = document.getElementById('customerScoreCard'); 
-      card.classList.remove('hidden');
+      if (card) card.classList.remove('hidden');
 
       let query = supabaseClient.from('transactions').select('*');
       if (searchMode === 'MOBILE') query = query.eq('customer_phone', q); 
@@ -886,29 +935,31 @@
       const uniqueShopsCount = shopsSet.size; 
       let score = calculateSmartScore(maxOverdueDays, totalUnpaid, uniqueShopsCount);
 
-      if (hasUnpaid) {
-        let riskBadge = score >= 90 ? `<span class="text-xs bg-emerald-600 text-white px-3 py-1 rounded-full uppercase">✓ LOW RISK</span>` : (score >= 50 ? `<span class="text-xs bg-amber-600 text-white px-3 py-1 rounded-full uppercase">⚠ CAUTION</span>` : `<span class="text-xs bg-red-600 text-white px-3 py-1 rounded-full uppercase">🚨 HIGH RISK</span>`);
-        card.className = `mt-4 p-5 rounded-2xl border text-white shadow-xl space-y-3 ${score >= 90 ? "bg-emerald-950/30 border-emerald-500/60" : (score >= 50 ? "bg-amber-950/30 border-amber-500/60" : "bg-red-950/40 border-red-500/60")}`;
-        
-        card.innerHTML = `
-        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-            ${riskBadge} 
-            <h4 class="font-black text-lg">स्कोर: <span class="${score >= 90 ? 'text-emerald-400' : score >= 50 ? 'text-amber-400' : 'text-red-400'}">${score}</span> / 100</h4>
-        </div>
-        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
-            <div class="font-bold">${custName} ${uniqueShopsCount >= 2 ? '<span class="text-red-400 ml-1">⚠ (Multi-Shop)</span>' : ''}</div>
-            <div class="text-slate-400 font-mono">📱 ${custPhone}</div>
-        </div>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800"><span class="text-slate-400 text-[10px] block">कुल बकाया</span><span class="text-base font-black text-amber-400">₹${totalUnpaid.toLocaleString('en-IN')}</span></div>
-            <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800"><span class="text-slate-400 text-[10px] block">उधारी उम्र</span><span class="text-xs font-bold">${formatOverdueAge(maxOverdueDays)}</span></div>
-        </div>
-        <div class="space-y-1">
-            ${pendingList.map((r, i) => `<div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs flex justify-between"><span>उधारी #${i+1} (${r.shop_id}): <b>₹${r.amount}</b></span>${currentUser.shop_id === r.shop_id ? `<button onclick="clearTransaction('${r.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded">क्लियर</button>` : ''}</div>`).join('')}
-        </div>`;
-      } else {
-        card.className = "mt-4 p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 text-emerald-200";
-        card.innerHTML = `<h4 class="font-extrabold text-white text-base">स्कोर: ${score} / 100</h4><p class="text-xs text-emerald-400">✓ सुरक्षित रिकॉर्ड (उधारी दी जा सकती है)</p>`;
+      if (card) {
+        if (hasUnpaid) {
+          let riskBadge = score >= 90 ? `<span class="text-xs bg-emerald-600 text-white px-3 py-1 rounded-full uppercase">✓ LOW RISK</span>` : (score >= 50 ? `<span class="text-xs bg-amber-600 text-white px-3 py-1 rounded-full uppercase">⚠ CAUTION</span>` : `<span class="text-xs bg-red-600 text-white px-3 py-1 rounded-full uppercase">🚨 HIGH RISK</span>`);
+          card.className = `mt-4 p-5 rounded-2xl border text-white shadow-xl space-y-3 ${score >= 90 ? "bg-emerald-950/30 border-emerald-500/60" : (score >= 50 ? "bg-amber-950/30 border-amber-500/60" : "bg-red-950/40 border-red-500/60")}`;
+          
+          card.innerHTML = `
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+              ${riskBadge} 
+              <h4 class="font-black text-lg">स्कोर: <span class="${score >= 90 ? 'text-emerald-400' : score >= 50 ? 'text-amber-400' : 'text-red-400'}">${score}</span> / 100</h4>
+          </div>
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
+              <div class="font-bold">${custName} ${uniqueShopsCount >= 2 ? '<span class="text-red-400 ml-1">⚠ (Multi-Shop)</span>' : ''}</div>
+              <div class="text-slate-400 font-mono">📱 ${custPhone}</div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800"><span class="text-slate-400 text-[10px] block">कुल बकाया</span><span class="text-base font-black text-amber-400">₹${totalUnpaid.toLocaleString('en-IN')}</span></div>
+              <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800"><span class="text-slate-400 text-[10px] block">उधारी उम्र</span><span class="text-xs font-bold">${formatOverdueAge(maxOverdueDays)}</span></div>
+          </div>
+          <div class="space-y-1">
+              ${pendingList.map((r, i) => `<div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs flex justify-between"><span>उधारी #${i+1} (${r.shop_id}): <b>₹${r.amount}</b></span>${currentUser && currentUser.shop_id === r.shop_id ? `<button onclick="clearTransaction('${r.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded">क्लियर</button>` : ''}</div>`).join('')}
+          </div>`;
+        } else {
+          card.className = "mt-4 p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 text-emerald-200";
+          card.innerHTML = `<h4 class="font-extrabold text-white text-base">स्कोर: ${score} / 100</h4><p class="text-xs text-emerald-400">✓ सुरक्षित रिकॉर्ड (उधारी दी जा सकती है)</p>`;
+        }
       }
     }
 
@@ -947,19 +998,22 @@
     }
 
     async function renderShopkeeperView() {
+      if (!currentUser) return;
       const { data: myTxs } = await supabaseClient.from('transactions').select('*').eq('shop_id', currentUser.shop_id).order('created_at', { ascending: false });
       
-      document.getElementById('shopkeeperTxList').innerHTML = (myTxs || []).map(t => `
-        <tr class="text-slate-300 ${t.status === 'cleared' ? 'opacity-60' : ''}">
-          <td class="py-3 px-2 font-bold text-white">${t.customer_name}</td>
-          <td class="font-mono text-slate-400">${t.customer_phone}</td>
-          <td class="font-mono text-amber-300">${t.customer_aadhaar || t.customer_pan || '-'}</td>
-          <td class="text-amber-400 font-bold font-mono">₹${Number(t.amount).toLocaleString('en-IN')}</td>
-          <td>${new Date(t.created_at).toLocaleDateString('hi-IN')}</td>
-          <td><span class="text-[10px] ${t.status === 'cleared' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-400'} px-2 py-0.5 rounded-full font-bold">${t.status.toUpperCase()}</span></td>
-          <td>${t.status !== 'cleared' ? `<button onclick="clearTransaction('${t.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">क्लियर</button>` : '✓ चुकता'}</td>
-        </tr>`).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई लेन-देन नहीं।</td></tr>`;
-      
+      const txListElem = document.getElementById('shopkeeperTxList');
+      if (txListElem) {
+        txListElem.innerHTML = (myTxs || []).map(t => `
+          <tr class="text-slate-300 ${t.status === 'cleared' ? 'opacity-60' : ''}">
+            <td class="py-3 px-2 font-bold text-white">${t.customer_name}</td>
+            <td class="font-mono text-slate-400">${t.customer_phone}</td>
+            <td class="font-mono text-amber-300">${t.customer_aadhaar || t.customer_pan || '-'}</td>
+            <td class="text-amber-400 font-bold font-mono">₹${Number(t.amount).toLocaleString('en-IN')}</td>
+            <td>${new Date(t.created_at).toLocaleDateString('hi-IN')}</td>
+            <td><span class="text-[10px] ${t.status === 'cleared' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-400'} px-2 py-0.5 rounded-full font-bold">${t.status.toUpperCase()}</span></td>
+            <td>${t.status !== 'cleared' ? `<button onclick="clearTransaction('${t.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">क्लियर</button>` : '✓ चुकता'}</td>
+          </tr>`).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई लेन-देन नहीं।</td></tr>`;
+      }
       lucide.createIcons();
     }
 
