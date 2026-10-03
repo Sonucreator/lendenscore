@@ -618,7 +618,7 @@
       const shopNameVal = document.getElementById('newShop_ShopName').value.trim();
       const phoneVal = document.getElementById('newShop_Phone').value.trim();
 
-      if (!/^\d{10}$/.test(phoneVal) \vert{}\vert{} /^(\d)\1{9}$/.test(phoneVal)) {
+      if (!/^\d{10}$/.test(phoneVal) || /^(\d)\1{9}$/.test(phoneVal)) {
           alert("❌ कृपया एक वैध और सही 10-अंकों का मोबाइल नंबर दर्ज करें!");
           return;
       }
