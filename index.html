@@ -727,7 +727,7 @@ window.sendPushNotification = async function() {
           alert('सभी विवरण भरें!'); 
           return; 
       }
-      await supabaseClient.from('appeals').insert([{ shop_id: currentUser.shop_id, customer_phone: phone, reason: reason, status: 'pending' }]);
+      await supabaseClient.from('audit_logs').insert([{ shop_id: currentUser.shop_id, customer_phone: phone, reason: reason, status: 'pending' }]);
       alert('✓ आपकी अपील एडमिन को भेज दी गई है!'); 
       logActivity(currentUser.shop_id, `Submitted appeal for customer phone ${phone}`); 
       closeAppealModal(); 
