@@ -568,6 +568,22 @@
     let searchMode = 'ALL';
 
     // Notification Permission Lene aur Token Save karne ka function
+    // यह रहा वो छोटा सा फंक्शन जो आपको अपनी बड़ी फाइल में कहीं भी नीचे जोड़ देना है
+window.sendPushNotification = async function() {
+  try {
+    const response = await fetch('https://sjxckncjxxqoymjtydpz.supabase.co/functions/v1/send-notification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer sb_publishable_o534-o_bYy_aRRjXhOW0fA_Wck9Drem`
+      }
+    });
+    const result = await response.json();
+    console.log("Notification Response:", result);
+  } catch (err) {
+    console.error("Error:", err);
+  }
+};
     async function requestNotificationPermission() {
       try {
         const permission = await Notification.requestPermission();
