@@ -997,14 +997,14 @@ window.sendPushNotification = async function() {
         let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber'; 
         let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
         
-        let safeShopName = (s.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        let safeShopName = (s.shop_name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
         let safeOwnerName = (s.owner_name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
         let safeEmail = (s.email || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
         return `
         <tr class="text-slate-300">
           <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
-          <td><b class="text-white">${s.name || '-'}</b><br><span class="text-[10px] text-slate-400">${s.owner_name || '-'}</span></td>
+          <td><b class="text-white">${s.shop_name || s.name || '-'}</b><br><span class="text-[10px] text-slate-400">${s.owner_name || '-'}</span></td>
           <td class="text-slate-400">${s.email || '-'}</td>
           <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
           <td class="font-mono text-slate-400">${s.phone || '-'}</td>
