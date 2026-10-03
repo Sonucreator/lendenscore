@@ -2,1024 +2,249 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>लेन-देन | MASTER REGISTRY</title>
   
-  <meta name="theme-color" content="#020617" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    body {
-      -webkit-tap-highlight-color: transparent;
-      background-color: #020617;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-    .tab-active {
-      border-bottom: 2px solid #f59e0b;
-      color: #f59e0b;
-      font-weight: 700;
-    }
+    body { background-color: #020617; font-family: sans-serif; color: #f8fafc; }
+    .tab-active { border-bottom: 2px solid #f59e0b; color: #f59e0b; font-weight: bold; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between select-none">
+<body class="bg-slate-950 min-h-screen flex flex-col justify-between">
 
-  <!-- ================= TOP STICKY BAR ================= -->
-  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 p-4 sticky top-0 z-50">
+  <header class="bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 p-0.5 shadow-lg shadow-amber-500/20 flex items-center justify-center overflow-hidden">
-          <img id="appLogoImg" src="https://api.dicebear.com/7.x/identicon/svg?seed=LenDenScore" alt="Logo" class="w-full h-full object-cover rounded-2xl" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';" />
-          <div id="logoFallback" class="hidden w-full h-full bg-amber-500 items-center justify-center font-black text-slate-950 text-xl">L</div>
-        </div>
-        <div>
-          <h1 class="font-extrabold text-base tracking-wide text-white">LEN-DEN <span class="text-amber-400">SCORE</span></h1>
-          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-medium">सेंट्रल कम्युनिटी रजिस्ट्री • क्लाउड सिंक</p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <div id="userBadge" class="hidden flex items-center gap-3">
-          <div class="text-xs bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-full flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span id="shopkeeperDisplayCode" class="font-mono font-bold text-amber-300"></span>
-          </div>
-          <button onclick="logout()" class="bg-red-950 hover:bg-red-900 border border-red-800 text-red-300 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
-            <i data-lucide="log-out" class="w-3.5 h-3.5"></i> लॉगआउट
-          </button>
-        </div>
+      <h1 class="font-extrabold text-white text-lg">LEN-DEN <span class="text-amber-400">SCORE</span></h1>
+      <div id="userBadge" class="hidden flex items-center gap-3">
+        <span id="shopkeeperDisplayCode" class="font-mono font-bold text-amber-300 text-xs bg-slate-800 px-3 py-1 rounded-full"></span>
+        <button onclick="logout()" class="bg-red-950 border border-red-800 text-red-300 font-bold px-3 py-1 rounded text-xs">लॉगआउट</button>
       </div>
     </div>
   </header>
 
-  <!-- ================= MAIN APP CONTAINER ================= -->
   <main class="max-w-7xl mx-auto p-4 flex-1 w-full">
-
-    <!-- 1. GMAIL OAUTH LOGIN VIEW -->
-    <div id="authView" class="max-w-md mx-auto mt-10 bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl text-center">
-      <div class="mb-6 flex justify-center">
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 p-0.5 shadow-lg shadow-amber-500/20 flex items-center justify-center">
-          <h1 class="font-black text-slate-950 text-3xl">L</h1>
-        </div>
-      </div>
+    <!-- LOGIN VIEW -->
+    <div id="authView" class="max-w-md mx-auto mt-16 bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-2xl">
       <h2 class="text-xl font-bold text-white mb-2">Len-Den Registry</h2>
-      <p class="text-xs text-slate-400 mb-8">सुरक्षित पहुँच के लिए अपने Google अकाउंट से लॉगिन करें</p>
-      
-      <button onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-200 text-slate-950 font-extrabold py-3.5 rounded-2xl transition text-sm shadow-lg shadow-white/10 cursor-pointer">
-        <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      <p class="text-xs text-slate-400 mb-6">लॉगिन करने के लिए नीचे दिए गए बटन पर क्लिक करें</p>
+      <button onclick="signInWithGoogle()" class="w-full bg-white text-slate-950 font-bold py-3 rounded-xl text-sm shadow cursor-pointer">
         Google (Gmail) से लॉगिन करें
       </button>
-      
-      <div id="authStatusMsg" class="mt-4 text-xs font-bold text-center hidden"></div>
+      <div id="authStatusMsg" class="mt-4 text-xs font-bold text-amber-400 hidden"></div>
     </div>
 
-    <!-- 2. SHOPKEEPER DASHBOARD -->
-    <div id="shopkeeperDashboard" class="hidden space-y-5">
-      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex justify-between items-center">
-        <div>
-          <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
-          <p class="text-[11px] text-slate-400">सेंट्रल कम्युनिटी रजिस्ट्री • लाइव क्लाउड डेटा सिंक</p>
-        </div>
-      </section>
-
-      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
-        <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
-          <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-            <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i> ग्राहक लेन-देन स्कोर व नेटवर्क जांच
-          </h2>
-          <div class="flex gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px]">
-            <button type="button" onclick="setSearchMode('ALL')" id="btnSearchALL" class="px-2.5 py-1 rounded-lg font-bold bg-amber-500 text-slate-950 cursor-pointer">Auto Detect</button>
-            <button type="button" onclick="setSearchMode('MOBILE')" id="btnSearchMOBILE" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white cursor-pointer">📱 मोबाइल</button>
-            <button type="button" onclick="setSearchMode('AADHAAR')" id="btnSearchAADHAAR" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white cursor-pointer">🪪 पहचान पत्र</button>
-            <button type="button" onclick="setSearchMode('PAN')" id="btnSearchPAN" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white cursor-pointer">💳 पैन</button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-          <input type="text" id="customerSearchInput" placeholder="नंबर दर्ज करें (Mobile / Aadhaar / PAN)..." class="md:col-span-3 bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:border-amber-400 uppercase font-mono text-white outline-none" />
-          <button onclick="searchCustomerScore()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-3 rounded-2xl text-sm transition cursor-pointer shadow-md">स्कोर चेक करें</button>
-        </div>
-        <div id="customerScoreCard" class="hidden mt-4 p-4 rounded-2xl border"></div>
-      </section>
-
-      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
-        <h2 class="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
-          <i data-lucide="plus-circle" class="w-4 h-4 text-amber-400"></i> नया सिंगल लेन-देन जोड़ें
-        </h2>
-        <form onsubmit="handleAddTransaction(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-          <input type="text" id="txCustName" placeholder="ग्राहक का नाम *" required class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-amber-400" />
-          <input type="tel" id="txCustPhone" placeholder="मोबाइल नंबर *" required maxlength="10" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono outline-none focus:border-amber-400" />
-          <input type="number" id="txAmount" placeholder="उधारी रकम (₹) *" required class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-amber-400 font-bold font-mono outline-none focus:border-amber-400" />
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-1">उधारी की तारीख (वैकल्पिक)</label>
-            <input type="date" id="txDate" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono outline-none focus:border-amber-400" />
-          </div>
-          <input type="text" id="txCustAadhaar" placeholder="पहचान पत्र संख्या (वैकल्पिक)" maxlength="12" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono outline-none focus:border-amber-400" />
-          <input type="text" id="txCustPan" placeholder="पैन कार्ड (वैकल्पिक)" maxlength="10" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white uppercase font-mono outline-none focus:border-amber-400" />
-          <input type="text" id="txNotes" placeholder="सामान का विवरण / नोट" class="md:col-span-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-amber-400" />
-          
-          <button type="submit" id="txSubmitBtn" class="md:col-span-2 lg:col-span-4 bg-amber-500 hover:bg-amber-400 font-bold text-slate-950 py-3 rounded-xl text-xs transition shadow-md cursor-pointer">+ खाते में उधारी दर्ज करें</button>
+    <!-- DASHBOARD -->
+    <div id="shopkeeperDashboard" class="hidden space-y-4">
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex justify-between items-center">
+        <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
+      </div>
+      
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+        <h2 class="text-xs font-bold text-slate-300 mb-2">नया लेन-देन जोड़ें</h2>
+        <form onsubmit="handleAddTransaction(event)" class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+          <input type="text" id="txCustName" placeholder="ग्राहक का नाम *" required class="bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white outline-none" />
+          <input type="tel" id="txCustPhone" placeholder="मोबाइल नंबर (10 अंक) *" required maxlength="10" class="bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-mono outline-none" />
+          <input type="number" id="txAmount" placeholder="रकम (₹) *" required class="bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-amber-400 font-bold font-mono outline-none" />
+          <button type="submit" class="md:col-span-3 bg-amber-500 font-bold text-slate-950 py-2.5 rounded-xl cursor-pointer">+ उधारी दर्ज करें</button>
         </form>
-      </section>
+      </div>
 
-      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
-        <div class="flex justify-between items-center mb-3">
-          <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-            <i data-lucide="wallet" class="w-4 h-4 text-amber-400"></i> आपकी दुकान का हिसाब
-          </h2>
-          <button onclick="renderShopkeeperView()" class="text-xs text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> रिफ्रेश</button>
-        </div>
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+        <h2 class="text-xs font-bold text-slate-300 mb-2">आपकी दुकान का हिसाब</h2>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
-            <thead class="text-slate-400 uppercase border-b border-slate-800 bg-slate-950/40 font-mono">
+            <thead class="text-slate-400 uppercase border-b border-slate-800">
               <tr>
-                <th class="py-3 px-2">ग्राहक</th>
-                <th>मोबाइल नंबर</th>
-                <th>पहचान पत्र / पैन</th>
-                <th>रकम</th>
-                <th>तारीख / उम्र</th>
-                <th>स्थिति</th>
-                <th>एक्शन</th>
+                <th class="py-2">ग्राहक</th><th>मोबाइल</th><th>रकम</th><th>स्थिति</th><th>एक्शन</th>
               </tr>
             </thead>
-            <tbody id="shopkeeperTxList" class="divide-y divide-slate-800/60 font-medium"></tbody>
+            <tbody id="shopkeeperTxList" class="divide-y divide-slate-800 font-medium"></tbody>
           </table>
         </div>
-      </section>
+      </div>
     </div>
 
-    <!-- 3. FULL MASTER ADMIN DASHBOARD -->
-    <div id="adminDashboard" class="hidden space-y-6">
-
-      <div class="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
-        <div>
-          <h2 class="text-sm font-extrabold text-amber-400 flex items-center gap-2">
-            <i data-lucide="shield-alert" class="w-4 h-4"></i> सुपर एडमिन मास्टर कंट्रोल
-          </h2>
-          <p class="text-[11px] text-slate-400">मास्टर एडमिन एक्सेस एक्टिवेटेड</p>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <button onclick="downloadCloudBackup()" class="bg-blue-950 hover:bg-blue-900 border border-blue-800 text-blue-300 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 transition cursor-pointer">
-            <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i> ऑटो बैकअप (JSON)
-          </button>
-          <button onclick="renderAdminAll()" class="bg-slate-800 hover:bg-slate-750 text-amber-400 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 transition cursor-pointer">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> डेटा सिंक
-          </button>
+    <!-- ADMIN DASHBOARD -->
+    <div id="adminDashboard" class="hidden space-y-4">
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+        <h2 class="text-sm font-bold text-amber-400 mb-2">सुपर एडमिन कंट्रोल पैनल</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="text-slate-400 uppercase border-b border-slate-800">
+              <tr>
+                <th class="py-2">ID</th><th>दुकान / मालिक</th><th>ईमेल</th><th>शहर</th><th>स्थिति</th>
+              </tr>
+            </thead>
+            <tbody id="adminShopkeepersList" class="divide-y divide-slate-800"></tbody>
+          </table>
         </div>
       </div>
-
-      <!-- Admin Search & Filter Bar -->
-      <section class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-4 shadow-xl">
-        <div class="relative w-full">
-          <i data-lucide="search" class="w-4 h-4 text-amber-400 absolute left-4 top-3.5"></i>
-          <input type="text" id="adminUniversalSearch" oninput="filterAdminViews()" placeholder="मास्टर सर्च पैनल: नाम, मोबाइल, पहचान, पैन, दुकान कोड दर्ज करें..." class="w-full bg-slate-950 border border-slate-700 rounded-2xl pl-11 pr-4 py-3 text-sm focus:border-amber-400 font-mono text-amber-300 outline-none" />
-        </div>
-      </section>
-
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow">
-          <div class="text-[11px] text-slate-400">कुल पंजीकृत दुकानें</div>
-          <div id="statShopkeepers" class="text-lg font-black text-amber-400 mt-1 font-mono">0</div>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow">
-          <div class="text-[11px] text-slate-400">सक्रिय लंबित खाते</div>
-          <div id="statPendingDues" class="text-lg font-black text-red-400 mt-1 font-mono">0</div>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow">
-          <div class="text-[11px] text-slate-400">क्लियर (आर्काइव) खाते</div>
-          <div id="statClearedDues" class="text-lg font-black text-emerald-400 mt-1 font-mono">0</div>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow">
-          <div class="text-[11px] text-slate-400">नेटवर्क कुल बकाया</div>
-          <div id="statTotalDues" class="text-lg font-black text-amber-400 mt-1 font-mono">₹0</div>
-        </div>
-      </div>
-
-      <div class="flex flex-wrap border-b border-slate-800 gap-4 text-sm font-semibold">
-        <button id="adminTab1" onclick="switchAdminSection('shopkeepers')" class="pb-2.5 tab-active cursor-pointer">दुकानदार मास्टर</button>
-        <button id="adminTab2" onclick="switchAdminSection('customers')" class="pb-2.5 text-slate-400 cursor-pointer">ग्राहक व स्कोर कंट्रोल</button>
-        <button id="adminTab3" onclick="switchAdminSection('transactions')" class="pb-2.5 text-slate-400 cursor-pointer">बल्क CSV व लेन-देन</button>
-        <button id="adminTab4" onclick="switchAdminSection('analytics')" class="pb-2.5 text-slate-400 cursor-pointer">एनालिटिक्स & चार्ट्स</button>
-        <button id="adminTab5" onclick="switchAdminSection('audit')" class="pb-2.5 text-slate-400 cursor-pointer">एक्टिविटी लॉग</button>
-      </div>
-
-      <!-- SECTION A: SHOPKEEPERS MASTER -->
-      <div id="secShopkeepers" class="space-y-5">
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
-          <h2 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2">
-            <i data-lucide="user-plus" class="w-4 h-4"></i> नया दुकानदार रजिस्टर करें (Admin Access)
-          </h2>
-          <form onsubmit="adminRegisterShopkeeper(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-300 mb-1">दुकान का नाम (Shop Name) *</label>
-              <input type="text" id="newShop_ShopName" required placeholder="जैसे: श्री राधे ज्वैलर्स" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-amber-400" />
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-300 mb-1">मालिक का नाम (Owner Name) *</label>
-              <input type="text" id="newShop_OwnerName" required placeholder="जैसे: अजय वर्मा" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-amber-400" />
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-300 mb-1">ईमेल (Email) *</label>
-              <input type="email" id="newShop_Email" required placeholder="shop@gmail.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-amber-400" />
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-300 mb-1">मोबाइल नंबर *</label>
-              <input type="tel" id="newShop_Phone" required maxlength="10" placeholder="10-अंकों का नंबर" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none font-mono focus:border-amber-400" />
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-300 mb-1">शहर (City) *</label>
-              <input type="text" id="newShop_City" required placeholder="SAMALKHA" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none uppercase focus:border-amber-400" />
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-300 mb-1">लॉगिन पिन (PIN) *</label>
-              <input type="text" id="newShop_Pin" required maxlength="4" placeholder="4-अंकों का पिन" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none font-mono focus:border-amber-400" />
-            </div>
-            <button type="submit" class="md:col-span-1 lg:col-span-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl text-xs transition cursor-pointer shadow mt-2">
-              + नया खाता बनाएं
-            </button>
-          </form>
-        </section>
-
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
-          <h2 class="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
-            <i data-lucide="users" class="w-4 h-4 text-blue-400"></i> सभी पंजीकृत दुकानदार (Pending & Active)
-          </h2>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="text-slate-400 uppercase border-b border-slate-800 bg-slate-950/40 font-mono">
-                <tr>
-                  <th class="py-3 px-2">ID कोड</th>
-                  <th>दुकान / मालिक</th>
-                  <th>ईमेल</th>
-                  <th>शहर</th>
-                  <th>फोन</th>
-                  <th>स्थिति</th>
-                  <th class="text-right pr-2">मास्टर एक्शन</th>
-                </tr>
-              </thead>
-              <tbody id="adminShopkeepersList" class="divide-y divide-slate-800/60 font-medium"></tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <!-- SECTION B: ALL CUSTOMERS MASTER -->
-      <div id="secCustomers" class="hidden space-y-5">
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="text-slate-400 uppercase border-b border-slate-800 bg-slate-950/40 font-mono">
-                <tr>
-                  <th class="py-3 px-2">ग्राहक का नाम</th>
-                  <th>मोबाइल</th>
-                  <th>पहचान पत्र</th>
-                  <th>पैन कार्ड</th>
-                  <th>सक्रिय बकाया</th>
-                  <th>उधारी उम्र</th>
-                  <th>स्कोर</th>
-                  <th>स्थिति</th>
-                  <th class="text-right pr-2">एक्शन</th>
-                </tr>
-              </thead>
-              <tbody id="adminCustomersList" class="divide-y divide-slate-800/60 font-medium"></tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <!-- SECTION C: TRANSACTIONS & BULK CSV (ADMIN ONLY) -->
-      <div id="secTransactions" class="hidden space-y-5">
-        <section class="bg-slate-900/90 border border-blue-500/40 rounded-3xl p-5 shadow-xl space-y-3">
-          <div class="flex justify-between items-center">
-            <div>
-              <h2 class="text-sm font-bold text-slate-100 flex items-center gap-2">
-                <i data-lucide="folder-input" class="w-4 h-4 text-blue-400"></i> एडमिन मास्टर बल्क CSV अपलोड
-              </h2>
-            </div>
-          </div>
-          <label class="inline-flex bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs items-center gap-2 cursor-pointer transition shadow">
-            <i data-lucide="upload" class="w-4 h-4"></i> CSV फ़ाइल चुनें और अपलोड करें
-            <input type="file" id="adminCsvInput" accept=".csv" onchange="importAdminCSV(event)" class="hidden" />
-          </label>
-        </section>
-
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="text-slate-400 uppercase border-b border-slate-800 bg-slate-950/40 font-mono">
-                <tr>
-                  <th class="py-3 px-2">दुकान कोड</th>
-                  <th>ग्राहक</th>
-                  <th>मोबाइल</th>
-                  <th>पहचान पत्र / पैन</th>
-                  <th>रकम</th>
-                  <th>तारीख</th>
-                  <th>स्थिति</th>
-                  <th class="text-right pr-2">मास्टर एक्शन</th>
-                </tr>
-              </thead>
-              <tbody id="adminTxList" class="divide-y divide-slate-800/60 font-medium"></tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <!-- SECTION D: NETWORK ANALYTICS & CHARTS -->
-      <div id="secAnalytics" class="hidden space-y-5">
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4">
-          <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
-            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> नेटवर्क वित्तीय एनालिटिक्स व शहरवार बकाया
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-2">
-              <span class="text-xs font-bold text-slate-300">शहर के अनुसार कुल बकाया वितरण</span>
-              <div id="cityAnalyticsContainer" class="space-y-2 pt-2 text-xs font-mono"></div>
-            </div>
-            <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-2">
-              <span class="text-xs font-bold text-slate-300">डिफ़ॉल्ट बनाम सुरक्षित खाता अनुपात</span>
-              <div id="riskRatioContainer" class="space-y-2 pt-2 text-xs font-mono"></div>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <!-- SECTION E: SHOPKEEPER ACTIVITY TRACKER (AUDIT LOGS) -->
-      <div id="secAudit" class="hidden space-y-5">
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
-          <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-            <i data-lucide="activity" class="w-4 h-4 text-amber-400"></i> दुकानदार गतिविधि और ऑडिट लॉग (Activity Tracker)
-          </h2>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="text-slate-400 uppercase border-b border-slate-800 bg-slate-950/40 font-mono">
-                <tr>
-                  <th class="py-3 px-2">दुकान ID</th>
-                  <th>एक्शन विवरण</th>
-                  <th>समय</th>
-                </tr>
-              </thead>
-              <tbody id="auditLogsList" class="divide-y divide-slate-800/60 font-medium font-mono text-slate-300"></tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
     </div>
-
   </main>
 
-  <!-- ================= EDIT SHOPKEEPER MODAL ================= -->
-  <div id="editShopModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 max-w-md w-full rounded-3xl p-6 space-y-4 shadow-2xl">
-      <h3 class="text-sm font-bold text-amber-400">दुकानदार विवरण संपादित करें (Edit)</h3>
-      <input type="hidden" id="editShopRowId" />
-      
-      <div>
-        <label class="block text-[10px] text-slate-400 mb-1">दुकान का नाम (Shop Name)</label>
-        <input type="text" id="editShop_ShopNameInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
-      </div>
-      <div>
-        <label class="block text-[10px] text-slate-400 mb-1">मालिक का नाम (Owner Name)</label>
-        <input type="text" id="editShop_OwnerNameInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
-      </div>
-      <div>
-        <label class="block text-[10px] text-slate-400 mb-1">शहर (City)</label>
-        <input type="text" id="editShop_CityInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase outline-none" />
-      </div>
-      <div>
-        <label class="block text-[10px] text-slate-400 mb-1">मोबाइल नंबर</label>
-        <input type="tel" id="editShop_PhoneInput" maxlength="10" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono" />
-      </div>
-      <div>
-        <label class="block text-[10px] text-slate-400 mb-1">ईमेल (Email)</label>
-        <input type="email" id="editShop_EmailInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
-      </div>
-      <div>
-        <label class="block text-[10px] text-slate-400 mb-1">पिन (PIN)</label>
-        <input type="text" id="editShop_PinInput" maxlength="4" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono" />
-      </div>
-      <div class="flex gap-2 pt-2">
-        <button type="button" onclick="saveShopkeeperEdit()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer">अपडेट सेव करें</button>
-        <button type="button" onclick="closeEditShopModal()" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs cursor-pointer">रद्द करें</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= FOOTER ================= -->
-  <footer class="bg-slate-900/50 border-t border-slate-800/80 p-3 text-center text-xs text-slate-400">
-    <span>LEN-DEN P2P Registry • Supabase लाइव सिंक सक्रिय</span>
+  <footer class="bg-slate-900 border-t border-slate-800 p-3 text-center text-xs text-slate-400">
+    <span>LEN-DEN Registry • Supabase Active</span>
   </footer>
 
-  <!-- ================= JAVASCRIPT APPLICATION CORE ================= -->
   <script>
-    const MASTER_ADMIN_EMAIL = "admin@gmail.com"; 
+    const MASTER_ADMIN_EMAIL = "admin@gmail.com";
     const SUPABASE_URL = "https://sjxckncjxxqoymjtydpz.supabase.co";
     const SUPABASE_KEY = "sb_publishable_o534-o_bYy_aRRjXh0W0fA_WcK9Drem";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let rawAdminShopkeepers = []; 
-    let rawAdminTxs = []; 
-    let rawAuditLogs = []; 
-    let currentUser = null; 
-    let searchMode = 'ALL';
+    let currentUser = null;
 
     async function signInWithGoogle() {
-      const btnMsg = document.getElementById('authStatusMsg'); 
-      if (btnMsg) {
-        btnMsg.classList.remove('hidden'); 
-        btnMsg.className = "mt-4 text-xs font-bold text-center text-amber-400 block"; 
-        btnMsg.innerText = "Google से कनेक्ट हो रहा है...";
+      const msg = document.getElementById('authStatusMsg');
+      if (msg) {
+        msg.classList.remove('hidden');
+        msg.innerText = "Google से कनेक्ट हो रहा है...";
       }
       const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
-      if (error && btnMsg) btnMsg.innerText = "❌ लॉगिन फेल: " + error.message;
+      if (error && msg) msg.innerText = "❌ लॉगिन फेल: " + error.message;
     }
 
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (session && event === 'SIGNED_IN') {
-        const userEmail = session.user.email; 
-        const userName = session.user.user_metadata.full_name || "Owner";
-        
-        if (userEmail === MASTER_ADMIN_EMAIL) { 
-            currentUser = { shop_id: "JBSMK000001", owner_name: "Master Admin", name: "Master Admin", email: userEmail, role: "admin", status: "active" }; 
-            initDashboard(); 
-            return; 
+        const email = session.user.email;
+        const name = session.user.user_metadata.full_name || "Owner";
+
+        if (email === MASTER_ADMIN_EMAIL) {
+          currentUser = { shop_id: "JBSMK000001", name: "Master Admin", role: "admin" };
+          initUI();
+          return;
         }
 
-        let { data: shopRecord } = await supabaseClient.from('shopkeepers').select('*').eq('email', userEmail).single();
+        let { data: shop } = await supabaseClient.from('shopkeepers').select('*').eq('email', email).single();
 
-        if (!shopRecord) {
-          const autoCode = "SRSAM" + Math.floor(1000 + Math.random() * 9000); 
-          await supabaseClient.from('shopkeepers').insert([{ 
-              shop_id: autoCode, 
-              name: 'New Shop', 
-              shop_name: 'New Shop',
-              owner_name: userName, 
-              email: userEmail, 
-              city: "SAMALKHA", 
-              phone: "0000000000", 
-              pin: "0000", 
-              status: "pending" 
+        if (!shop) {
+          const autoCode = "SRSAM" + Math.floor(1000 + Math.random() * 9000);
+          await supabaseClient.from('shopkeepers').insert([{
+            shop_id: autoCode,
+            name: 'New Shop',
+            shop_name: 'New Shop',
+            owner_name: name,
+            email: email,
+            city: "SAMALKHA",
+            phone: "9876543210",
+            pin: "0000",
+            status: "pending"
           }]);
-          alert("✅ आपका अकाउंट रजिस्टर हो गया है!\n\nलेकिन अभी यह पेंडिंग (Pending) है। कृपया एडमिन द्वारा ID एक्टिवेट होने का इंतज़ार करें।");
-          await supabaseClient.auth.signOut(); 
-          window.location.reload();
-        } else if (shopRecord.status === 'pending') {
-          alert("⏳ आपकी ID अभी भी पेंडिंग है। एडमिन पैनल से अप्रूवल के बाद ही डैशबोर्ड खुलेगा!"); 
+          alert("✅ अकाउंट रजिस्टर हो गया है! एडमिन द्वारा अप्रूवल मिलने के बाद लॉगिन करें।");
           await supabaseClient.auth.signOut();
-        } else if (shopRecord.status === 'blocked') {
-          alert("🚫 आपका अकाउंट एडमिन द्वारा ब्लॉक कर दिया गया है।"); 
+          window.location.reload();
+        } else if (shop.status === 'pending') {
+          alert("⏳ आपकी ID अभी पेंडिंग है।");
+          await supabaseClient.auth.signOut();
+        } else if (shop.status === 'blocked') {
+          alert("🚫 अकाउंट ब्लॉक है।");
           await supabaseClient.auth.signOut();
         } else {
-          currentUser = shopRecord; 
-          initDashboard(); 
-          await logActivity(currentUser.shop_id, "Logged in via Google");
+          currentUser = shop;
+          initUI();
         }
       } else if (event === 'SIGNED_OUT') {
-        currentUser = null; 
-        const authView = document.getElementById('authView');
-        const shopDash = document.getElementById('shopkeeperDashboard');
-        const adminDash = document.getElementById('adminDashboard');
-        const userBadge = document.getElementById('userBadge');
-        if (authView) authView.classList.remove('hidden'); 
-        if (shopDash) shopDash.classList.add('hidden'); 
-        if (adminDash) adminDash.classList.add('hidden'); 
-        if (userBadge) userBadge.classList.add('hidden');
+        currentUser = null;
+        location.reload();
       }
     });
 
-    async function logout() { 
-        await supabaseClient.auth.signOut(); 
+    async function logout() {
+      await supabaseClient.auth.signOut();
     }
 
-    function formatOverdueAge(days) {
-      if (isNaN(days) || days <= 0) return "आज / आगामी";
-      if (days < 30) return `${days} दिन पुराना`;
-      const months = Math.floor(days / 30); 
-      const remDays = days % 30;
-      if (months >= 12) { 
-          const yrs = Math.floor(months / 12); 
-          const remMonths = months % 12; 
-          return `${yrs} वर्ष ${remMonths > 0 ? remMonths + ' माह' : ''} पुराना (${days} दिन)`; 
-      }
-      return `${months} माह ${remDays > 0 ? remDays + ' दिन' : ''} पुराना (${days} दिन)`;
-    }
-
-    function calculateSmartScore(days, totalDues, uniqueShopsCount = 1) {
-      if (days <= 0 && totalDues <= 0) return 100;
-      const months = days / 30; 
-      let amountPenalty = Math.sqrt(totalDues) * 0.5; 
-      let timePenalty = months * 1.2; 
-      let totalPenalty = amountPenalty + timePenalty; 
-      let baseScore = Math.round(100 - totalPenalty);
-      
-      if (uniqueShopsCount >= 2) baseScore -= (100 - baseScore);
-      if (baseScore < 1) baseScore = 1; 
-      if (baseScore > 100) baseScore = 100; 
-      return baseScore;
-    }
-
-    function downloadCloudBackup() {
-      const backupData = { 
-          shopkeepers: rawAdminShopkeepers, 
-          transactions: rawAdminTxs, 
-          auditLogs: rawAuditLogs, 
-          exportDate: new Date().toISOString() 
-      };
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2)); 
-      const dlAnchor = document.createElement('a'); 
-      dlAnchor.setAttribute("href", dataStr); 
-      dlAnchor.setAttribute("download", `lenden_registry_backup_${new Date().toISOString().slice(0,10)}.json`); 
-      document.body.appendChild(dlAnchor); 
-      dlAnchor.click(); 
-      dlAnchor.remove(); 
-      if(currentUser && currentUser.shop_id) logActivity(currentUser.shop_id, "Downloaded Cloud JSON Backup");
-    }
-
-    async function logActivity(shopId, actionText) { 
-        await supabaseClient.from('audit_logs').insert([{ shop_id: shopId, action: actionText, created_at: new Date().toISOString() }]); 
-    }
-
-    function setSearchMode(mode) {
-      searchMode = mode;
-      ['ALL', 'MOBILE', 'AADHAAR', 'PAN'].forEach(m => {
-        const btn = document.getElementById('btnSearch' + m);
-        if (btn) { 
-            btn.className = m === mode ? "px-2.5 py-1 rounded-lg font-bold bg-amber-500 text-slate-950 cursor-pointer" : "px-2.5 py-1 rounded-lg text-slate-400 hover:text-white cursor-pointer"; 
-        }
-      });
-      const input = document.getElementById('customerSearchInput');
-      if (!input) return;
-      if (mode === 'MOBILE') input.placeholder = "10-अंकों का मोबाइल नंबर दर्ज करें..."; 
-      else if (mode === 'AADHAAR') input.placeholder = "12-अंकों का पहचान पत्र नंबर दर्ज करें..."; 
-      else if (mode === 'PAN') input.placeholder = "पैन कार्ड नंबर दर्ज करें..."; 
-      else input.placeholder = "नंबर दर्ज करें (Mobile / Aadhaar / PAN)...";
-      input.focus();
-    }
-
-    function initDashboard() {
+    function initUI() {
       const authView = document.getElementById('authView');
       const userBadge = document.getElementById('userBadge');
-      if (authView) authView.classList.add('hidden'); 
+      if (authView) authView.classList.add('hidden');
       if (userBadge) userBadge.classList.remove('hidden');
-      const displayId = currentUser.shop_id || 'ACTIVE'; 
-      const displayCode = document.getElementById('shopkeeperDisplayCode');
-      if (displayCode) displayCode.innerText = displayId;
+      
+      const codeSpan = document.getElementById('shopkeeperDisplayCode');
+      if (codeSpan) codeSpan.innerText = currentUser.shop_id;
 
-      if (currentUser.role === 'admin' || displayId === 'JBSMK000001') {
+      if (currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001') {
         const adminDash = document.getElementById('adminDashboard');
-        if (adminDash) adminDash.classList.remove('hidden'); 
-        renderAdminAll();
+        if (adminDash) adminDash.classList.remove('hidden');
+        loadAdminData();
       } else {
         const shopDash = document.getElementById('shopkeeperDashboard');
-        const dashTitle = document.getElementById('dashShopTitle');
+        const title = document.getElementById('dashShopTitle');
         if (shopDash) shopDash.classList.remove('hidden');
-        if (dashTitle) dashTitle.innerText = currentUser.shop_name || currentUser.name || currentUser.owner_name || displayId; 
-        renderShopkeeperView();
+        if (title) title.innerText = currentUser.shop_name || currentUser.name || "दुकानदार डैशबोर्ड";
+        loadShopkeeperData();
       }
       lucide.createIcons();
     }
 
-    function switchAdminSection(sec) {
-      ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit'].forEach((s, idx) => {
-        const elem = document.getElementById(s);
-        const tab = document.getElementById('adminTab' + (idx+1));
-        if (elem) elem.classList.toggle('hidden', s !== ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)));
-        if (tab) tab.className = s === ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)) ? 'pb-2.5 tab-active cursor-pointer' : 'pb-2.5 text-slate-400 cursor-pointer';
-      });
-    }
-
-    async function renderAdminAll() {
-      const [shopsRes, txsRes, logsRes] = await Promise.all([
-        supabaseClient.from('shopkeepers').select('*').neq('shop_id', 'JBSMK000001').order('created_at', { ascending: false }),
-        supabaseClient.from('transactions').select('*').order('created_at', { ascending: false }),
-        supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(50)
-      ]);
-      
-      rawAdminShopkeepers = shopsRes.data || []; 
-      rawAdminTxs = txsRes.data || []; 
-      rawAuditLogs = logsRes.data || rawAuditLogs;
-      
-      updateAdminStats(); 
-      renderAnalyticsCharts(); 
-      renderAuditLogsList(); 
-      filterAdminViews();
-    }
-
-    async function adminRegisterShopkeeper(e) {
-      e.preventDefault();
-      const autoCode = "SRSAM" + Math.floor(1000 + Math.random() * 9000); 
-      const shopNameVal = document.getElementById('newShop_ShopName').value.trim();
-      const phoneVal = document.getElementById('newShop_Phone').value.trim();
-
-      if (!/^\d{10}$/.test(phoneVal) || /^(\d)\1{9}$/.test(phoneVal)) {
-          alert("❌ कृपया एक वैध और सही 10-अंकों का मोबाइल नंबर दर्ज करें!");
-          return;
-      }
-      
-      const { error } = await supabaseClient.from('shopkeepers').insert([{
-        shop_id: autoCode,
-        shop_name: shopNameVal,
-        name: shopNameVal,
-        owner_name: document.getElementById('newShop_OwnerName').value.trim(),
-        email: document.getElementById('newShop_Email').value.trim(),
-        phone: phoneVal,
-        city: document.getElementById('newShop_City').value.trim().toUpperCase(),
-        pin: document.getElementById('newShop_Pin').value.trim(),
-        status: 'active'
-      }]);
-      
-      if(!error) { 
-          alert("✓ नया दुकानदार सफलता से जुड़ गया! ID: " + autoCode); 
-          e.target.reset(); 
-          renderAdminAll(); 
-          logActivity("ADMIN", "Registered shop: " + autoCode); 
-      } else { 
-          alert("❌ नया खाता बनाने में एरर: " + error.message); 
-      }
-    }
-
-    function openEditShopModal(id, shop_name, owner_name, city, phone, pin, email) {
-      document.getElementById('editShopRowId').value = id;
-      document.getElementById('editShop_ShopNameInput').value = shop_name;
-      document.getElementById('editShop_OwnerNameInput').value = owner_name;
-      document.getElementById('editShop_CityInput').value = city;
-      document.getElementById('editShop_PhoneInput').value = phone;
-      document.getElementById('editShop_PinInput').value = pin;
-      document.getElementById('editShop_EmailInput').value = email;
-      document.getElementById('editShopModal').classList.remove('hidden');
-    }
-    
-    function closeEditShopModal() { 
-        document.getElementById('editShopModal').classList.add('hidden'); 
-    }
-
-    async function saveShopkeeperEdit() {
-      try {
-          const rowId = document.getElementById('editShopRowId').value;
-          const sName = document.getElementById('editShop_ShopNameInput').value.trim();
-          const oName = document.getElementById('editShop_OwnerNameInput').value.trim();
-          const city = document.getElementById('editShop_CityInput').value.trim().toUpperCase();
-          const phone = document.getElementById('editShop_PhoneInput').value.trim();
-          const pin = document.getElementById('editShop_PinInput').value.trim();
-          const email = document.getElementById('editShop_EmailInput').value.trim();
-
-          if (!/^\d{10}$/.test(phone) \vert{}\vert{} /^(\d)\1{9}$/.test(phone)) {
-              alert("❌ कृपया एक वैध और सही 10-अंकों का मोबाइल नंबर दर्ज करें!");
-              return;
-          }
-
-          const { error } = await supabaseClient.from('shopkeepers').update({ 
-              shop_name: sName,
-              name: sName, 
-              owner_name: oName, 
-              city: city, 
-              phone: phone, 
-              pin: pin, 
-              email: email 
-          }).eq('id', rowId);
-          
-          if(!error) { 
-              alert('✓ विवरण सफलतापूर्वक अपडेट कर दिया गया है!'); 
-              closeEditShopModal(); 
-              renderAdminAll(); 
-          } else {
-              alert('❌ डेटाबेस एरर: ' + error.message);
-          }
-      } catch (err) {
-          alert('सिस्टम एरर: ' + err.message);
-      }
-    }
-
-    function renderAnalyticsCharts() {
-      const cityMap = {}; 
-      let safeCount = 0, defaultCount = 0;
-      
-      rawAdminTxs.forEach(t => { 
-          const shop = rawAdminShopkeepers.find(s => s.shop_id === t.shop_id); 
-          const city = shop ? (shop.city || 'SAM') : 'OTHER'; 
-          if(t.status !== 'cleared') { 
-              cityMap[city] = (cityMap[city] || 0) + Number(t.amount || 0); 
-              defaultCount++; 
-          } else {
-              safeCount++; 
-          }
-      });
-      
-      const cityContainer = document.getElementById('cityAnalyticsContainer');
-      const riskContainer = document.getElementById('riskRatioContainer');
-
-      if (cityContainer) {
-        cityContainer.innerHTML = Object.keys(cityMap).length ? Object.entries(cityMap).map(([c, amt]) => `<div class="flex justify-between border-b border-slate-900 pb-1"><span>शहर: <b>${c}</b></span><span class="text-amber-400">₹${amt.toLocaleString('en-IN')}</span></div>`).join('') : '<span class="text-slate-500">कोई डेटा उपलब्ध नहीं</span>';
-      }
-      if (riskContainer) {
-        riskContainer.innerHTML = `<div class="flex justify-between border-b border-slate-900 pb-1 text-red-400"><span>सक्रिय डिफ़ॉल्ट खाते:</span><b>${defaultCount}</b></div><div class="flex justify-between pb-1 text-emerald-400"><span>क्लियर सुरक्षित खाते:</span><b>${safeCount}</b></div>`;
-      }
-    }
-
-    function renderAuditLogsList() {
-      const auditList = document.getElementById('auditLogsList');
-      if (auditList) {
-        auditList.innerHTML = rawAuditLogs.length ? rawAuditLogs.map(l => `<tr><td class="py-2.5 px-2 text-amber-300">${l.shop_id}</td><td>${l.action}</td><td>${new Date(l.created_at).toLocaleString('hi-IN')}</td></tr>`).join('') : `<tr><td colspan="3" class="text-center py-6 text-slate-500">कोई लॉग उपलब्ध नहीं।</td></tr>`;
-      }
-    }
-
-    function filterAdminViews() { 
-        const q = (document.getElementById('adminUniversalSearch')?.value || '').trim().toLowerCase(); 
-        renderFilteredAdminShopkeepers(q); 
-        renderFilteredAdminCustomers(q); 
-        renderFilteredAdminTransactions(q); 
-    }
-
-    function updateAdminStats() {
-      const pendingTxs = rawAdminTxs.filter(t => t.status !== 'cleared'); 
-      const clearedTxs = rawAdminTxs.filter(t => t.status === 'cleared'); 
-      const totalDues = pendingTxs.reduce((acc, t) => acc + Number(t.amount || 0), 0);
-      
-      const statShops = document.getElementById('statShopkeepers');
-      const statPending = document.getElementById('statPendingDues');
-      const statCleared = document.getElementById('statClearedDues');
-      const statTotal = document.getElementById('statTotalDues');
-
-      if (statShops) statShops.innerText = rawAdminShopkeepers.length; 
-      if (statPending) statPending.innerText = pendingTxs.length; 
-      if (statCleared) statCleared.innerText = clearedTxs.length; 
-      if (statTotal) statTotal.innerText = '₹' + totalDues.toLocaleString('en-IN');
-    }
-
-    function renderFilteredAdminShopkeepers(query) {
-      const listElem = document.getElementById('adminShopkeepersList');
-      if (!listElem) return;
-
-      listElem.innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || (s.owner_name||'').toLowerCase().includes(query) || (s.shop_name||'').toLowerCase().includes(query) || (s.name||'').toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
-        let statusBadge = s.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
-        let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber'; 
-        let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
-        
-        let displayShopName = s.shop_name || s.name || '-';
-        let safeShopName = displayShopName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        let safeOwnerName = (s.owner_name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        let safeEmail = (s.email || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-
-        return `
-        <tr class="text-slate-300">
-          <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
-          <td><b class="text-white">${displayShopName}</b><br><span class="text-[10px] text-slate-400">${s.owner_name || '-'}</span></td>
-          <td class="text-slate-400">${s.email || '-'}</td>
-          <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
-          <td class="font-mono text-slate-400">${s.phone || '-'}</td>
-          <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${s.status}</span></td>
-          <td class="text-right pr-2 space-x-1">
-            <button onclick="openEditShopModal('${s.id}', '${safeShopName}', '${safeOwnerName}', '${s.city || 'SAM'}', '${s.phone || ''}', '${s.pin || ''}', '${safeEmail}')" class="bg-blue-900/60 text-blue-300 px-2 py-1 rounded text-[11px] cursor-pointer">Edit</button>
-            <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-900/60 text-${actionBtnColor}-300 px-2 py-1 rounded text-[11px] cursor-pointer">${actionBtnText}</button>
-            <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-[11px] cursor-pointer">Del</button>
-          </td>
-        </tr>`;
-      }).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
-    }
-
-    function renderFilteredAdminCustomers(query) {
-      const custMap = {}; 
-      const now = new Date();
-      
-      rawAdminTxs.forEach(t => {
-        const key = t.customer_phone; 
-        if (!custMap[key]) {
-            custMap[key] = { name: t.customer_name, phone: t.customer_phone, aadhaar: t.customer_aadhaar || '-', pan: t.customer_pan || '-', dues: 0, unpaidDays: 0, shopsSet: new Set() };
-        }
-        if (t.status !== 'cleared') { 
-            custMap[key].dues += Number(t.amount || 0); 
-            custMap[key].shopsSet.add(t.shop_id); 
-            const diff = Math.floor((now - new Date(t.created_at || now)) / (1000*60*60*24)); 
-            if (diff > custMap[key].unpaidDays) custMap[key].unpaidDays = diff; 
-        }
-      });
-      
-      let custList = Object.values(custMap).filter(c => !query || c.name.toLowerCase().includes(query) || c.phone.includes(query) || c.aadhaar.toLowerCase().includes(query) || c.pan.toLowerCase().includes(query));
-      
-      const custElem = document.getElementById('adminCustomersList');
-      if (!custElem) return;
-
-      custElem.innerHTML = custList.map(c => {
-        const uniqueShopsCount = c.shopsSet.size; 
-        const score = calculateSmartScore(c.unpaidDays, c.dues, uniqueShopsCount);
-
-        return `
-          <tr class="text-slate-300">
-            <td class="py-3 px-2 font-bold text-white">${c.name} ${uniqueShopsCount >= 2 ? '<span class="text-[10px] bg-red-600 text-white px-1.5 py-0.5 rounded font-mono ml-1">2x</span>' : ''}</td>
-            <td class="font-mono text-slate-400">${c.phone}</td>
-            <td class="font-mono text-amber-300/80">${c.aadhaar}</td>
-            <td class="font-mono text-blue-300/80">${c.pan}</td>
-            <td class="text-amber-400 font-bold font-mono">₹${c.dues.toLocaleString('en-IN')}</td>
-            <td class="text-slate-300 text-[11px]">${formatOverdueAge(c.unpaidDays)}</td>
-            <td><span class="font-mono text-xs ${uniqueShopsCount >= 2 ? 'text-red-400 font-bold' : ''}">${score}/100</span></td>
-            <td><span class="text-[10px] ${c.dues > 0 ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'} px-2 py-0.5 rounded-full font-bold uppercase">${c.dues > 0 ? 'PENDING' : 'CLEARED'}</span></td>
-            <td class="text-right pr-2 space-x-1"></td>
-          </tr>`;
-      }).join('') || `<tr><td colspan="9" class="text-center py-6 text-slate-500">कोई ग्राहक नहीं।</td></tr>`;
-    }
-
-    function renderFilteredAdminTransactions(query) {
-      const txElem = document.getElementById('adminTxList');
-      if (!txElem) return;
-
-      txElem.innerHTML = rawAdminTxs.filter(t => !query || t.shop_id.toLowerCase().includes(query) || t.customer_name.toLowerCase().includes(query) || t.customer_phone.includes(query)).map(t => `
-        <tr class="text-slate-300 ${t.status === 'cleared' ? 'opacity-60 bg-slate-950/40' : ''}">
-          <td class="py-3 px-2 font-mono text-amber-300">${t.shop_id}</td>
-          <td class="font-bold text-white">${t.customer_name}</td>
-          <td class="font-mono text-slate-400">${t.customer_phone}</td>
-          <td class="font-mono text-amber-300/80">${t.customer_aadhaar || t.customer_pan || '-'}</td>
-          <td class="text-amber-400 font-bold font-mono">₹${Number(t.amount).toLocaleString('en-IN')}</td>
-          <td>${new Date(t.created_at).toLocaleDateString('hi-IN')}</td>
-          <td><span class="text-[10px] ${t.status === 'cleared' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-400'} px-2 py-0.5 rounded-full font-bold">${t.status.toUpperCase()}</span></td>
-          <td class="text-right pr-2 space-x-1"><button onclick="adminDeleteTx('${t.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-[11px] cursor-pointer">Del</button></td>
-        </tr>`).join('') || `<tr><td colspan="8" class="text-center py-6 text-slate-500">कोई लेन-देन नहीं।</td></tr>`;
-    }
-
-    async function adminToggleBlockShopkeeper(id, currentStatus) { 
-        let newStatus = currentStatus === 'active' ? 'blocked' : 'active'; 
-        await supabaseClient.from('shopkeepers').update({ status: newStatus }).eq('id', id); 
-        renderAdminAll(); 
-    }
-    
-    async function adminDeleteShopkeeper(id) { 
-        if(!confirm("हटाना चाहते हैं?")) return; 
-        await supabaseClient.from('shopkeepers').delete().eq('id', id); 
-        renderAdminAll(); 
-    }
-    
-    async function adminDeleteTx(txId) { 
-        if(!confirm("हटाना चाहते हैं?")) return; 
-        await supabaseClient.from('transactions').delete().eq('id', txId); 
-        renderAdminAll(); 
-    }
-
-    async function importAdminCSV(e) {
-      const file = e.target.files[0]; 
-      if (!file) return; 
-      
-      const reader = new FileReader();
-      reader.onload = async function(evt) {
-        const lines = evt.target.result.split(/\r\n|\n/); 
-        const newRecords = [];
-        
-        for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].trim().split(',');
-          if (cols.length >= 4) { 
-              newRecords.push({ 
-                  shop_id: cols[0].trim().toUpperCase(), 
-                  customer_name: cols[1].trim(), 
-                  customer_phone: cols[2].trim(), 
-                  amount: parseFloat(cols[3].trim()), 
-                  customer_aadhaar: cols[4] ? cols[4].trim() : null, 
-                  customer_pan: cols[5] ? cols[5].trim().toUpperCase() : null, 
-                  created_at: cols[6] ? new Date(cols[6]).toISOString() : new Date().toISOString(), 
-                  status: "pending" 
-              }); 
-          }
-        }
-        
-        if (newRecords.length > 0) { 
-            await supabaseClient.from('transactions').insert(newRecords); 
-            renderAdminAll(); 
-            alert(`✓ ${newRecords.length} रिकॉर्ड अपलोड हो गए!`); 
-        }
-      }; 
-      
-      reader.readAsText(file); 
-      e.target.value = "";
-    }
-
-    async function searchCustomerScore() {
-      const searchInput = document.getElementById('customerSearchInput'); 
-      if (!searchInput) return;
-      const q = searchInput.value.trim(); 
-      if (!q) return;
-      
-      const card = document.getElementById('customerScoreCard'); 
-      if (card) card.classList.remove('hidden');
-
-      let query = supabaseClient.from('transactions').select('*');
-      if (searchMode === 'MOBILE') query = query.eq('customer_phone', q); 
-      else if (searchMode === 'AADHAAR') query = query.eq('customer_aadhaar', q); 
-      else if (searchMode === 'PAN') query = query.ilike('customer_pan', q); 
-      else query = query.or(`customer_phone.eq.${q},customer_aadhaar.eq.${q},customer_pan.ilike.${q}`);
-
-      const { data: custTxs } = await query; 
-      let maxOverdueDays = 0, totalUnpaid = 0, hasUnpaid = false; 
-      const now = new Date(); 
-      let pendingList = []; 
-      let custName = "", custPhone = ""; 
-      const shopsSet = new Set();
-      
-      (custTxs || []).forEach(t => {
-        if (!custName) custName = t.customer_name; 
-        if (!custPhone) custPhone = t.customer_phone;
-        
-        if (t.status !== 'cleared') { 
-            hasUnpaid = true; 
-            totalUnpaid += Number(t.amount || 0); 
-            shopsSet.add(t.shop_id); 
-            const diff = Math.floor((now - new Date(t.created_at || now)) / (1000 * 60 * 60 * 24)); 
-            if (diff > maxOverdueDays) maxOverdueDays = diff; 
-            pendingList.push({ ...t, diffDays: diff }); 
-        }
-      });
-      
-      const uniqueShopsCount = shopsSet.size; 
-      let score = calculateSmartScore(maxOverdueDays, totalUnpaid, uniqueShopsCount);
-
-      if (card) {
-        if (hasUnpaid) {
-          let riskBadge = score >= 90 ? `<span class="text-xs bg-emerald-600 text-white px-3 py-1 rounded-full uppercase">✓ LOW RISK</span>` : (score >= 50 ? `<span class="text-xs bg-amber-600 text-white px-3 py-1 rounded-full uppercase">⚠ CAUTION</span>` : `<span class="text-xs bg-red-600 text-white px-3 py-1 rounded-full uppercase">🚨 HIGH RISK</span>`);
-          card.className = `mt-4 p-5 rounded-2xl border text-white shadow-xl space-y-3 ${score >= 90 ? "bg-emerald-950/30 border-emerald-500/60" : (score >= 50 ? "bg-amber-950/30 border-amber-500/60" : "bg-red-950/40 border-red-500/60")}`;
-          
-          card.innerHTML = `
-          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-              ${riskBadge} 
-              <h4 class="font-black text-lg">स्कोर: <span class="${score >= 90 ? 'text-emerald-400' : score >= 50 ? 'text-amber-400' : 'text-red-400'}">${score}</span> / 100</h4>
-          </div>
-          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
-              <div class="font-bold">${custName} ${uniqueShopsCount >= 2 ? '<span class="text-red-400 ml-1">⚠ (Multi-Shop)</span>' : ''}</div>
-              <div class="text-slate-400 font-mono">📱 ${custPhone}</div>
-          </div>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800"><span class="text-slate-400 text-[10px] block">कुल बकाया</span><span class="text-base font-black text-amber-400">₹${totalUnpaid.toLocaleString('en-IN')}</span></div>
-              <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800"><span class="text-slate-400 text-[10px] block">उधारी उम्र</span><span class="text-xs font-bold">${formatOverdueAge(maxOverdueDays)}</span></div>
-          </div>
-          <div class="space-y-1">
-              ${pendingList.map((r, i) => `<div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs flex justify-between"><span>उधारी #${i+1} (${r.shop_id}): <b>₹${r.amount}</b></span>${currentUser && currentUser.shop_id === r.shop_id ? `<button onclick="clearTransaction('${r.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded">क्लियर</button>` : ''}</div>`).join('')}
-          </div>`;
-        } else {
-          card.className = "mt-4 p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 text-emerald-200";
-          card.innerHTML = `<h4 class="font-extrabold text-white text-base">स्कोर: ${score} / 100</h4><p class="text-xs text-emerald-400">✓ सुरक्षित रिकॉर्ड (उधारी दी जा सकती है)</p>`;
-        }
+    async function loadShopkeeperData() {
+      if (!currentUser) return;
+      const { data: txs } = await supabaseClient.from('transactions').select('*').eq('shop_id', currentUser.shop_id).order('created_at', { ascending: false });
+      const list = document.getElementById('shopkeeperTxList');
+      if (list) {
+        list.innerHTML = (txs || []).map(t => `
+          <tr>
+            <td class="py-2 font-bold text-white">${t.customer_name}</td>
+            <td class="font-mono">${t.customer_phone}</td>
+            <td class="text-amber-400 font-mono">₹${t.amount}</td>
+            <td><span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded font-bold">${t.status}</span></td>
+            <td>${t.status !== 'cleared' ? `<button onclick="clearTx('${t.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs">क्लियर</button>` : 'चुकता'}</td>
+          </tr>
+        `).join('') || `<tr><td colspan="5" class="text-center py-4 text-slate-500">कोई डेटा नहीं</td></tr>`;
       }
     }
 
     async function handleAddTransaction(e) {
-      e.preventDefault(); 
-      const phoneVal = document.getElementById('txCustPhone').value.trim();
-      if (!/^\d{10}$/.test(phoneVal) \vert{}\vert{} /^(\d)\1{9}$/.test(phoneVal)) {
-          alert("❌ कृपया एक वैध और सही 10-अंकों का मोबाइल नंबर दर्ज करें!");
-          return;
+      e.preventDefault();
+      const phone = document.getElementById('txCustPhone').value.trim();
+      if (!/^\d{10}$/.test(phone) \vert{}\vert{} /^(\d)\1{9}$/.test(phone)) {
+        alert("❌ कृपया सही 10-अंकों का मोबाइल नंबर दर्ज करें!");
+        return;
       }
 
-      const customDate = document.getElementById('txDate').value;
-      const { error } = await supabaseClient.from('transactions').insert([{ 
-          shop_id: currentUser.shop_id, 
-          customer_name: document.getElementById('txCustName').value.trim(), 
-          customer_phone: phoneVal, 
-          amount: parseFloat(document.getElementById('txAmount').value), 
-          customer_aadhaar: document.getElementById('txCustAadhaar').value.trim() || null, 
-          customer_pan: document.getElementById('txCustPan').value.trim().toUpperCase() || null, 
-          notes: document.getElementById('txNotes').value.trim() || null, 
-          status: "pending", 
-          created_at: customDate ? new Date(customDate).toISOString() : new Date().toISOString() 
+      const { error } = await supabaseClient.from('transactions').insert([{
+        shop_id: currentUser.shop_id,
+        customer_name: document.getElementById('txCustName').value.trim(),
+        customer_phone: phone,
+        amount: parseFloat(document.getElementById('txAmount').value),
+        status: "pending"
       }]);
-      
-      if (!error) { 
-          renderShopkeeperView(); 
-          e.target.reset(); 
-          alert("✓ लेन-देन दर्ज हो गया!"); 
+
+      if (!error) {
+        alert("✓ लेन-देन दर्ज हो गया!");
+        e.target.reset();
+        loadShopkeeperData();
+      } else {
+        alert("एरर: " + error.message);
       }
     }
 
-    async function clearTransaction(txId) { 
-        if(!confirm("क्लियर करना चाहते हैं?")) return; 
-        await supabaseClient.from('transactions').update({ status: "cleared", cleared_at: new Date().toISOString() }).eq('id', txId); 
-        renderShopkeeperView(); 
+    async function clearTx(id) {
+      if (!confirm("क्लियर करना चाहते हैं?")) return;
+      await supabaseClient.from('transactions').update({ status: 'cleared' }).eq('id', id);
+      loadShopkeeperData();
     }
 
-    async function renderShopkeeperView() {
-      if (!currentUser) return;
-      const { data: myTxs } = await supabaseClient.from('transactions').select('*').eq('shop_id', currentUser.shop_id).order('created_at', { ascending: false });
-      
-      const txListElem = document.getElementById('shopkeeperTxList');
-      if (txListElem) {
-        txListElem.innerHTML = (myTxs || []).map(t => `
-          <tr class="text-slate-300 ${t.status === 'cleared' ? 'opacity-60' : ''}">
-            <td class="py-3 px-2 font-bold text-white">${t.customer_name}</td>
-            <td class="font-mono text-slate-400">${t.customer_phone}</td>
-            <td class="font-mono text-amber-300">${t.customer_aadhaar || t.customer_pan || '-'}</td>
-            <td class="text-amber-400 font-bold font-mono">₹${Number(t.amount).toLocaleString('en-IN')}</td>
-            <td>${new Date(t.created_at).toLocaleDateString('hi-IN')}</td>
-            <td><span class="text-[10px] ${t.status === 'cleared' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-400'} px-2 py-0.5 rounded-full font-bold">${t.status.toUpperCase()}</span></td>
-            <td>${t.status !== 'cleared' ? `<button onclick="clearTransaction('${t.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">क्लियर</button>` : '✓ चुकता'}</td>
-          </tr>`).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई लेन-देन नहीं।</td></tr>`;
+    async function loadAdminData() {
+      const { data: shops } = await supabaseClient.from('shopkeepers').select('*').neq('shop_id', 'JBSMK000001');
+      const list = document.getElementById('adminShopkeepersList');
+      if (list) {
+        list.innerHTML = (shops || []).map(s => `
+          <tr>
+            <td class="py-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
+            <td><b>${s.shop_name || s.name || '-'}</b><br><span class="text-[10px] text-slate-400">${s.owner_name}</span></td>
+            <td class="text-slate-400">${s.email}</td>
+            <td class="font-mono">${s.city}</td>
+            <td><span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold">${s.status}</span></td>
+          </tr>
+        `).join('') || `<tr><td colspan="5" class="text-center py-4 text-slate-500">कोई दुकान नहीं</td></tr>`;
       }
-      lucide.createIcons();
     }
 
-    document.addEventListener('DOMContentLoaded', () => { 
-        lucide.createIcons(); 
-    });
+    document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });
   </script>
 </body>
 </html>
