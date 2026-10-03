@@ -21,7 +21,7 @@
       <h1 class="font-extrabold text-white text-lg">LEN-DEN <span class="text-amber-400">SCORE</span></h1>
       <div id="userBadge" class="hidden flex items-center gap-3">
         <span id="shopkeeperDisplayCode" class="font-mono font-bold text-amber-300 text-xs bg-slate-800 px-3 py-1 rounded-full"></span>
-        <button onclick="logout()" class="bg-red-950 border border-red-800 text-red-300 font-bold px-3 py-1 rounded text-xs">लॉगआउट</button>
+        <button onclick="logout()" class="bg-red-950 border border-red-800 text-red-300 font-bold px-3 py-1 rounded text-xs cursor-pointer">लॉगआउट</button>
       </div>
     </div>
   </header>
@@ -37,7 +37,7 @@
       <div id="authStatusMsg" class="mt-4 text-xs font-bold text-amber-400 hidden"></div>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- SHOPKEEPER DASHBOARD -->
     <div id="shopkeeperDashboard" class="hidden space-y-4">
       <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex justify-between items-center">
         <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
@@ -59,7 +59,11 @@
           <table class="w-full text-left text-xs">
             <thead class="text-slate-400 uppercase border-b border-slate-800">
               <tr>
-                <th class="py-2">ग्राहक</th><th>मोबाइल</th><th>रकम</th><th>स्थिति</th><th>एक्शन</th>
+                <th class="py-2">ग्राहक</th>
+                <th>मोबाइल</th>
+                <th>रकम</th>
+                <th>स्थिति</th>
+                <th>एक्शन</th>
               </tr>
             </thead>
             <tbody id="shopkeeperTxList" class="divide-y divide-slate-800 font-medium"></tbody>
@@ -76,7 +80,11 @@
           <table class="w-full text-left text-xs">
             <thead class="text-slate-400 uppercase border-b border-slate-800">
               <tr>
-                <th class="py-2">ID</th><th>दुकान / मालिक</th><th>ईमेल</th><th>शहर</th><th>स्थिति</th>
+                <th class="py-2">ID</th>
+                <th>दुकान / मालिक</th>
+                <th>ईमेल</th>
+                <th>शहर</th>
+                <th>स्थिति</th>
               </tr>
             </thead>
             <tbody id="adminShopkeepersList" class="divide-y divide-slate-800"></tbody>
@@ -105,7 +113,9 @@
         msg.innerText = "Google से कनेक्ट हो रहा है...";
       }
       const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
-      if (error && msg) msg.innerText = "❌ लॉगिन फेल: " + error.message;
+      if (error && msg) {
+        msg.innerText = "❌ लॉगिन फेल: " + error.message;
+      }
     }
 
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
@@ -149,7 +159,7 @@
         }
       } else if (event === 'SIGNED_OUT') {
         currentUser = null;
-        location.reload();
+        window.location.reload();
       }
     });
 
@@ -191,7 +201,7 @@
             <td class="font-mono">${t.customer_phone}</td>
             <td class="text-amber-400 font-mono">₹${t.amount}</td>
             <td><span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded font-bold">${t.status}</span></td>
-            <td>${t.status !== 'cleared' ? `<button onclick="clearTx('${t.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs">क्लियर</button>` : 'चुकता'}</td>
+            <td>${t.status !== 'cleared' ? `<button onclick="clearTx('${t.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs cursor-pointer">क्लियर</button>` : 'चुकता'}</td>
           </tr>
         `).join('') || `<tr><td colspan="5" class="text-center py-4 text-slate-500">कोई डेटा नहीं</td></tr>`;
       }
@@ -244,7 +254,9 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });
+    document.addEventListener('DOMContentLoaded', () => { 
+      lucide.createIcons(); 
+    });
   </script>
 </body>
 </html>
