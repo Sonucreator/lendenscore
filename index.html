@@ -664,9 +664,11 @@
 
     function checkGlobalBroadcast() {
       const data = localStorage.getItem('ld_global_broadcast');
+      const dot = document.getElementById('broadcastDot');
       if(data) {
         const obj = JSON.parse(data);
-        alert(`📢 नेटवर्क ग्लोबल अलर्ट:\n\n${obj.message}\n\n(समय: ${new Date(obj.time).toLocaleString('hi-IN')})`);
+        if (dot) dot.classList.remove('hidden');
+        console.log("Global Broadcast Active:", obj.message);
       } else {
         alert('कोई नया ग्लोबल ब्रॉडकास्ट अलर्ट उपलब्ध नहीं है।');
       }
@@ -675,6 +677,8 @@
     function clearGlobalBroadcast() {
       localStorage.removeItem('ld_global_broadcast');
       document.getElementById('broadcastDot').classList.add('hidden');
+      const alertBox = document.getElementById('globalAlertBanner,);
+      if (alertBox) alertBox.classList.add('hidden');                                         
       alert('✓ ग्लोबल नोटिफिकेशन क्लियर / हटा दिया गया है!');
     }
 
