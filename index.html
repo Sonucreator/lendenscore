@@ -864,8 +864,8 @@
           <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${s.status}</span></td>
           <td class="text-right pr-2 space-x-1">
             <button onclick="openEditShopModal('${s.id}')" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs">Edit</button>
-            <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-900/60 text-${actionBtnColor}-300 px-2 py-1 rounded text-[11px] cursor-pointer">${actionBtnText}</button>
-            <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-[11px] cursor-pointer">Del</button>
+            <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs">${actionBtnText}</button>
+            <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs">Delete</button>
           </td>
         </tr>`
       }).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
