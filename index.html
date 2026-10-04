@@ -66,7 +66,9 @@
       </div>
     </div>
   </header>
-
+<div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-3 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
+    <span>⭐ डिफ़ॉल्ट सूचना: डेटा लोड हो रहा है...</span>
+</div>
   <!-- ================= SINGLE PERMANENT BANNER ================= -->
   <div class="max-w-7xl mx-auto px-4 mt-3 w-full">
     <div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
@@ -191,6 +193,14 @@
     </div>
 
     <!-- 3. FULL MASTER ADMIN DASHBOARD -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg mt-4">
+    <h3 class="text-md font-bold text-amber-400 mb-3">⚙️ डिफ़ॉल्ट कस्टमर / डिफ़ॉल्टर बैनर सेट करें (केवल एडमिन)</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <input type="text" id="adminDefaulterName" placeholder="कस्टमर का नाम..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+        <input type="number" id="adminDefaulterAmount" placeholder="बकाया राशि (रुपये में)..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+    </div>
+    <button onclick="updateDefaultCustomerBanner()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm w-full">बैनर अपडेट करें</button>
+</div>
     <div id="adminDashboard" class="hidden space-y-6">
 
       <div class="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
@@ -1406,7 +1416,94 @@ async function loadAdminAppeals() {
         console.error('अपील एरर:', err);
     }
 }
+    }// --- एडमिन डिफ़ॉल्टर बैनर और डेटा फिक्स लॉजिक ---
+async function fetchDefaultCustomerBanner() {
+    try {
+        if (typeof supabaseClient === 'undefined') return;
+        const { data, error } = await supabaseClient
+            .from('settings')
+            .select('value')
+            .eq('key', 'default_customer_banner')
+            .single();
+
+        const permBanner = document.getElementById('permanentCustomBanner');
+        if (permBanner && data && data.value) {
+            permBanner.innerHTML = `<span>⚠️ <b>डिफ़ॉल्ट / डिफ़ॉल्टर सूचना:</b> ${data.value}</span>`;
+        }
+    } catch (err) {
+        console.log('बैनर लोड हो रहा है...');
     }
+}
+
+async function updateDefaultCustomerBanner() {
+    const custName = document.getElementById('adminDefaulterName')?.value.trim();
+    const defAmount = document.getElementById('adminDefaulterAmount')?.value.trim();
+
+    if (!custName) {
+        alert('कृपया डिफ़ॉल्ट कस्टमर का नाम दर्ज करें।');
+        return;
+    }
+
+    const bannerText = defAmount ? `${custName} - बक़ाया राशि: ₹${defAmount}` : custName;
+
+    try {
+        const { error } = await supabaseClient
+            .from('settings')
+            .upsert({ key: 'default_customer_banner', value: bannerText });
+
+        if (error) {
+            alert('डिफ़ॉल्टर बैनर सेव करने में विफल।');
+            return;
+        }
+
+        alert('सफलतापूर्वक! डिफ़ॉल्ट कस्टमर/डिफ़ॉल्टर बैनर अपडेट कर दिया गया है।');
+        fetchDefaultCustomerBanner();
+        document.getElementById('adminDefaulterName').value = '';
+        document.getElementById('adminDefaulterAmount').value = '';
+    } catch (err) {
+        console.error('एरर:', err);
+    }
+}
+
+// JSON बैकअप पॉप-अप के साथ
+function downloadCloudBackup() {
+    try {
+        const backupData = {
+            shopkeepers: typeof rawAdminShopkeepers !== 'undefined' ? rawAdminShopkeepers : [],
+            timestamp: new Date().toISOString()
+        };
+        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `shri_radhe_radhe_jewellers_backup_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert('सफलतापूर्वक! JSON बैकअप फाइल डाउनलोड हो गई है।');
+    } catch (err) {
+        alert('JSON डाउनलोड करने में विफल रहा।');
+    }
+}
+
+// डेटा सिंक फंक्शन
+async function syncCloudData() {
+    alert('डेटा सिंक किया जा रहा है...');
+    try {
+        if (typeof loadAdminAppeals === 'function') await loadAdminAppeals();
+        await fetchDefaultCustomerBanner();
+        if (typeof renderAdminAll === 'function') renderAdminAll();
+        alert('डेटा सफलतापूर्वक सिंक हो गया है!');
+    } catch (error) {
+        alert('डेटा सिंक करने में विफल।');
+    }
+}
+
+// पेज लोड होते ही बैनर फेच करें
+document.addEventListener('DOMContentLoaded', () => {
+    fetchDefaultCustomerBanner();
+});
   </script>
 </body>
 </html>
