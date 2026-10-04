@@ -560,12 +560,6 @@
         lucide.createIcons();
       }
       
-      // सेट परमानेंट बैनर टेक्स्ट (यहाँ आप अपना नाम या डिफ़ॉल्ट कस्टमर बदल सकते हैं)
-      const permBanner = document.getElementById('permanentCustomBanner');
-      if (permBanner) {
-        permBanner.innerHTML = `<span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>`;
-      }
-
       // एडमिन पैनल के लिए अपील डेटा लोड करना
       loadAdminAppeals();
 
@@ -1346,13 +1340,17 @@ async function loadMasterDataManually() {
             window.rawAdminShopkeepers = shopData;
             const shopTable = document.getElementById('adminShopkeepersTableBody'); 
             if (shopTable) {
-                shopTable.innerHTML = shopData.map(s => `
-                    <tr class="border-b border-slate-800 hover:bg-slate-800/50">
-                        <td class="px-4 py-2 font-mono text-amber-300">${s.code || s.shop_code || s.id}</td>
-                        <td class="px-4 py-2">${s.name || s.shop_name || 'N/A'}</td>
-                        <td class="px-4 py-2">${s.status || 'Active'}</td>
-                    </tr>
-                `).join('');
+               shopTableBody.innerHTML = shopData.map(s => `
+    <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+        <td class="px-4 py-3 font-mono text-amber-300">${s.code || s.shop_code || s.id || 'N/A'}</td>
+        <td class="px-4 py-3">
+            <div class="font-bold text-white">${s.shop_name || s.name || 'श्री राधे राधे ज्वेलर्स'}</div>
+            <div class="text-xs text-slate-400">${s.owner_name || s.owner || 'दुकानदार'}</div>
+        </td>
+        <td class="px-4 py-3 text-xs text-slate-300">${s.email || s.shop_email || 'N/A'}</td>
+        <td class="px-4 py-3">${s.city || 'Samalkha'}</td>
+    </tr>
+`).join('');
             }
         }
     } catch (e) {
