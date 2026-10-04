@@ -47,13 +47,13 @@
 
       <div class="flex items-center gap-3">
         <div class="relative flex items-center gap-1">
-         
-        <button onclick="showGlobalBroadcastNotification()" class="p-2 text-slate-300 hover:text-white relative">
-    <i data-lucide="bell" class="w-5 h-5"></i>
-</button>
-<div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-lg mb-4 text-sm font-semibold flex justify-between items-center shadow-md">
-    <span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
-</div>
+          <!-- Bell Icon -->
+          <button onclick="showGlobalBroadcastNotification()" class="p-2 text-slate-300 hover:text-white relative cursor-pointer">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+            <span id="broadcastDot" class="hidden absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+          </button>
+        </div>
+
         <div id="userBadge" class="hidden flex items-center gap-3">
           <div class="text-xs bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-full flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -66,31 +66,35 @@
       </div>
     </div>
   </header>
-  <!-- 1. परमानेंट बैनर (डिफ़ॉल्ट कस्टमर या मैसेज के लिए) -->
-<div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-lg mb-4 text-sm font-semibold flex justify-between items-center shadow-md">
-    <span>⭐ Default Customer / Notice: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
-</div>
 
-<!-- 2. ग्लोबल नोटिफिकेशन पॉप-अप मॉडल (जो बेल आइकन पर क्लिक करने पर खुलेगा) -->
-<div id="globalNotificationModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl text-slate-100">
-        <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
-            <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2">📢 ग्लोबल ब्रॉडकास्ट अलर्ट</h3>
-            <button onclick="closeGlobalModal()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
-        </div>
-        <div id="globalModalMessage" class="text-sm text-slate-300 mb-6 leading-relaxed">
-            कोई नया अलर्ट उपलब्ध नहीं है।
-        </div>
-        <div class="flex justify-end gap-3">
-            <button onclick="closeGlobalModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium">कैंसिल करें</button>
-            <button onclick="clearGlobalAlert()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium">हटाएं (Clear)</button>
-        </div>
+  <!-- ================= SINGLE PERMANENT BANNER ================= -->
+  <div class="max-w-7xl mx-auto px-4 mt-3 w-full">
+    <div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
+      <span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
     </div>
-</div>
-  <!-- ================= MAIN APP CONTAINER ================= -->
-  <main class="max-w-7xl mx-auto p-4 flex-1 w-full">
+  </div>
 
-    <!-- 1. GMAIL OAUTH LOGIN VIEW (NEW) -->
+  <!-- ================= GLOBAL NOTIFICATION MODAL ================= -->
+  <div id="globalNotificationModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl text-slate-100">
+      <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+        <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2">📢 ग्लोबल ब्रॉडकास्ट अलर्ट</h3>
+        <button onclick="closeGlobalModal()" class="text-slate-400 hover:text-white text-xl font-bold cursor-pointer">&times;</button>
+      </div>
+      <div id="globalModalMessage" class="text-sm text-slate-300 mb-6 leading-relaxed">
+        कोई नया अलर्ट उपलब्ध नहीं है।
+      </div>
+      <div class="flex justify-end gap-3">
+        <button onclick="closeGlobalModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium cursor-pointer">कैंसिल करें</button>
+        <button onclick="clearGlobalAlert()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium cursor-pointer">हटाएं (Clear)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN APP CONTAINER ================= -->
+  <main class="max-w-7xl mx-auto p-4 flex-1 w-full space-y-5">
+
+    <!-- 1. GMAIL OAUTH LOGIN VIEW -->
     <div id="authView" class="max-w-md mx-auto mt-10 bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl text-center">
       <div class="mb-6 flex justify-center">
         <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 p-0.5 shadow-lg shadow-amber-500/20 flex items-center justify-center">
@@ -110,7 +114,6 @@
 
     <!-- 2. SHOPKEEPER DASHBOARD -->
     <div id="shopkeeperDashboard" class="hidden space-y-5">
-      
       <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex justify-between items-center">
         <div>
           <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
@@ -201,28 +204,32 @@
           <button onclick="downloadCloudBackup()" class="bg-blue-950 hover:bg-blue-900 border border-blue-800 text-blue-300 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 transition cursor-pointer">
             <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i> ऑटो बैकअप (JSON)
           </button>
-          <button onclick="renderAdminAll()" class="bg-slate-800 hover:bg-slate-750 text-amber-400 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 transition cursor-pointer">
+          <button onclick="syncCloudData()" class="bg-slate-800 hover:bg-slate-750 text-amber-400 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 transition cursor-pointer">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> डेटा सिंक
           </button>
         </div>
       </div>
-      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 mt-6">
-    <h3 class="text-md font-bold text-amber-400 mb-3">📋 शॉपकीपर अपील लिस्ट (Admin Panel)</h3>
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-300">
-            <thead class="bg-slate-800 text-xs uppercase text-slate-400">
-                <tr>
-                    <th class="px-4 py-3">शॉपकीपर कोड</th>
-                    <th class="px-4 py-3">अपील / कारण</th>
-                    <th class="px-4 py-3">समय</th>
-                </tr>
+
+      <!-- Shopkeeper Appeals Table in Admin -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
+        <h3 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2">
+          <i data-lucide="clipboard-list" class="w-4 h-4"></i> शॉपकीपर अपील लिस्ट (Admin Panel)
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-800 text-xs uppercase text-slate-400 font-mono">
+              <tr>
+                <th class="py-3 px-3">शॉपकीपर कोड</th>
+                <th class="py-3 px-3">अपील / कारण</th>
+                <th class="py-3 px-3">समय</th>
+              </tr>
             </thead>
-            <tbody id="adminAppealsTableBody">
-                <tr><td colspan="3" class="text-center py-4 text-slate-500">अपील लोड हो रही हैं...</td></tr>
+            <tbody id="adminAppealsTableBody" class="divide-y divide-slate-800/60 font-medium">
+              <tr><td colspan="3" class="text-center py-4 text-slate-500">अपील लोड हो रही हैं...</td></tr>
             </tbody>
-        </table>
-    </div>
-</div>
+          </table>
+        </div>
+      </div>
 
       <!-- Admin Search & Filter Bar -->
       <section class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-4 shadow-xl">
@@ -335,7 +342,7 @@
           </label>
         </section>
 
-        <!-- ADMIN DIRECT TRANSACTION FORM WITH DATE PICKER -->
+        <!-- ADMIN DIRECT TRANSACTION FORM -->
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
           <h2 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2">
             <i data-lucide="file-plus" class="w-4 h-4"></i> एडमिन डायरेक्ट लेन-देन दर्ज करें
@@ -396,7 +403,7 @@
         </section>
       </div>
 
-      <!-- SECTION E: SHOPKEEPER ACTIVITY TRACKER (AUDIT LOGS) -->
+      <!-- SECTION E: SHOPKEEPER ACTIVITY TRACKER -->
       <div id="secAudit" class="hidden space-y-5">
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
           <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
@@ -521,96 +528,12 @@
 
   <!-- ================= JAVASCRIPT APPLICATION CORE ================= -->
   <script>
-    // ✅ YAHAN APNA MASTER ADMIN EMAIL DAALEIN
     const MASTER_ADMIN_EMAIL = "admin@gmail.com"; 
 
     const SUPABASE_URL = "https://sjxckncjxxqoymjtydpz.supabase.co";
     const SUPABASE_KEY = "sb_publishable_o534-o_bYy_aRRjXh0W0fA_WcK9Drem";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. पेज लोड होते ही आइकन्स और परमानेंट बैनर सेट करें
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-    
-    // परमानेंट बैनर को डिफ़ॉल्ट वैल्यू देना
-    const permBanner = document.getElementById('permanentCustomBanner');
-    if (permBanner) {
-        permBanner.innerHTML = `<span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>`;
-    }
 
-    // 2. एडमिन पैनल के लिए अपील डेटा लोड करना
-    loadAdminAppeals();
-});
-
-// बेल आइकन पर क्लिक करने पर पॉप-अप दिखाने का फंक्शन
-function showGlobalBroadcastNotification() {
-    const data = localStorage.getItem('ld_global_broadcast');
-    const modal = document.getElementById('globalNotificationModal');
-    const msgDiv = document.getElementById('globalModalMessage');
-
-    if (data && modal && msgDiv) {
-        const obj = JSON.parse(data);
-        msgDiv.innerHTML = `
-            <p class="mb-2">${obj.message}</p>
-            <span class="text-xs text-slate-400">समय: ${new Date(obj.time).toLocaleString('hi-IN')}</span>
-        `;
-        modal.classList.remove('hidden');
-    } else {
-        alert('कोई नया ग्लोबल ब्रॉडकास्ट अलर्ट उपलब्ध नहीं है।');
-    }
-}
-
-// पॉप-अप बंद करने का फंक्शन (कैंसिल बटन)
-function closeGlobalModal() {
-    const modal = document.getElementById('globalNotificationModal');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-}
-
-// नोटिफिकेशन पूरी तरह हटाने का फंक्शन (हटाएं बटन)
-function clearGlobalAlert() {
-    localStorage.removeItem('ld_global_broadcast');
-    closeGlobalModal();
-    alert('ग्लोबल ब्रॉडकास्ट अलर्ट हटा दिया गया है।');
-}
-
-// Supabase से शॉपकीपर की अपील फैच करके एडमिन टेबल में दिखाने का फंक्शन
-async function loadAdminAppeals() {
-    try {
-        // सुनिश्चित करें कि आपका supabaseClient ऑब्जेक्ट यहाँ उपलब्ध है
-        if (typeof supabaseClient === 'undefined') return;
-
-        const { data, error } = await supabaseClient
-            .from('appeals')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        const tableBody = document.getElementById('adminAppealsTableBody');
-        if (!tableBody) return;
-
-        if (error) {
-            console.error('अपील लोड करने में त्रुटि:', error);
-            tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-red-400">डेटा लोड करने में विफल</td></tr>`;
-            return;
-        }
-
-        if (data && data.length > 0) {
-            tableBody.innerHTML = data.map(app => `
-                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
-                    <td class="px-4 py-3 font-mono text-amber-300">${app.shopkeeper_code || app.shopkeeper_id || 'N/A'}</td>
-                    <td class="px-4 py-3">${app.message || app.reason || 'विवरण उपलब्ध नहीं'}</td>
-                    <td class="px-4 py-3 text-xs text-slate-400">${new Date(app.created_at).toLocaleString('hi-IN')}</td>
-                </tr>
-            `).join('');
-        } else {
-            tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-slate-500">कोई नई अपील दर्ज नहीं है।</td></tr>`;
-        }
-    } catch (err) {
-        console.error('एरर:', err);
-    }
-}
     let rawAdminShopkeepers = [];
     let rawAdminTxs = [];
     let rawAdminCustomScores = {};
@@ -620,7 +543,30 @@ async function loadAdminAppeals() {
     let searchMode = 'ALL';
 
     // ------------------------------------------------------------
-    // SUPABASE GOOGLE AUTHENTICATION & APPROVAL SYSTEM
+    // DOM LOADED & CORE UI SETUP
+    // ------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+      
+      // सेट परमानेंट बैनर टेक्स्ट (यहाँ आप अपना नाम या डिफ़ॉल्ट कस्टमर बदल सकते हैं)
+      const permBanner = document.getElementById('permanentCustomBanner');
+      if (permBanner) {
+        permBanner.innerHTML = `<span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>`;
+      }
+
+      // एडमिन पैनल के लिए अपील डेटा लोड करना
+      loadAdminAppeals();
+
+      if(localStorage.getItem('ld_global_broadcast')) {
+        const dot = document.getElementById('broadcastDot');
+        if (dot) dot.classList.remove('hidden');
+      }
+    });
+
+    // ------------------------------------------------------------
+    // GOOGLE AUTHENTICATION SYSTEM
     // ------------------------------------------------------------
     async function signInWithGoogle() {
       const btnMsg = document.getElementById('authStatusMsg');
@@ -641,18 +587,15 @@ async function loadAdminAppeals() {
         const userEmail = session.user.email;
         const userName = session.user.user_metadata.full_name || "New Shop";
         
-        // Master Admin Check
         if (userEmail === MASTER_ADMIN_EMAIL) {
           currentUser = { shop_id: "JBSMK000001", name: "Master Admin", email: userEmail, role: "admin", status: "active" };
           initDashboard();
           return;
         }
 
-        // Normal Shopkeeper Check
         let { data: shopRecord, error } = await supabaseClient.from('shopkeepers').select('*').eq('email', userEmail).single();
 
         if (!shopRecord) {
-          // New Registration -> Auto Pending Status
           const autoCode = "SRSAM" + Math.floor(1000 + Math.random() * 9000); 
           await supabaseClient.from('shopkeepers').insert([{ 
             shop_id: autoCode, 
@@ -674,7 +617,6 @@ async function loadAdminAppeals() {
           alert("🚫 आपका अकाउंट एडमिन द्वारा ब्लॉक कर दिया गया है।");
           await supabaseClient.auth.signOut();
         } else {
-          // Active User
           currentUser = shopRecord;
           initDashboard();
           await logActivity(currentUser.shop_id, "Logged in via Google");
@@ -691,9 +633,98 @@ async function loadAdminAppeals() {
     async function logout() {
       await supabaseClient.auth.signOut();
     }
+
     // ------------------------------------------------------------
+    // GLOBAL BROADCAST NOTIFICATIONS & POPUPS
+    // ------------------------------------------------------------
+    function showGlobalBroadcastNotification() {
+      const data = localStorage.getItem('ld_global_broadcast');
+      const modal = document.getElementById('globalNotificationModal');
+      const msgDiv = document.getElementById('globalModalMessage');
 
+      if (data && modal && msgDiv) {
+        const obj = JSON.parse(data);
+        msgDiv.innerHTML = `
+          <p class="mb-2">${obj.message}</p>
+          <span class="text-xs text-slate-400">समय: ${new Date(obj.time).toLocaleString('hi-IN')}</span>
+        `;
+        modal.classList.remove('hidden');
+      } else {
+        alert('कोई नया ग्लोबल ब्रॉडकास्ट अलर्ट उपलब्ध नहीं है।');
+      }
+    }
 
+    function closeGlobalModal() {
+      const modal = document.getElementById('globalNotificationModal');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function clearGlobalAlert() {
+      localStorage.removeItem('ld_global_broadcast');
+      closeGlobalModal();
+      const dot = document.getElementById('broadcastDot');
+      if (dot) dot.classList.add('hidden');
+      alert('✓ ग्लोबल ब्रॉडकास्ट अलर्ट हटा दिया गया है।');
+    }
+
+    async function publishGlobalBroadcast() {
+      const msg = document.getElementById('broadcastInput').value.trim();
+      if(!msg) { alert('कृपया संदेश दर्ज करें!'); return; }
+      localStorage.setItem('ld_global_broadcast', JSON.stringify({ message: msg, time: new Date().toISOString() }));
+      alert('✓ ग्लोबल ब्रॉडकास्ट पूरे नेटवर्क पर लाइव कर दिया गया है!');
+      document.getElementById('broadcastInput').value = "";
+      const dot = document.getElementById('broadcastDot');
+      if (dot) dot.classList.remove('hidden');
+      logActivity("ADMIN", "Published Global Broadcast Notification");
+    }
+
+    // ------------------------------------------------------------
+    // CLOUD BACKUP (JSON) WITH POP-UP ALERT
+    // ------------------------------------------------------------
+    function downloadCloudBackup() {
+      try {
+        const backupData = {
+          shopkeepers: rawAdminShopkeepers,
+          transactions: rawAdminTxs,
+          auditLogs: rawAuditLogs,
+          appeals: rawAppeals,
+          exportDate: new Date().toISOString()
+        };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+        const dlAnchor = document.createElement('a');
+        dlAnchor.setAttribute("href", dataStr);
+        dlAnchor.setAttribute("download", `lenden_registry_backup_${new Date().toISOString().slice(0,10)}.json`);
+        document.body.appendChild(dlAnchor);
+        dlAnchor.click();
+        dlAnchor.remove();
+        
+        logActivity(currentUser ? currentUser.shop_id : "ADMIN", "Downloaded Cloud JSON Backup");
+        alert('✅ सफलतापूर्क! JSON बैकअप फाइल डाउनलोड हो गई है। कृपया अपने डाउनलोड्स (Downloads) फोल्डर में चेक करें।');
+      } catch (err) {
+        console.error('डाउनलोड एरर:', err);
+        alert('❌ JSON डाउनलोड करने में विफल रहा।');
+      }
+    }
+
+    // ------------------------------------------------------------
+    // DATA SYNC FUNCTION FIX
+    // ------------------------------------------------------------
+    async function syncCloudData() {
+      alert('🔄 डेटा सिंक किया जा रहा है...');
+      try {
+        await renderAdminAll();
+        alert('✅ डेटा सफलतापूर्वक सिंक (Sync) हो गया है!');
+      } catch (error) {
+        console.error('सिंक करने में त्रुटि:', error);
+        alert('❌ डेटा सिंक करने में विफल। कृपया अपना इंटरनेट कनेक्शन जांचें।');
+      }
+    }
+
+    // ------------------------------------------------------------
+    // UTILS & SCORE LOGIC
+    // ------------------------------------------------------------
     function formatOverdueAge(days) {
       if (isNaN(days) || days <= 0) return "आज / आगामी";
       if (days < 30) return `${days} दिन पुराना`;
@@ -723,25 +754,6 @@ async function loadAdminAppeals() {
       return baseScore;
     }
 
-    function downloadCloudBackup() {
-      const backupData = {
-        shopkeepers: rawAdminShopkeepers,
-        transactions: rawAdminTxs,
-        auditLogs: rawAuditLogs,
-        appeals: rawAppeals,
-        exportDate: new Date().toISOString()
-      };
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-      const dlAnchor = document.createElement('a');
-      dlAnchor.setAttribute("href", dataStr);
-      dlAnchor.setAttribute("download", `lenden_registry_backup_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(dlAnchor);
-      dlAnchor.click();
-      dlAnchor.remove();
-      logActivity(currentUser.shop_id, "Downloaded Cloud JSON Backup");
-    }
-
-    // UPDATED LOG ACTIVITY WITH ERROR TRAP
     async function logActivity(shopId, actionText) {
       const { error } = await supabaseClient.from('audit_logs').insert([{ 
         shop_id: shopId, 
@@ -750,13 +762,13 @@ async function loadAdminAppeals() {
       }]);
       
       if (error) {
-        console.error("Log Activity Error (Check Supabase RLS):", error.message);
-        alert("⚠️ एक्टिविटी लॉग सेव नहीं हुआ (Security Error): " + error.message);
+        console.error("Log Activity Error:", error.message);
       }
     }
 
     function openAppealModal() { document.getElementById('appealModal').classList.remove('hidden'); }
     function closeAppealModal() { document.getElementById('appealModal').classList.add('hidden'); }
+    
     async function submitAppeal() {
       const phone = document.getElementById('appealCustPhone').value.trim();
       const reason = document.getElementById('appealReason').value.trim();
@@ -770,34 +782,38 @@ async function loadAdminAppeals() {
       document.getElementById('appealReason').value = "";
     }
 
-    async function publishGlobalBroadcast() {
-      const msg = document.getElementById('broadcastInput').value.trim();
-      if(!msg) return;
-      localStorage.setItem('ld_global_broadcast', JSON.stringify({ message: msg, time: new Date().toISOString() }));
-      alert('✓ ग्लोबल ब्रॉडकास्ट पूरे नेटवर्क पर लाइव कर दिया गया है!');
-      document.getElementById('broadcastInput').value = "";
-      document.getElementById('broadcastDot').classList.remove('hidden');
-      logActivity("ADMIN", "Published Global Broadcast Notification");
-    }
+    async function loadAdminAppeals() {
+      try {
+        if (typeof supabaseClient === 'undefined') return;
 
-    function checkGlobalBroadcast() {
-      const data = localStorage.getItem('ld_global_broadcast');
-      const dot = document.getElementById('broadcastDot');
-      if(data) {
-        const obj = JSON.parse(data);
-        if (dot) dot.classList.remove('hidden');
-        console.log("Global Broadcast Active:", obj.message);
-      } else {
-        alert('कोई नया ग्लोबल ब्रॉडकास्ट अलर्ट उपलब्ध नहीं है।');
+        const { data, error } = await supabaseClient
+            .from('appeals')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        const tableBody = document.getElementById('adminAppealsTableBody');
+        if (!tableBody) return;
+
+        if (error) {
+            console.error('अपील लोड करने में त्रुटि:', error);
+            tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-red-400">डेटा लोड करने में विफल</td></tr>`;
+            return;
+        }
+
+        if (data && data.length > 0) {
+            tableBody.innerHTML = data.map(app => `
+                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                    <td class="px-4 py-3 font-mono text-amber-300">${app.shopkeeper_code || app.shop_id || 'N/A'}</td>
+                    <td class="px-4 py-3">${app.message || app.reason || 'विवरण उपलब्ध नहीं'}</td>
+                    <td class="px-4 py-3 text-xs text-slate-400">${new Date(app.created_at).toLocaleString('hi-IN')}</td>
+                </tr>
+            `).join('');
+        } else {
+            tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-slate-500">कोई नई अपील दर्ज नहीं है।</td></tr>`;
+        }
+      } catch (err) {
+        console.error('अपील फेच एरर:', err);
       }
-    }
-
-    function clearGlobalBroadcast() {
-      localStorage.removeItem('ld_global_broadcast');
-      document.getElementById('broadcastDot').classList.add('hidden');
-      const alertBox = document.getElementById('globalAlertBanner');
-      if (alertBox) alertBox.classList.add('hidden');                                         
-      alert('✓ ग्लोबल नोटिफिकेशन क्लियर / हटा दिया गया है!');
     }
 
     function setSearchMode(mode) {
@@ -832,9 +848,6 @@ async function loadAdminAppeals() {
         renderShopkeeperView();
       }
       lucide.createIcons();
-      if(localStorage.getItem('ld_global_broadcast')) {
-        document.getElementById('broadcastDot').classList.remove('hidden');
-      }
     }
 
     function switchAdminSection(sec) {
@@ -862,14 +875,14 @@ async function loadAdminAppeals() {
       renderAuditLogsList();
       renderAdminAppeals();
       filterAdminViews();
+      loadAdminAppeals();
     }
 
     function openEditShopModal(id, name, city, phone, pin) {
       document.getElementById('editShopRowId').value = id;
-      document.getElementById('editShopNameInput').value = name;
-      document.getElementById('editShopCityInput').value = city;
-      document.getElementById('editShopPhoneInput').value = phone;
-      document.getElementById('editShopPinInput').value = pin;
+      document.getElementById('editShopNameInput').value = name || '';
+      document.getElementById('editShopCityInput').value = city || '';
+      document.getElementById('editShopPhoneInput').value = phone || '';
       document.getElementById('editShopModal').classList.remove('hidden');
     }
 
@@ -882,9 +895,8 @@ async function loadAdminAppeals() {
       const name = document.getElementById('editShopNameInput').value.trim();
       const city = document.getElementById('editShopCityInput').value.trim().toUpperCase();
       const phone = document.getElementById('editShopPhoneInput').value.trim();
-      const pin = document.getElementById('editShopPinInput').value.trim();
 
-      const { error } = await supabaseClient.from('shopkeepers').update({ name: name, city: city, phone: phone, pin: pin }).eq('id', rowId);
+      const { error } = await supabaseClient.from('shopkeepers').update({ name: name, city: city, phone: phone }).eq('id', rowId);
       if(!error) {
         alert('✓ विवरण सफलतापूर्वक अपडेट कर दिया गया है!');
         closeEditShopModal();
@@ -941,17 +953,6 @@ async function loadAdminAppeals() {
       tbody.innerHTML = rawAuditLogs.length ? rawAuditLogs.map(l => `<tr><td class="py-2.5 px-2 text-amber-300">${l.shop_id}</td><td>${l.action}</td><td>${new Date(l.created_at).toLocaleString('hi-IN')}</td></tr>`).join('') : `<tr><td colspan="3" class="text-center py-6 text-slate-500">कोई लॉग उपलब्ध नहीं।</td></tr>`;
     }
 
-    function renderAdminAppeals() {
-      const box = document.getElementById('adminAppealsBox');
-      const pending = rawAppeals.filter(a => a.status === 'pending');
-      box.innerHTML = pending.length ? `<div class="bg-blue-950/40 border border-blue-800/60 p-3 rounded-2xl space-y-2"><span class="text-xs font-bold text-blue-300">📬 लंबित अपीलें (${pending.length})</span>${pending.map(a => `<div class="flex justify-between items-center text-xs bg-slate-950 p-2.5 rounded-xl border border-slate-800"><span>दुकान: <b>${a.shop_id}</b> | फोन: <b>${a.customer_phone}</b> \vert{} कारण: ${a.reason}</span><button onclick="resolveAppeal('${a.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg font-bold cursor-pointer">हल करें</button></div>`).join('')}</div>` : '';
-    }
-
-    async function resolveAppeal(id) {
-      await supabaseClient.from('appeals').update({ status: 'resolved' }).eq('id', id);
-      renderAdminAll();
-    }
-
     function filterAdminViews() {
       const q = (document.getElementById('adminUniversalSearch')?.value || '').trim().toLowerCase();
       renderFilteredAdminShopkeepers(q);
@@ -969,7 +970,6 @@ async function loadAdminAppeals() {
       document.getElementById('statTotalDues').innerText = '₹' + totalDues.toLocaleString('en-IN');
     }
 
-    // UPDATED SHOPKEEPER LIST WITH APPROVE BUTTON LOGIC
     function renderFilteredAdminShopkeepers(query) {
       const tbody = document.getElementById('adminShopkeepersList');
       tbody.innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || s.name.toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
@@ -979,15 +979,15 @@ async function loadAdminAppeals() {
         return `
         <tr class="text-slate-300">
           <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
-          <td><b>${s.owner_name || 'Owner'} / ${s.shop_name || s.owner_name || s.name || 'Store'}</b></td>
+          <td><b>${s.name || 'Store'}</b></td>
           <td class="text-slate-400">${s.email || '-'}</td>
           <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
           <td class="font-mono text-slate-400">${s.phone}</td>
           <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${s.status}</span></td>
           <td class="text-right pr-2 space-x-1">
-            <button onclick="openEditShopModal('${s.id}')" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs">Edit</button>
-            <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs">${actionBtnText}</button>
-            <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs">Delete</button>
+            <button onclick="openEditShopModal('${s.id}', '${s.name}', '${s.city}', '${s.phone}')" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit</button>
+            <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs cursor-pointer">${actionBtnText}</button>
+            <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs cursor-pointer">Delete</button>
           </td>
         </tr>`
       }).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
@@ -1038,15 +1038,13 @@ async function loadAdminAppeals() {
           <td class="font-mono text-amber-300/80">${t.customer_aadhaar || t.customer_pan || '-'}</td>
           <td class="text-amber-400 font-bold font-mono">₹${Number(t.amount).toLocaleString('en-IN')}</td>
           <td>${new Date(t.created_at).toLocaleDateString('hi-IN')}</td>
-          <td><span class="text-[10px] ${t.status === 'cleared' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'} px-2 py-0.5 rounded-full font-bold">${t.status.toUpperCase()}</span></td>
+          <td><span class="text-[10px] ${t.status === 'cleared' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-400'} px-2 py-0.5 rounded-full font-bold">${t.status.toUpperCase()}</span></td>
           <td class="text-right pr-2 space-x-1"><button onclick="adminDeleteTx('${t.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-[11px] cursor-pointer">Del</button></td>
         </tr>`).join('') || `<tr><td colspan="8" class="text-center py-6 text-slate-500">कोई लेन-देन नहीं।</td></tr>`;
     }
 
     async function adminToggleBlockShopkeeper(id, currentStatus) {
-      let newStatus = 'active'; // Default unblock/approve action
-      if (currentStatus === 'active') newStatus = 'blocked';
-      
+      let newStatus = currentStatus === 'active' ? 'blocked' : 'active';
       await supabaseClient.from('shopkeepers').update({ status: newStatus }).eq('id', id);
       renderAdminAll();
       logActivity("ADMIN", `Changed status of shop ID ${id} to ${newStatus}`);
@@ -1175,7 +1173,7 @@ async function loadAdminAppeals() {
             <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800"><span class="text-slate-400 text-[10px] block">कुल बकाया</span><span class="text-base font-black text-amber-400">₹${totalUnpaid.toLocaleString('en-IN')}</span></div>
             <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800"><span class="text-slate-400 text-[10px] block">उधारी उम्र</span><span class="text-xs font-bold">${formatOverdueAge(maxOverdueDays)}</span></div>
           </div>
-          <div class="space-y-1">${pendingList.map((r, i) => `<div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs flex justify-between"><span>उधारी #${i+1} (${r.shop_id}): <b>₹${r.amount}</b></span>${currentUser.shop_id === r.shop_id ? `<button onclick="clearTransaction('${r.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded">क्लियर</button>` : ''}</div>`).join('')}</div>`;
+          <div class="space-y-1">${pendingList.map((r, i) => `<div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs flex justify-between"><span>उधारी #${i+1} (${r.shop_id}): <b>₹${r.amount}</b></span>${currentUser && currentUser.shop_id === r.shop_id ? `<button onclick="clearTransaction('${r.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded cursor-pointer">क्लियर</button>` : ''}</div>`).join('')}</div>`;
       } else {
         card.className = "mt-4 p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 text-emerald-200";
         card.innerHTML = `<h4 class="font-extrabold text-white text-base">स्कोर: ${score} / 100</h4><p class="text-xs text-emerald-400">✓ सुरक्षित रिकॉर्ड (उधारी दी जा सकती है)</p>`;
@@ -1227,16 +1225,6 @@ async function loadAdminAppeals() {
         </tr>`).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई लेन-देन नहीं।</td></tr>`;
       lucide.createIcons();
     }
-
-    document.addEventListener('DOMContentLoaded', () => { 
-      lucide.createIcons(); 
-               
-    // परमानेंट बैनर को अपडेट करने वाला कोड:
-    document.getElementById('permanentCustomBanner').innerHTML = `<span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>`;
-    
-    // Supabase ka auth change listener hi session handle karega...
-});
-      
   </script>
 </body>
 </html>
