@@ -1223,8 +1223,190 @@
           <td><span class="text-[10px] ${t.status === 'cleared' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-400'} px-2 py-0.5 rounded-full font-bold">${t.status.toUpperCase()}</span></td>
           <td>${t.status !== 'cleared' ? `<button onclick="clearTransaction('${t.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">क्लियर</button>` : '✓ चुकता'}</td>
         </tr>`).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई लेन-देन नहीं।</td></tr>`;
-      lucide.createIcons();
+      lucide.createIcons();document.addEventListener('DOMContentLoaded', () => {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
     }
+    
+    // 1. पेज लोड होते ही लाइव बैनर और अपील लोड करें
+    fetchGlobalBanner();
+    loadAdminAppeals();
+    
+    // 2. शॉपकीपर मास्टर और कस्टमर स्कोर डेटा लोड करें
+    setTimeout(() => {
+        if (typeof renderAdminAll === 'function') {
+            renderAdminAll();
+        } else {
+            loadMasterDataManually();
+        }
+    }, 1000);
+});
+
+// ================= 1. लाइव एडिटेबल बैनर लॉजिक (डेटाबेस से सिंक) =================
+async function fetchGlobalBanner() {
+    try {
+        if (typeof supabaseClient === 'undefined') return;
+        const { data, error } = await supabaseClient
+            .from('settings')
+            .select('value')
+            .eq('key', 'permanent_banner')
+            .single();
+
+        const permBanner = document.getElementById('permanentCustomBanner');
+        if (permBanner && data && data.value) {
+            permBanner.innerHTML = `<span>⭐ ${data.value}</span>`;
+        }
+    } catch (err) {
+        console.log('डिफ़ॉल्ट बैनर लोड हो रहा है...');
+    }
+}
+
+async function updateGlobalBannerText() {
+    const inputVal = document.getElementById('adminBannerInput')?.value.trim();
+    if (!inputVal) {
+        alert('कृपया बैनर के लिए कुछ नया टेक्स्ट लिखें।');
+        return;
+    }
+
+    try {
+        if (typeof supabaseClient === 'undefined') {
+            alert('डेटाबेस कनेक्टेड नहीं है।');
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from('settings')
+            .upsert({ key: 'permanent_banner', value: inputVal });
+
+        if (error) {
+            console.error('बैनर अपडेट एरर:', error);
+            alert('बैनर सेव करने में विफल।');
+            return;
+        }
+
+        alert('सफलतापूर्वक! परमानेंट बैनर अपडेट कर दिया गया है, अब सभी शॉपकीपर्स को यह दिखाई देगा।');
+        fetchGlobalBanner();
+        if (document.getElementById('adminBannerInput')) {
+            document.getElementById('adminBannerInput').value = '';
+        }
+    } catch (err) {
+        console.error('एरर:', err);
+    }
+}
+
+// ================= 2. शॉपकीपर मास्टर और कस्टमर स्कोर डेटा लोडर =================
+async function loadMasterDataManually() {
+    try {
+        if (typeof supabaseClient === 'undefined') return;
+
+        // शॉपकीपर मास्टर डेटा फेच करना
+        const { data: shopData, error: shopErr } = await supabaseClient.from('shopkeepers').select('*');
+        if (!shopErr && shopData) {
+            window.rawAdminShopkeepers = shopData;
+            const shopTable = document.getElementById('adminShopkeepersTableBody'); 
+            if (shopTable) {
+                shopTable.innerHTML = shopData.map(s => `
+                    <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                        <td class="px-4 py-2 font-mono text-amber-300">${s.code || s.shop_code || s.id}</td>
+                        <td class="px-4 py-2">${s.name || s.shop_name || 'N/A'}</td>
+                        <td class="px-4 py-2">${s.status || 'Active'}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+    } catch (e) {
+        console.error('मास्टर डेटा लोड करने में त्रुटि:', e);
+    }
+}
+
+// ================= 3. JSON बैकअप डाउनलोड (पॉप-अप अलर्ट के साथ) =================
+function downloadCloudBackup() {
+    try {
+        const backupData = {
+            shopkeepers: typeof rawAdminShopkeepers !== 'undefined' ? rawAdminShopkeepers : [],
+            transactions: typeof rawAdminTxs !== 'undefined' ? rawAdminTxs : [],
+            timestamp: new Date().toISOString()
+        };
+        
+        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `shri_radhe_radhe_jewellers_backup_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        alert('सफलतापूर्वक! JSON बैकअप फाइल डाउनलोड हो गई है। कृपया अपने डाउनलोड्स फोल्डर को चेक करें।');
+    } catch (err) {
+        console.error('डाउनलोड एरर:', err);
+        alert('JSON डाउनलोड करने में विफल रहा।');
+    }
+}
+
+// ================= 4. डेटा सिंक फंक्शन =================
+async function syncCloudData() {
+    alert('डेटा सिंक किया जा रहा है...');
+    try {
+        await loadAdminAppeals();
+        await fetchGlobalBanner();
+        await loadMasterDataManually();
+        if (typeof renderAdminAll === 'function') {
+            renderAdminAll();
+        }
+        alert('डेटा सफलतापूर्वक सिंक (Sync) हो गया है!');
+    } catch (error) {
+        console.error('सिंक करने में त्रुटि:', error);
+        alert('डेटा सिंक करने में विफल। कृपया इंटरनेट कनेक्शन जांचें।');
+    }
+}
+
+// ================= 5. ग्लोबल ब्रॉडकास्ट नोटिफिकेशन (बेल आइकन के लिए) =================
+function showGlobalBroadcastNotification() {
+    const data = localStorage.getItem('ld_global_broadcast');
+    if (data) {
+        const obj = JSON.parse(data);
+        alert(`📢 ग्लोबल ब्रॉडकास्ट अलर्ट:\n\n${obj.message}\n\nसमय: ${new Date(obj.time).toLocaleString('hi-IN')}`);
+    } else {
+        alert('कोई नया ग्लोबल ब्रॉडकास्ट अलर्ट उपलब्ध नहीं है।');
+    }
+}
+
+// ================= 6. एडमिन अपील लिस्ट लोड करना =================
+async function loadAdminAppeals() {
+    try {
+        if (typeof supabaseClient === 'undefined') return;
+
+        const { data, error } = await supabaseClient
+            .from('appeals')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        const tableBody = document.getElementById('adminAppealsTableBody');
+        if (!tableBody) return;
+
+        if (error) {
+            tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-red-400">डेटा लोड करने में विफल</td></tr>`;
+            return;
+        }
+
+        if (data && data.length > 0) {
+            tableBody.innerHTML = data.map(app => `
+                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                    <td class="px-4 py-3 font-mono text-amber-300">${app.shopkeeper_code || app.shopkeeper_id || 'N/A'}</td>
+                    <td class="px-4 py-3">${app.message || app.reason || 'विवरण उपलब्ध नहीं'}</td>
+                    <td class="px-4 py-3 text-xs text-slate-400">${new Date(app.created_at).toLocaleString('hi-IN')}</td>
+                </tr>
+            `).join('');
+        } else {
+            tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-slate-500">कोई नई अपील दर्ज नहीं है।</td></tr>`;
+        }
+    } catch (err) {
+        console.error('अपील एरर:', err);
+    }
+}
+
   </script>
 </body>
 </html>
