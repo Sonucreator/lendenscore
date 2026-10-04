@@ -1340,7 +1340,7 @@ async function loadMasterDataManually() {
             window.rawAdminShopkeepers = shopData;
             const shopTable = document.getElementById('adminShopkeepersTableBody'); 
             if (shopTable) {
-               shopTableBody.innerHTML = shopData.map(s => `
+               shopTable.innerHTML = shopData.map(s => `
     <tr class="border-b border-slate-800 hover:bg-slate-800/50">
         <td class="px-4 py-3 font-mono text-amber-300">${s.code || s.shop_code || s.id || 'N/A'}</td>
         <td class="px-4 py-3">
@@ -1349,6 +1349,8 @@ async function loadMasterDataManually() {
         </td>
         <td class="px-4 py-3 text-xs text-slate-300">${s.email || s.shop_email || 'N/A'}</td>
         <td class="px-4 py-3">${s.city || 'Samalkha'}</td>
+        <td class="px-4 py-3">${s.phone || 'N/A'}</td>
+        <td class="px-4 py-3">${s.status || 'Active'}</td>
     </tr>
 `).join('');
             }
