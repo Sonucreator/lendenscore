@@ -857,7 +857,7 @@
         return `
         <tr class="text-slate-300">
           <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
-          <td><b>${s.name}</b></td>
+          <td><b>${s.shop_name || s.owner_name || s.name || 'Store'}</b></td>
           <td class="text-slate-400">${s.email || '-'}</td>
           <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
           <td class="font-mono text-slate-400">${s.phone}</td>
