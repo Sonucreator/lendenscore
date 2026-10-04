@@ -863,7 +863,7 @@
           <td class="font-mono text-slate-400">${s.phone}</td>
           <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${s.status}</span></td>
           <td class="text-right pr-2 space-x-1">
-            <button onclick="openEditShopModal('${s.id}', '${(s.owner_name || 'Owner'}.replace(/'/g, "\\'")}, '${(s.shop_name || 'Shop').replace(/'/g, "\\'")}', '${s.city || 'SAM'}', '${s.phone}', '${s.pin}')" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs">Edit</button>
+            <button onclick="openEditShopModal('${s.id}')" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs">Edit</button>
             <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-900/60 text-${actionBtnColor}-300 px-2 py-1 rounded text-[11px] cursor-pointer">${actionBtnText}</button>
             <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-[11px] cursor-pointer">Del</button>
           </td>
