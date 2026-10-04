@@ -47,15 +47,13 @@
 
       <div class="flex items-center gap-3">
         <div class="relative flex items-center gap-1">
-          <button onclick="checkGlobalBroadcast()" class="relative bg-slate-800 hover:bg-slate-700 text-amber-400 p-2 rounded-xl text-xs transition cursor-pointer" title="ग्लोबल अलर्ट">
-            <i data-lucide="bell" class="w-4 h-4"></i>
-            <span id="broadcastDot" class="hidden absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
-          </button>
-          <button onclick="clearGlobalBroadcast()" class="bg-slate-900 hover:bg-red-950 text-slate-400 hover:text-red-300 p-2 rounded-xl text-xs transition cursor-pointer border border-slate-800" title="ग्लोबल नोटिफिकेशन हटाएं">
-            <i data-lucide="bell-off" class="w-4 h-4"></i>
-          </button>
-        </div>
-
+         
+        <button onclick="showGlobalBroadcastNotification()" class="p-2 text-slate-300 hover:text-white relative">
+    <i data-lucide="bell" class="w-5 h-5"></i>
+</button>
+<div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-lg mb-4 text-sm font-semibold flex justify-between items-center shadow-md">
+    <span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
+</div>
         <div id="userBadge" class="hidden flex items-center gap-3">
           <div class="text-xs bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-full flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -68,8 +66,26 @@
       </div>
     </div>
   </header>
-  <div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-lg mb-4 text-sm font-semibold flex justify-between items-center shadow-md">
-    <span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
+  <!-- 1. परमानेंट बैनर (डिफ़ॉल्ट कस्टमर या मैसेज के लिए) -->
+<div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-lg mb-4 text-sm font-semibold flex justify-between items-center shadow-md">
+    <span>⭐ Default Customer / Notice: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
+</div>
+
+<!-- 2. ग्लोबल नोटिफिकेशन पॉप-अप मॉडल (जो बेल आइकन पर क्लिक करने पर खुलेगा) -->
+<div id="globalNotificationModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl text-slate-100">
+        <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+            <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2">📢 ग्लोबल ब्रॉडकास्ट अलर्ट</h3>
+            <button onclick="closeGlobalModal()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+        </div>
+        <div id="globalModalMessage" class="text-sm text-slate-300 mb-6 leading-relaxed">
+            कोई नया अलर्ट उपलब्ध नहीं है।
+        </div>
+        <div class="flex justify-end gap-3">
+            <button onclick="closeGlobalModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium">कैंसिल करें</button>
+            <button onclick="clearGlobalAlert()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium">हटाएं (Clear)</button>
+        </div>
+    </div>
 </div>
   <!-- ================= MAIN APP CONTAINER ================= -->
   <main class="max-w-7xl mx-auto p-4 flex-1 w-full">
@@ -190,6 +206,23 @@
           </button>
         </div>
       </div>
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 mt-6">
+    <h3 class="text-md font-bold text-amber-400 mb-3">📋 शॉपकीपर अपील लिस्ट (Admin Panel)</h3>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-800 text-xs uppercase text-slate-400">
+                <tr>
+                    <th class="px-4 py-3">शॉपकीपर कोड</th>
+                    <th class="px-4 py-3">अपील / कारण</th>
+                    <th class="px-4 py-3">समय</th>
+                </tr>
+            </thead>
+            <tbody id="adminAppealsTableBody">
+                <tr><td colspan="3" class="text-center py-4 text-slate-500">अपील लोड हो रही हैं...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
       <!-- Admin Search & Filter Bar -->
       <section class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-4 shadow-xl">
@@ -494,7 +527,90 @@
     const SUPABASE_URL = "https://sjxckncjxxqoymjtydpz.supabase.co";
     const SUPABASE_KEY = "sb_publishable_o534-o_bYy_aRRjXh0W0fA_WcK9Drem";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. पेज लोड होते ही आइकन्स और परमानेंट बैनर सेट करें
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    // परमानेंट बैनर को डिफ़ॉल्ट वैल्यू देना
+    const permBanner = document.getElementById('permanentCustomBanner');
+    if (permBanner) {
+        permBanner.innerHTML = `<span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>`;
+    }
 
+    // 2. एडमिन पैनल के लिए अपील डेटा लोड करना
+    loadAdminAppeals();
+});
+
+// बेल आइकन पर क्लिक करने पर पॉप-अप दिखाने का फंक्शन
+function showGlobalBroadcastNotification() {
+    const data = localStorage.getItem('ld_global_broadcast');
+    const modal = document.getElementById('globalNotificationModal');
+    const msgDiv = document.getElementById('globalModalMessage');
+
+    if (data && modal && msgDiv) {
+        const obj = JSON.parse(data);
+        msgDiv.innerHTML = `
+            <p class="mb-2">${obj.message}</p>
+            <span class="text-xs text-slate-400">समय: ${new Date(obj.time).toLocaleString('hi-IN')}</span>
+        `;
+        modal.classList.remove('hidden');
+    } else {
+        alert('कोई नया ग्लोबल ब्रॉडकास्ट अलर्ट उपलब्ध नहीं है।');
+    }
+}
+
+// पॉप-अप बंद करने का फंक्शन (कैंसिल बटन)
+function closeGlobalModal() {
+    const modal = document.getElementById('globalNotificationModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// नोटिफिकेशन पूरी तरह हटाने का फंक्शन (हटाएं बटन)
+function clearGlobalAlert() {
+    localStorage.removeItem('ld_global_broadcast');
+    closeGlobalModal();
+    alert('ग्लोबल ब्रॉडकास्ट अलर्ट हटा दिया गया है।');
+}
+
+// Supabase से शॉपकीपर की अपील फैच करके एडमिन टेबल में दिखाने का फंक्शन
+async function loadAdminAppeals() {
+    try {
+        // सुनिश्चित करें कि आपका supabaseClient ऑब्जेक्ट यहाँ उपलब्ध है
+        if (typeof supabaseClient === 'undefined') return;
+
+        const { data, error } = await supabaseClient
+            .from('appeals')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        const tableBody = document.getElementById('adminAppealsTableBody');
+        if (!tableBody) return;
+
+        if (error) {
+            console.error('अपील लोड करने में त्रुटि:', error);
+            tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-red-400">डेटा लोड करने में विफल</td></tr>`;
+            return;
+        }
+
+        if (data && data.length > 0) {
+            tableBody.innerHTML = data.map(app => `
+                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                    <td class="px-4 py-3 font-mono text-amber-300">${app.shopkeeper_code || app.shopkeeper_id || 'N/A'}</td>
+                    <td class="px-4 py-3">${app.message || app.reason || 'विवरण उपलब्ध नहीं'}</td>
+                    <td class="px-4 py-3 text-xs text-slate-400">${new Date(app.created_at).toLocaleString('hi-IN')}</td>
+                </tr>
+            `).join('');
+        } else {
+            tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-slate-500">कोई नई अपील दर्ज नहीं है।</td></tr>`;
+        }
+    } catch (err) {
+        console.error('एरर:', err);
+    }
+}
     let rawAdminShopkeepers = [];
     let rawAdminTxs = [];
     let rawAdminCustomScores = {};
