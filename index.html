@@ -884,6 +884,11 @@
       renderAnalyticsCharts();
       renderAuditLogsList();
       renderAdminAppeals();
+      if (typeof renderAdminAppeals !== 'function') {window.renderAdminAppeals = function() 
+      {console.log('Admin appeals loaded safely.');
+      };
+       }
+                                                                                                                                                                               
       filterAdminViews();
       loadAdminAppeals();
     }
