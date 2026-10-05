@@ -1340,18 +1340,25 @@ async function loadMasterDataManually() {
             window.rawAdminShopkeepers = shopData;
             const shopTable = document.getElementById('adminShopkeepersTableBody'); 
             if (shopTable) {
-               shopTable.innerHTML = shopData.map(s => `
+               shopTable.innerHTML = shopData.map(s => {
+    // Agar database mein 'Store' save hai, toh use ignore karke email ka naam ya code dikhao
+    let cleanName = s.shop_name;
+    if (!cleanName || cleanName === 'Store' || cleanName.toLowerCase() === 'store') {
+        cleanName = s.email ? s.email.split('@')[0] : (s.code || 'श्री राधे राधे ज्वेलर्स');
+    }
+    return `
     <tr class="border-b border-slate-800 hover:bg-slate-800/50">
         <td class="px-4 py-3 font-mono text-amber-300">${s.code || s.shop_code || s.id || 'N/A'}</td>
         <td class="px-4 py-3">
-            <div class="font-bold text-white">${s.shop_name && s.shop_name !== 'Store' ? s.shop_name : (s.email ? s.email.split('@')[0] : 'श्री राधे राधे ज्वेलर्स')}</div>
+            <div class="font-bold text-white">${cleanName}</div>
         </td>
         <td class="px-4 py-3 text-xs text-slate-300">${s.email || 'N/A'}</td>
         <td class="px-4 py-3">${s.city || 'Samalkha'}</td>
         <td class="px-4 py-3">${s.phone || 'N/A'}</td>
         <td class="px-4 py-3">${s.status || 'ACTIVE'}</td>
-    </tr>
-`).join('');            }
+    </tr>`;
+}).join('');
+            }
         }
     } catch (e) {
         console.error('मास्टर डेटा लोड करने में त्रुटि:', e);
