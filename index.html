@@ -1344,16 +1344,14 @@ async function loadMasterDataManually() {
     <tr class="border-b border-slate-800 hover:bg-slate-800/50">
         <td class="px-4 py-3 font-mono text-amber-300">${s.code || s.shop_code || s.id || 'N/A'}</td>
         <td class="px-4 py-3">
-            <div class="font-bold text-white">${s.shop_name || s.name || 'श्री राधे राधे ज्वेलर्स'}</div>
-            <div class="text-xs text-slate-400">${s.owner_name || s.owner || 'दुकानदार'}</div>
+            <div class="font-bold text-white">${s.shop_name && s.shop_name !== 'Store' ? s.shop_name : (s.email ? s.email.split('@')[0] : 'श्री राधे राधे ज्वेलर्स')}</div>
         </td>
-        <td class="px-4 py-3 text-xs text-slate-300">${s.email || s.shop_email || 'N/A'}</td>
+        <td class="px-4 py-3 text-xs text-slate-300">${s.email || 'N/A'}</td>
         <td class="px-4 py-3">${s.city || 'Samalkha'}</td>
         <td class="px-4 py-3">${s.phone || 'N/A'}</td>
-        <td class="px-4 py-3">${s.status || 'Active'}</td>
+        <td class="px-4 py-3">${s.status || 'ACTIVE'}</td>
     </tr>
-`).join('');
-            }
+`).join('');            }
         }
     } catch (e) {
         console.error('मास्टर डेटा लोड करने में त्रुटि:', e);
