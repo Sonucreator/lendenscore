@@ -2,7 +2,7 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>लेन-देन | MASTER REGISTRY</title>
   
   <meta name="theme-color" content="#020617" />
@@ -17,19 +17,100 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <style>
+    :root {
+      color-scheme: dark;
+      --page: #07111f;
+      --panel: rgba(15, 28, 47, .88);
+      --line: rgba(148, 163, 184, .14);
+      --accent: #f4b544;
+      --muted: #91a2b8;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       -webkit-tap-highlight-color: transparent;
-      background-color: #020617;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(ellipse at 8% 0%, rgba(22, 78, 99, .24), transparent 34rem),
+        radial-gradient(ellipse at 95% 18%, rgba(180, 112, 28, .12), transparent 28rem),
+        var(--page);
+      color: #e8eef7;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-    .tab-active {
-      border-bottom: 2px solid #f59e0b;
-      color: #f59e0b;
-      font-weight: 700;
+    .tab-active { border-bottom: 2px solid var(--accent); color: var(--accent); font-weight: 700; }
+    header {
+      background: rgba(7, 17, 31, .88) !important;
+      border-color: var(--line) !important;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .16);
+    }
+    main { padding-top: 1.5rem !important; padding-bottom: 3rem !important; }
+    main section, #adminDashboard > div, #adminDashboard > section {
+      border-color: var(--line) !important;
+      background: linear-gradient(145deg, rgba(17, 32, 52, .96), rgba(11, 23, 39, .96)) !important;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, .16) !important;
+    }
+    #authView {
+      margin-top: clamp(2rem, 8vh, 5rem) !important;
+      padding: clamp(1.5rem, 6vw, 2.75rem) !important;
+      border: 1px solid rgba(148, 163, 184, .2) !important;
+      background: radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, .12), transparent 55%), linear-gradient(145deg, #122139, #0b1728) !important;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, .38) !important;
+    }
+    input, textarea, select {
+      border-color: rgba(148, 163, 184, .2) !important;
+      background-color: rgba(5, 14, 27, .78) !important;
+      border-radius: .8rem !important;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(244, 181, 68, .8) !important;
+      box-shadow: 0 0 0 3px rgba(244, 181, 68, .12);
+      outline: none;
+    }
+    button { transition: transform .16s ease, filter .16s ease, box-shadow .16s ease; }
+    button:not(:disabled):hover { filter: brightness(1.08); }
+    button:not(:disabled):active { transform: translateY(1px); }
+    button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    table { border-collapse: separate; border-spacing: 0; }
+    thead th { padding-top: .9rem; padding-bottom: .9rem; white-space: nowrap; }
+    tbody tr:hover { background: rgba(148, 163, 184, .045); }
+    #permanentCustomBanner {
+      border: 1px solid rgba(244, 181, 68, .28);
+      background: linear-gradient(100deg, rgba(100, 58, 12, .52), rgba(15, 28, 47, .9));
+      color: #f5d38f;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, .16);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    #permanentCustomBanner > span {
+      display: inline-block;
+      min-width: max-content;
+      animation: notice-scroll 28s linear infinite;
+    }
+    #permanentCustomBanner:hover > span { animation-play-state: paused; }
+    @keyframes notice-scroll {
+      from { transform: translateX(100%); }
+      to { transform: translateX(-100%); }
+    }
+    footer { background: rgba(7, 17, 31, .78) !important; border-color: var(--line) !important; }
+    @media (max-width: 640px) {
+      header { padding: .8rem !important; }
+      header > div { gap: .5rem; }
+      header p { max-width: 14rem; line-height: 1.4; }
+      main { padding-left: .85rem !important; padding-right: .85rem !important; }
+      #userBadge { gap: .4rem !important; }
+      #userBadge button { padding: .55rem .65rem !important; }
+      .overflow-x-auto { border-radius: .9rem; }
+      .overflow-x-auto table { min-width: 680px; }
+      #adminDashboard .flex.flex-wrap.border-b { flex-wrap: nowrap; overflow-x: auto; gap: 1.25rem; padding-bottom: .15rem; }
+      #adminDashboard .flex.flex-wrap.border-b button { flex: 0 0 auto; white-space: nowrap; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      #permanentCustomBanner > span { animation: none; }
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between select-none">
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between">
 
   <!-- ================= TOP STICKY BAR ================= -->
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 p-4 sticky top-0 z-50">
@@ -48,7 +129,7 @@
       <div class="flex items-center gap-3">
         <div class="relative flex items-center gap-1">
           <!-- Bell Icon -->
-          <button onclick="showGlobalBroadcastNotification()" class="p-2 text-slate-300 hover:text-white relative cursor-pointer">
+          <button id="broadcastButton" onclick="showGlobalBroadcastNotification()" class="hidden p-2 text-slate-300 hover:text-white relative cursor-pointer" aria-label="ग्लोबल सूचना">
             <i data-lucide="bell" class="w-5 h-5"></i>
             <span id="broadcastDot" class="hidden absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
           </button>
@@ -66,14 +147,9 @@
       </div>
     </div>
   </header>
-<div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-3 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
-    <span>⭐ डिफ़ॉल्ट सूचना: डेटा लोड हो रहा है...</span>
-</div>
-  <!-- ================= SINGLE PERMANENT BANNER ================= -->
-  <div class="max-w-7xl mx-auto px-4 mt-3 w-full">
-    <div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
-      <span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
-    </div>
+  <!-- One shared defaulter notice, visible only after successful sign-in. -->
+  <div id="permanentCustomBanner" class="hidden max-w-7xl mx-auto px-4 mt-4 w-full rounded-2xl px-4 py-3 text-sm font-semibold" aria-live="polite">
+    <span>डिफ़ॉल्टर सूचना लोड हो रही है...</span>
   </div>
 
   <!-- ================= GLOBAL NOTIFICATION MODAL ================= -->
@@ -119,7 +195,7 @@
       <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex justify-between items-center">
         <div>
           <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
-          <p id="dashShopOwner" class="text-[11px] text-slate-400">सेंट्रल कम्युनिटी रजिस्ट्री • लाइव क्लाउड डेटा सिंक</p>
+          <p class="text-[11px] text-slate-400">सेंट्रल कम्युनिटी रजिस्ट्री • लाइव क्लाउड डेटा सिंक</p>
         </div>
         <div class="flex gap-2">
           <button onclick="openAppealModal()" class="bg-slate-800 hover:bg-slate-750 border border-slate-700 text-blue-400 font-bold px-3 py-2 rounded-xl text-xs transition cursor-pointer">अपील / सुधार भेजें</button>
@@ -193,15 +269,19 @@
     </div>
 
     <!-- 3. FULL MASTER ADMIN DASHBOARD -->
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg mt-4">
-    <h3 class="text-md font-bold text-amber-400 mb-3">⚙️ डिफ़ॉल्ट कस्टमर / डिफ़ॉल्टर बैनर सेट करें (केवल एडमिन)</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-        <input type="text" id="adminDefaulterName" placeholder="कस्टमर का नाम..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-        <input type="number" id="adminDefaulterAmount" placeholder="बकाया राशि (रुपये में)..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-    </div>
-    <button onclick="updateDefaultCustomerBanner()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm w-full">बैनर अपडेट करें</button>
-</div>
     <div id="adminDashboard" class="hidden space-y-6">
+
+      <section class="rounded-3xl border border-amber-500/25 bg-slate-900 p-5 shadow-xl">
+        <div class="mb-4">
+          <h3 class="text-sm font-extrabold text-amber-300">डिफ़ॉल्टर बैनर प्रबंधन</h3>
+          <p class="mt-1 text-xs text-slate-400">लॉगिन किए हुए सभी उपयोगकर्ताओं को एक ही बैनर में सूचना दिखेगी।</p>
+        </div>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_auto]">
+          <input type="text" id="adminDefaulterName" placeholder="ग्राहक का नाम" aria-label="ग्राहक का नाम" class="border border-slate-700 px-3 py-2.5 text-sm text-white">
+          <input type="number" id="adminDefaulterAmount" placeholder="बकाया राशि (₹)" aria-label="बकाया राशि" class="border border-slate-700 px-3 py-2.5 text-sm text-white">
+          <button onclick="updateDefaultCustomerBanner()" class="rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-bold text-slate-950">बैनर अपडेट करें</button>
+        </div>
+      </section>
 
       <div class="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
         <div>
@@ -631,6 +711,8 @@
         document.getElementById('shopkeeperDashboard').classList.add('hidden');
         document.getElementById('adminDashboard').classList.add('hidden');
         document.getElementById('userBadge').classList.add('hidden');
+        document.getElementById('broadcastButton')?.classList.add('hidden');
+        document.getElementById('permanentCustomBanner')?.classList.add('hidden');
       }
     });
 
@@ -840,6 +922,9 @@
     function initDashboard() {
       document.getElementById('authView').classList.add('hidden');
       document.getElementById('userBadge').classList.remove('hidden');
+      document.getElementById('broadcastButton')?.classList.remove('hidden');
+      document.getElementById('permanentCustomBanner')?.classList.remove('hidden');
+      if (typeof fetchDefaultCustomerBanner === 'function') fetchDefaultCustomerBanner();
       const displayId = currentUser.shop_id || 'ACTIVE';
       document.getElementById('shopkeeperDisplayCode').innerText = displayId;
 
@@ -848,10 +933,7 @@
         renderAdminAll();
       } else {
         document.getElementById('shopkeeperDashboard').classList.remove('hidden');
-        const shopName = currentUser.shop_name || currentUser.name || displayId;
-        const ownerName = currentUser.owner_name || currentUser.name || currentUser.email || 'मालिक का नाम उपलब्ध नहीं';
-        document.getElementById('dashShopTitle').innerText = shopName;
-        document.getElementById('dashShopOwner').innerText = `मालिक: ${ownerName}`;
+        document.getElementById('dashShopTitle').innerText = currentUser.name || displayId;
         renderShopkeeperView();
       }
       lucide.createIcons();
@@ -1010,19 +1092,14 @@ async function renderAdminAppeals() {
 
     function renderFilteredAdminShopkeepers(query) {
       const tbody = document.getElementById('adminShopkeepersList');
-      tbody.innerHTML =       rawAdminShopkeepers.filter(s => {
-        const searchable = [s.shop_id, s.shop_name, s.owner_name, s.name, s.email].filter(Boolean).join(' ').toLowerCase();
-        return !query || searchable.includes(query);
-      }).map(s => {
-        const ownerName = s.owner_name || s.name || (s.email || '').split('@')[0] || 'मालिक का नाम उपलब्ध नहीं';
-        const shopName = s.shop_name || (s.name && s.name.toLowerCase() !== 'store' ? s.name : '') || 'दुकान का नाम उपलब्ध नहीं';
+      tbody.innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || s.name.toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
         let statusBadge = s.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
         let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber';
         let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
         return `
         <tr class="text-slate-300">
-          <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id || '-'}</td>
-          <td><b>${shopName}</b><div class="text-[11px] text-slate-400">मालिक: ${ownerName}</div></td>
+          <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
+          <td><b>${s.name || 'Store'}</b></td>
           <td class="text-slate-400">${s.email || '-'}</td>
           <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
           <td class="font-mono text-slate-400">${s.phone}</td>
