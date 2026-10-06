@@ -2,7 +2,7 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>लेन-देन | MASTER REGISTRY</title>
   
   <meta name="theme-color" content="#020617" />
@@ -17,41 +17,16 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <style>
-    :root { color-scheme: dark; }
     body {
       -webkit-tap-highlight-color: transparent;
-      background: radial-gradient(ellipse at 15% 0%, #172554 0, #0b1222 38%, #070b14 100%);
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #020617;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-    .tab-active { border-bottom: 2px solid #fbbf24; color: #fcd34d; font-weight: 700; }
-    header { box-shadow: 0 10px 30px #02061755; }
-    main section, #adminDashboard > div, #adminDashboard > section { backdrop-filter: blur(12px); }
-    [class*="bg-slate-900/90"], [class*="bg-slate-900 border"] {
-      background-image: linear-gradient(145deg, #111b2eec, #0c1424f5);
-      border-color: #ffffff12;
-      box-shadow: 0 18px 42px #00000024;
+    .tab-active {
+      border-bottom: 2px solid #f59e0b;
+      color: #f59e0b;
+      font-weight: 700;
     }
-    #authView { border-color: #fbbf2433; background-image: radial-gradient(ellipse at top, #24304a, #101827 70%); }
-    #adminDashboard > .flex, #shopkeeperDashboard > section:first-child { border-color: #fbbf2428; }
-    input, textarea, select { transition: border-color .2s, box-shadow .2s, background-color .2s; }
-    input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px #f59e0b22; }
-    button { transition: transform .16s ease, filter .16s ease, box-shadow .16s ease; }
-    button:hover { filter: brightness(1.08); }
-    button:active { transform: scale(.98); }
-    table tbody tr { transition: background-color .15s ease; }
-    table tbody tr:hover { background-color: #ffffff08; }
-    .defaulter-viewport { overflow: hidden; }
-    .defaulter-track { display: flex; width: max-content; animation: defaulter-marquee 32s linear infinite; }
-    .defaulter-viewport:hover .defaulter-track, .defaulter-viewport:focus-within .defaulter-track { animation-play-state: paused; }
-    .defaulter-item { min-width: min(360px, 84vw); border-right: 1px solid #ffffff1a; }
-    @keyframes defaulter-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-    @media (max-width: 640px) {
-      main { padding: .85rem !important; }
-      header { padding: .8rem !important; }
-      #adminDashboard .flex-wrap { gap: .55rem; }
-      .defaulter-track { animation-duration: 24s; }
-    }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between select-none">
@@ -91,17 +66,15 @@
       </div>
     </div>
   </header>
-  <!-- One live, rotating defaulter ticker; rendered from shared Supabase settings. -->
-  <section id="permanentCustomBanner" class="hidden max-w-7xl mx-auto px-4 pt-4 w-full" aria-label="लाइव डिफ़ॉल्टर सूचना">
-    <div class="rounded-2xl border border-rose-400/25 bg-gradient-to-r from-rose-950/90 via-slate-900 to-amber-950/60 shadow-lg shadow-rose-950/20 overflow-hidden">
-      <div class="flex items-center gap-3 px-4 py-3 border-b border-white/10">
-        <span class="relative flex h-3 w-3 shrink-0"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-70"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span></span>
-        <div class="min-w-0"><p class="text-[10px] uppercase tracking-[.2em] font-black text-rose-300">Live network alert</p><p class="text-sm font-bold text-white">लाइव डिफ़ॉल्टर विवरण</p></div>
-        <span id="defaulterCount" class="ml-auto text-[10px] px-2.5 py-1 rounded-full bg-white/10 text-rose-100 font-bold">डेटा लोड हो रहा है</span>
-      </div>
-      <div class="defaulter-viewport" tabindex="0"><div id="defaulterTickerTrack" class="defaulter-track min-h-[68px] items-stretch"><div class="px-4 py-5 text-sm text-slate-300">लाइव सूचना लोड हो रही है…</div></div></div>
+<div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-3 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
+    <span>⭐ डिफ़ॉल्ट सूचना: डेटा लोड हो रहा है...</span>
+</div>
+  <!-- ================= SINGLE PERMANENT BANNER ================= -->
+  <div class="max-w-7xl mx-auto px-4 mt-3 w-full">
+    <div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
+      <span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
     </div>
-  </section>
+  </div>
 
   <!-- ================= GLOBAL NOTIFICATION MODAL ================= -->
   <div id="globalNotificationModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
@@ -220,6 +193,14 @@
     </div>
 
     <!-- 3. FULL MASTER ADMIN DASHBOARD -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg mt-4">
+    <h3 class="text-md font-bold text-amber-400 mb-3">⚙️ डिफ़ॉल्ट कस्टमर / डिफ़ॉल्टर बैनर सेट करें (केवल एडमिन)</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <input type="text" id="adminDefaulterName" placeholder="कस्टमर का नाम..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+        <input type="number" id="adminDefaulterAmount" placeholder="बकाया राशि (रुपये में)..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+    </div>
+    <button onclick="updateDefaultCustomerBanner()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm w-full">बैनर अपडेट करें</button>
+</div>
     <div id="adminDashboard" class="hidden space-y-6">
 
       <div class="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
@@ -238,23 +219,6 @@
           </button>
         </div>
       </div>
-
-      <section class="bg-slate-900/90 border border-rose-500/25 rounded-3xl p-5 shadow-xl space-y-4">
-        <div>
-          <h3 class="text-sm font-extrabold text-rose-300 flex items-center gap-2"><i data-lucide="radio" class="w-4 h-4"></i> लाइव डिफ़ॉल्टर बैनर प्रबंधन</h3>
-          <p class="text-xs text-slate-400 mt-1">यह सूची सभी स्वीकृत उपयोगकर्ताओं के एक ही चलते हुए बैनर में लाइव दिखाई देगी।</p>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <input type="text" id="adminDefaulterName" placeholder="ग्राहक का नाम *" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-rose-400" />
-          <input type="tel" id="adminDefaulterPhone" placeholder="मोबाइल (वैकल्पिक)" maxlength="10" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm font-mono text-white outline-none focus:border-rose-400" />
-          <input type="number" id="adminDefaulterAmount" min="0" step="0.01" placeholder="बकाया राशि (₹) *" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-rose-400" />
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <button id="defaulterSaveBtn" onclick="updateDefaultCustomerBanner()" class="bg-rose-500 hover:bg-rose-400 text-white font-bold px-4 py-2.5 rounded-xl text-sm shadow-lg shadow-rose-950/30">+ बैनर में ग्राहक जोड़ें</button>
-          <button id="defaulterCancelEdit" onclick="cancelDefaulterEdit()" class="hidden bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold px-4 py-2.5 rounded-xl text-sm">संपादन रद्द करें</button>
-        </div>
-        <div id="adminDefaulterList" class="grid grid-cols-1 md:grid-cols-2 gap-2"><p class="text-xs text-slate-500">डिफ़ॉल्टर सूची लोड हो रही है…</p></div>
-      </section>
 
       <!-- Shopkeeper Appeals Table in Admin -->
       <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
@@ -574,7 +538,7 @@
 
   <!-- ================= JAVASCRIPT APPLICATION CORE ================= -->
   <script>
-    const MASTER_ADMIN_EMAIL = "admin@gmail.com"; 
+    const MASTER_ADMIN_EMAIL = "jsonu308@gmail.com"; 
 
     const SUPABASE_URL = "https://sjxckncjxxqoymjtydpz.supabase.co";
     const SUPABASE_KEY = "sb_publishable_o534-o_bYy_aRRjXh0W0fA_WcK9Drem";
@@ -650,10 +614,11 @@
           alert("✅ आपका अकाउंट रजिस्टर हो गया है!\n\nलेकिन अभी यह पेंडिंग (Pending) है। कृपया एडमिन द्वारा ID एक्टिवेट होने का इंतज़ार करें।");
           await supabaseClient.auth.signOut();
           window.location.reload();
-        } else if (shopRecord.status !== 'active') {
-          alert(shopRecord.status === 'blocked'
-            ? "🚫 आपका अकाउंट एडमिन द्वारा ब्लॉक कर दिया गया है।"
-            : "⏳ आपकी ID एडमिन अप्रूवल का इंतज़ार कर रही है। अप्रूवल के बाद ही डैशबोर्ड खुलेगा।");
+        } else if (shopRecord.status === 'pending') {
+          alert("⏳ आपकी ID अभी भी पेंडिंग है। एडमिन पैनल से अप्रूवल के बाद ही डैशबोर्ड खुलेगा!");
+          await supabaseClient.auth.signOut();
+        } else if (shopRecord.status === 'blocked') {
+          alert("🚫 आपका अकाउंट एडमिन द्वारा ब्लॉक कर दिया गया है।");
           await supabaseClient.auth.signOut();
         } else {
           currentUser = shopRecord;
@@ -666,7 +631,6 @@
         document.getElementById('shopkeeperDashboard').classList.add('hidden');
         document.getElementById('adminDashboard').classList.add('hidden');
         document.getElementById('userBadge').classList.add('hidden');
-        document.getElementById('permanentCustomBanner').classList.add('hidden');
       }
     });
 
@@ -875,8 +839,6 @@
 
     function initDashboard() {
       document.getElementById('authView').classList.add('hidden');
-      document.getElementById('permanentCustomBanner').classList.remove('hidden');
-      fetchDefaultCustomerBanner();
       document.getElementById('userBadge').classList.remove('hidden');
       const displayId = currentUser.shop_id || 'ACTIVE';
       document.getElementById('shopkeeperDisplayCode').innerText = displayId;
@@ -1589,158 +1551,6 @@ if (typeof renderAdminAll !== 'function') {
         console.log('Admin view rendered safely.');
     };
 }
-
-    // Live multi-customer defaulter banner. Data is stored as JSON in settings.value.
-    let liveDefaulters = [];
-    let editingDefaulterIndex = -1;
-    let defaulterSettingsChannel = null;
-
-    function escapeBannerText(value) {
-      return String(value ?? '').replace(/[&<>"']/g, char => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      })[char]);
-    }
-
-    function normalizeDefaulterList(value) {
-      if (Array.isArray(value)) return value.filter(item => item && item.name).map(item => ({
-        name: String(item.name), phone: String(item.phone || ''), amount: Number(item.amount || 0)
-      }));
-      if (typeof value === 'string' && value.trim()) {
-        try {
-          const parsed = JSON.parse(value);
-          if (Array.isArray(parsed)) return normalizeDefaulterList(parsed);
-        } catch (_) { /* Convert old single-text banner below. */ }
-        const legacyText = value.trim();
-        const legacyMatch = legacyText.match(/^(.*?)\s*-\s*बक़ाया राशि:\s*₹?\s*([\d,]+(?:\.\d+)?)$/i);
-        if (legacyMatch) return [{ name: legacyMatch[1].trim(), phone: '', amount: Number(legacyMatch[2].replace(/,/g, '')) || 0 }];
-        return [{ name: legacyText, phone: '', amount: 0 }];
-      }
-      return [];
-    }
-
-    function renderDefaulterBanner() {
-      const track = document.getElementById('defaulterTickerTrack');
-      const count = document.getElementById('defaulterCount');
-      const adminList = document.getElementById('adminDefaulterList');
-      if (!track) return;
-
-      if (!liveDefaulters.length) {
-        track.innerHTML = '<div class="px-4 py-5 text-sm text-slate-300">फिलहाल कोई लाइव डिफ़ॉल्टर सूचना नहीं है।</div>';
-        if (count) count.textContent = '0 ग्राहक';
-        if (adminList) adminList.innerHTML = '<p class="text-xs text-slate-500">अभी बैनर में कोई ग्राहक नहीं है।</p>';
-        return;
-      }
-
-      const items = liveDefaulters.map(item => `
-        <article class="defaulter-item px-4 py-3 flex flex-col justify-center gap-1">
-          <div class="flex items-center gap-2"><span class="text-rose-300 font-black">${escapeBannerText(item.name)}</span><span class="text-[10px] text-slate-400">डिफ़ॉल्टर</span></div>
-          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-300">
-            ${item.phone ? `<span>☎ ${escapeBannerText(item.phone)}</span>` : ''}
-            ${Number(item.amount) > 0 ? `<span class="font-bold text-amber-300">बकाया ₹${Number(item.amount).toLocaleString('en-IN')}</span>` : '<span class="text-slate-400">राशि उपलब्ध नहीं</span>'}
-          </div>
-        </article>`).join('');
-      track.innerHTML = items + items;
-      if (count) count.textContent = `${liveDefaulters.length} ग्राहक`;
-      if (adminList) {
-        adminList.innerHTML = liveDefaulters.map((item, index) => `
-          <article class="flex flex-wrap items-center gap-3 justify-between bg-slate-950/80 border border-slate-800 rounded-xl p-3">
-            <div class="min-w-0"><p class="font-bold text-white text-sm">${escapeBannerText(item.name)}</p><p class="text-xs text-slate-400">${item.phone ? `${escapeBannerText(item.phone)} · ` : ''}₹${Number(item.amount || 0).toLocaleString('en-IN')}</p></div>
-            <div class="flex gap-2"><button type="button" onclick="editDefaulter(${index})" class="px-3 py-1.5 rounded-lg bg-blue-500/15 text-blue-300 text-xs font-bold">बदलें</button><button type="button" onclick="removeDefaulter(${index})" class="px-3 py-1.5 rounded-lg bg-rose-500/15 text-rose-300 text-xs font-bold">हटाएँ</button></div>
-          </article>`).join('');
-      }
-    }
-
-    async function fetchDefaultCustomerBanner() {
-      const { data, error } = await supabaseClient.from('settings').select('value').eq('key', 'default_customer_banner').maybeSingle();
-      if (error) {
-        console.error('डिफ़ॉल्टर बैनर लोड नहीं हुआ:', error.message);
-        return;
-      }
-      liveDefaulters = normalizeDefaulterList(data?.value);
-      renderDefaulterBanner();
-    }
-
-    async function saveDefaulterList() {
-      const { error } = await supabaseClient.from('settings').upsert({
-        key: 'default_customer_banner', value: JSON.stringify(liveDefaulters)
-      }, { onConflict: 'key' });
-      if (error) throw error;
-      renderDefaulterBanner();
-    }
-
-    async function updateDefaultCustomerBanner() {
-      if (!currentUser || (currentUser.role !== 'admin' && currentUser.email !== MASTER_ADMIN_EMAIL)) {
-        alert('यह बदलाव केवल एडमिन कर सकता है।');
-        return;
-      }
-      const nameInput = document.getElementById('adminDefaulterName');
-      const phoneInput = document.getElementById('adminDefaulterPhone');
-      const amountInput = document.getElementById('adminDefaulterAmount');
-      const name = nameInput.value.trim();
-      const amount = amountInput.value.trim();
-      if (!name || amount === '' || Number(amount) < 0) {
-        alert('ग्राहक का नाम और सही बकाया राशि दर्ज करें।');
-        return;
-      }
-      const item = { name, phone: phoneInput.value.trim(), amount: Number(amount) };
-      if (editingDefaulterIndex >= 0) liveDefaulters[editingDefaulterIndex] = item;
-      else liveDefaulters.push(item);
-      try {
-        await saveDefaulterList();
-        nameInput.value = ''; phoneInput.value = ''; amountInput.value = '';
-        cancelDefaulterEdit();
-        alert('डिफ़ॉल्टर विवरण लाइव बैनर में सेव हो गया।');
-      } catch (error) {
-        console.error('बैनर सेव एरर:', error);
-        alert('बैनर सेव नहीं हुआ। Supabase settings टेबल की अनुमति जाँचें।');
-        await fetchDefaultCustomerBanner();
-      }
-    }
-
-    function editDefaulter(index) {
-      const item = liveDefaulters[index];
-      if (!item) return;
-      editingDefaulterIndex = index;
-      document.getElementById('adminDefaulterName').value = item.name;
-      document.getElementById('adminDefaulterPhone').value = item.phone || '';
-      document.getElementById('adminDefaulterAmount').value = item.amount || '';
-      document.getElementById('defaulterSaveBtn').textContent = 'परिवर्तन सेव करें';
-      document.getElementById('defaulterCancelEdit').classList.remove('hidden');
-      document.getElementById('adminDefaulterName').focus();
-    }
-
-    function cancelDefaulterEdit() {
-      editingDefaulterIndex = -1;
-      const saveButton = document.getElementById('defaulterSaveBtn');
-      const cancelButton = document.getElementById('defaulterCancelEdit');
-      if (saveButton) saveButton.textContent = '+ बैनर में ग्राहक जोड़ें';
-      if (cancelButton) cancelButton.classList.add('hidden');
-    }
-
-    async function removeDefaulter(index) {
-      if (!currentUser || (currentUser.role !== 'admin' && currentUser.email !== MASTER_ADMIN_EMAIL)) return;
-      if (!confirm('इस ग्राहक को लाइव डिफ़ॉल्टर बैनर से हटाएँ?')) return;
-      const removed = liveDefaulters.splice(index, 1)[0];
-      try {
-        await saveDefaulterList();
-        if (editingDefaulterIndex === index) cancelDefaulterEdit();
-      } catch (error) {
-        liveDefaulters.splice(index, 0, removed);
-        renderDefaulterBanner();
-        alert('ग्राहक हटाया नहीं जा सका। Supabase अनुमति जाँचें।');
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      if (!defaulterSettingsChannel) {
-        defaulterSettingsChannel = supabaseClient.channel('live-defaulter-banner')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'settings', filter: 'key=eq.default_customer_banner' }, fetchDefaultCustomerBanner)
-          .subscribe();
-      }
-      window.setInterval(() => {
-        if (currentUser) fetchDefaultCustomerBanner();
-      }, 45000);
-    });
   </script>
 </body>
 </html>
