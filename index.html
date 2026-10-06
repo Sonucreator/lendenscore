@@ -27,11 +27,6 @@
       color: #f59e0b;
       font-weight: 700;
     }
-    #permanentCustomBanner { overflow: hidden; white-space: nowrap; }
-    #permanentCustomBanner > span { display: inline-block; min-width: max-content; animation: defaulterTicker 28s linear infinite; }
-    #permanentCustomBanner:hover > span { animation-play-state: paused; }
-    @keyframes defaulterTicker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
-    @media (prefers-reduced-motion: reduce) { #permanentCustomBanner > span { animation: none; white-space: normal; } }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between select-none">
@@ -71,9 +66,14 @@
       </div>
     </div>
   </header>
-  <!-- One shared defaulter banner; shown after login. -->
-  <div id="permanentCustomBanner" class="hidden max-w-7xl mx-auto px-4 mt-3 w-full rounded-xl border border-amber-500/30 bg-amber-950/30 px-4 py-3 text-sm font-semibold text-amber-200 shadow-md" aria-live="polite">
-    <span>⚠️ डिफ़ॉल्टर सूचना लोड हो रही है...</span>
+<div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-3 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
+    <span>⭐ डिफ़ॉल्ट सूचना: डेटा लोड हो रहा है...</span>
+</div>
+  <!-- ================= SINGLE PERMANENT BANNER ================= -->
+  <div class="max-w-7xl mx-auto px-4 mt-3 w-full">
+    <div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
+      <span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
+    </div>
   </div>
 
   <!-- ================= GLOBAL NOTIFICATION MODAL ================= -->
@@ -193,18 +193,15 @@
     </div>
 
     <!-- 3. FULL MASTER ADMIN DASHBOARD -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg mt-4">
+    <h3 class="text-md font-bold text-amber-400 mb-3">⚙️ डिफ़ॉल्ट कस्टमर / डिफ़ॉल्टर बैनर सेट करें (केवल एडमिन)</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <input type="text" id="adminDefaulterName" placeholder="कस्टमर का नाम..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+        <input type="number" id="adminDefaulterAmount" placeholder="बकाया राशि (रुपये में)..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+    </div>
+    <button onclick="updateDefaultCustomerBanner()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm w-full">बैनर अपडेट करें</button>
+</div>
     <div id="adminDashboard" class="hidden space-y-6">
-      <section class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl">
-        <h3 class="text-sm font-bold text-amber-400 mb-2">डिफ़ॉल्टर बैनर प्रबंधन</h3>
-        <p class="text-xs text-slate-400 mb-3">एक ही चलते हुए बैनर में कई ग्राहक जोड़ें; नाम बदलें या हटाएँ।</p>
-        <input type="hidden" id="adminDefaulterEditIndex" value="-1">
-        <div class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3">
-          <input type="text" id="adminDefaulterName" placeholder="ग्राहक का नाम" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-          <input type="number" id="adminDefaulterAmount" min="0" placeholder="बकाया राशि (₹)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-          <button id="adminDefaulterSaveButton" onclick="updateDefaultCustomerBanner()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm">ग्राहक जोड़ें</button>
-        </div>
-        <div id="adminDefaulterList" class="mt-4 space-y-2"></div>
-      </section>
 
       <div class="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
         <div>
@@ -291,7 +288,7 @@
               <thead class="text-slate-400 uppercase border-b border-slate-800 bg-slate-950/40 font-mono">
                 <tr>
                   <th class="py-3 px-2">ID कोड</th>
-                  <th>दुकान का नाम / मालिक का नाम</th>
+                  <th>मालिक / दुकान</th>
                   <th>ईमेल</th>
                   <th>शहर</th>
                   <th>फोन</th>
@@ -491,14 +488,9 @@
     <div class="bg-slate-900 border border-slate-800 max-w-md w-full rounded-3xl p-6 space-y-4 shadow-2xl">
       <h3 class="text-sm font-bold text-amber-400">दुकानदार विवरण संपादित करें (Edit Shopkeeper)</h3>
       <input type="hidden" id="editShopRowId" />
-      <input type="hidden" id="editShopCode" />
       <div>
-        <label class="block text-[10px] text-slate-400 mb-1">दुकान का नाम</label>
+        <label class="block text-[10px] text-slate-400 mb-1">दुकान / मालिक का नाम</label>
         <input type="text" id="editShopNameInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
-      </div>
-      <div>
-        <label class="block text-[10px] text-slate-400 mb-1">दुकान के मालिक का नाम</label>
-        <input type="text" id="editShopOwnerInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
       </div>
       <div>
         <label class="block text-[10px] text-slate-400 mb-1">शहर (City)</label>
@@ -553,8 +545,6 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let rawAdminShopkeepers = [];
-    let rawAdminShopProfiles = {};
-    let defaultCustomers = [];
     let rawAdminTxs = [];
     let rawAdminCustomScores = {};
     let rawAppeals = [];
@@ -607,41 +597,56 @@
           return;
         }
 
-        let { data: shopRecord, error } = await supabaseClient.from('shopkeepers').select('*').eq('email', userEmail).single();
+        const { data: shopRecord, error: shopLookupError } = await supabaseClient
+          .from('shopkeepers').select('*').eq('email', userEmail).maybeSingle();
+
+        if (shopLookupError) {
+          console.error('Shopkeeper lookup failed:', shopLookupError);
+          alert("❌ अकाउंट की स्थिति जाँची नहीं जा सकी। कृपया बाद में फिर प्रयास करें।");
+          await supabaseClient.auth.signOut();
+          return;
+        }
 
         if (!shopRecord) {
-          const autoCode = "SRSAM" + Math.floor(1000 + Math.random() * 9000); 
-          await supabaseClient.from('shopkeepers').insert([{ 
-            shop_id: autoCode, 
-            name: userName, 
-            email: userEmail, 
-            city: "SAMALKHA", 
+          const autoCode = "SRSAM" + Math.floor(1000 + Math.random() * 9000);
+          const { error: registrationError } = await supabaseClient.from('shopkeepers').insert([{
+            shop_id: autoCode,
+            name: userName,
+            email: userEmail,
+            city: "SAMALKHA",
             phone: "0000000000",
             pin: "0000",
-            status: "pending" 
+            status: "pending"
           }]);
-          
-          alert("✅ आपका अकाउंट रजिस्टर हो गया है!\n\nलेकिन अभी यह पेंडिंग (Pending) है। कृपया एडमिन द्वारा ID एक्टिवेट होने का इंतज़ार करें।");
+
+          if (registrationError) {
+            console.error('Shopkeeper registration failed:', registrationError);
+            alert("❌ अकाउंट रजिस्टर नहीं हो सका। कृपया एडमिन से संपर्क करें।");
+          } else {
+            alert("✅ आपका अकाउंट रजिस्टर हो गया है, लेकिन अभी एडमिन अप्रूवल का इंतज़ार है। अप्रूवल से पहले डैशबोर्ड नहीं खुलेगा।");
+          }
           await supabaseClient.auth.signOut();
-          window.location.reload();
-        } else if (shopRecord.status === 'pending') {
-          alert("⏳ आपकी ID अभी भी पेंडिंग है। एडमिन पैनल से अप्रूवल के बाद ही डैशबोर्ड खुलेगा!");
-          await supabaseClient.auth.signOut();
-        } else if (shopRecord.status === 'blocked') {
-          alert("🚫 आपका अकाउंट एडमिन द्वारा ब्लॉक कर दिया गया है।");
-          await supabaseClient.auth.signOut();
-        } else {
-          currentUser = shopRecord;
-          initDashboard();
-          await logActivity(currentUser.shop_id, "Logged in via Google");
+          return;
         }
+
+        if (shopRecord.status !== 'active') {
+          const message = shopRecord.status === 'blocked'
+            ? "🚫 आपका अकाउंट एडमिन द्वारा ब्लॉक किया गया है।"
+            : "⏳ आपकी ID एडमिन अप्रूवल का इंतज़ार कर रही है। अप्रूवल के बाद ही डैशबोर्ड खुलेगा।";
+          alert(message);
+          await supabaseClient.auth.signOut();
+          return;
+        }
+
+        currentUser = shopRecord;
+        initDashboard();
+        await logActivity(currentUser.shop_id, "Logged in via Google");
       } else if (event === 'SIGNED_OUT') {
         currentUser = null;
         document.getElementById('authView').classList.remove('hidden');
         document.getElementById('shopkeeperDashboard').classList.add('hidden');
         document.getElementById('adminDashboard').classList.add('hidden');
         document.getElementById('userBadge').classList.add('hidden');
-        document.getElementById('permanentCustomBanner')?.classList.add('hidden');
       }
     });
 
@@ -851,8 +856,6 @@
     function initDashboard() {
       document.getElementById('authView').classList.add('hidden');
       document.getElementById('userBadge').classList.remove('hidden');
-      document.getElementById('permanentCustomBanner')?.classList.remove('hidden');
-      if (typeof fetchDefaultCustomerBanner === 'function') fetchDefaultCustomerBanner();
       const displayId = currentUser.shop_id || 'ACTIVE';
       document.getElementById('shopkeeperDisplayCode').innerText = displayId;
 
@@ -875,21 +878,14 @@
     }
 
     async function renderAdminAll() {
-      const [shopsRes, txsRes, appealsRes, logsRes, profilesRes] = await Promise.all([
+      const [shopsRes, txsRes, appealsRes, logsRes] = await Promise.all([
         supabaseClient.from('shopkeepers').select('*').neq('shop_id', 'JBSMK000001').order('created_at', { ascending: false }),
         supabaseClient.from('transactions').select('*').order('created_at', { ascending: false }),
         supabaseClient.from('appeals').select('*').order('created_at', { ascending: false }),
-        supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(50),
-        supabaseClient.from('settings').select('key,value').like('key', 'shop_profile:%')
+        supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(50)
       ]);
 
       rawAdminShopkeepers = shopsRes.data || [];
-      rawAdminShopProfiles = {};
-      (profilesRes.data || []).forEach(row => {
-        const shopId = row.key.slice('shop_profile:'.length);
-        try { rawAdminShopProfiles[shopId] = typeof row.value === 'string' ? JSON.parse(row.value || '{}') : (row.value || {}); }
-        catch { rawAdminShopProfiles[shopId] = {}; }
-      });
       rawAdminTxs = txsRes.data || [];
       rawAppeals = appealsRes.data || [];
       rawAuditLogs = logsRes.data || rawAuditLogs;
@@ -933,14 +929,11 @@ async function renderAdminAppeals() {
       loadAdminAppeals();
     }
 
-    function openEditShopModalFromButton(button) {
-      const data = button.dataset;
-      document.getElementById('editShopRowId').value = data.shopId || '';
-      document.getElementById('editShopCode').value = data.shopCode || '';
-      document.getElementById('editShopNameInput').value = data.shopName || '';
-      document.getElementById('editShopOwnerInput').value = data.ownerName || '';
-      document.getElementById('editShopCityInput').value = data.city || '';
-      document.getElementById('editShopPhoneInput').value = data.phone || '';
+    function openEditShopModal(id, name, city, phone, pin) {
+      document.getElementById('editShopRowId').value = id;
+      document.getElementById('editShopNameInput').value = name || '';
+      document.getElementById('editShopCityInput').value = city || '';
+      document.getElementById('editShopPhoneInput').value = phone || '';
       document.getElementById('editShopModal').classList.remove('hidden');
     }
 
@@ -950,35 +943,18 @@ async function renderAdminAppeals() {
 
     async function saveShopkeeperEdit() {
       const rowId = document.getElementById('editShopRowId').value;
-      const shopCode = document.getElementById('editShopCode').value;
-      const shopName = document.getElementById('editShopNameInput').value.trim();
-      const ownerName = document.getElementById('editShopOwnerInput').value.trim();
+      const name = document.getElementById('editShopNameInput').value.trim();
       const city = document.getElementById('editShopCityInput').value.trim().toUpperCase();
       const phone = document.getElementById('editShopPhoneInput').value.trim();
 
-      if (!shopName || !ownerName) {
-        alert('कृपया दुकान और मालिक—दोनों के नाम भरें।');
-        return;
+      const { error } = await supabaseClient.from('shopkeepers').update({ name: name, city: city, phone: phone }).eq('id', rowId);
+      if(!error) {
+        alert('✓ विवरण सफलतापूर्वक अपडेट कर दिया गया है!');
+        closeEditShopModal();
+        renderAdminAll();
+      } else {
+        alert('❌ त्रुटि: ' + error.message);
       }
-
-      const { error: shopError } = await supabaseClient.from('shopkeepers').update({ city, phone }).eq('id', rowId);
-      if (shopError) {
-        alert('दुकानदार विवरण सेव नहीं हुआ: ' + shopError.message);
-        return;
-      }
-
-      const { error: profileError } = await supabaseClient.from('settings').upsert({
-        key: `shop_profile:${shopCode}`,
-        value: JSON.stringify({ shopName, ownerName })
-      }, { onConflict: 'key' });
-      if (profileError) {
-        alert('नाम सेव नहीं हुए। settings टेबल की अनुमति जाँचें: ' + profileError.message);
-        return;
-      }
-
-      alert('✓ दुकान और मालिक के नाम अपडेट हो गए।');
-      closeEditShopModal();
-      await renderAdminAll();
     }
 
     function openEditCustomerModal(phoneKey, currentName, currentAadhaar, currentPan) {
@@ -1045,51 +1021,26 @@ async function renderAdminAppeals() {
       document.getElementById('statTotalDues').innerText = '₹' + totalDues.toLocaleString('en-IN');
     }
 
-    function escapeHtml(value) {
-      return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
-    }
-
-    function getShopDisplayProfile(shop) {
-      const saved = rawAdminShopProfiles[shop.shop_id] || {};
-      const firstName = (...values) => values.find(value => {
-        if (typeof value !== 'string' || !value.trim()) return false;
-        return !['store', 'shop', 'new shop', 'unknown'].includes(value.trim().toLowerCase());
-      })?.trim() || '';
-      const shopName = firstName(saved.shopName, shop.shop_name, shop.shopName, shop.store_name, shop.storeName, shop.business_name, shop.businessName);
-      const ownerName = firstName(saved.ownerName, shop.owner_name, shop.ownerName, shop.proprietor_name, shop.proprietor, shop.owner, shop.name, shop.user_metadata?.full_name, shop.email?.split('@')[0]);
-      return { shopName, ownerName };
-    }
-
     function renderFilteredAdminShopkeepers(query) {
       const tbody = document.getElementById('adminShopkeepersList');
-      const rows = rawAdminShopkeepers.filter(shop => {
-        const profile = getShopDisplayProfile(shop);
-        const searchable = [shop.shop_id, profile.shopName, profile.ownerName, shop.email, shop.city, shop.phone].join(' ').toLowerCase();
-        return !query || searchable.includes(query);
-      });
-      tbody.innerHTML = rows.map(shop => {
-        const profile = getShopDisplayProfile(shop);
-        const status = shop.status || 'pending';
-        const statusBadge = status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
-        const actionBtnColor = status === 'pending' ? 'emerald' : 'amber';
-        const actionBtnText = status === 'active' ? 'Block' : (status === 'pending' ? 'Approve' : 'Unblock');
+      tbody.innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || s.name.toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
+        let statusBadge = s.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
+        let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber';
+        let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
         return `
         <tr class="text-slate-300">
-          <td class="py-3 px-2 font-mono text-amber-300 font-bold">${escapeHtml(shop.shop_id || '-')}</td>
-          <td class="py-3">
-            <div class="font-bold text-white">${escapeHtml(profile.shopName || 'दुकान का नाम सेट नहीं है')}</div>
-            <div class="mt-1 text-[11px] text-slate-400">मालिक: <span class="text-slate-300">${escapeHtml(profile.ownerName || 'नाम उपलब्ध नहीं')}</span></div>
-          </td>
-          <td class="text-slate-400">${escapeHtml(shop.email || '-')}</td>
-          <td class="font-mono text-slate-300 uppercase">${escapeHtml(shop.city || '-')}</td>
-          <td class="font-mono text-slate-400">${escapeHtml(shop.phone || '-')}</td>
-          <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${escapeHtml(status)}</span></td>
+          <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
+          <td><b>${s.name || 'Store'}</b></td>
+          <td class="text-slate-400">${s.email || '-'}</td>
+          <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
+          <td class="font-mono text-slate-400">${s.phone}</td>
+          <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${s.status}</span></td>
           <td class="text-right pr-2 space-x-1">
-            <button data-shop-id="${escapeHtml(shop.id)}" data-shop-code="${escapeHtml(shop.shop_id || '')}" data-shop-name="${escapeHtml(profile.shopName)}" data-owner-name="${escapeHtml(profile.ownerName)}" data-city="${escapeHtml(shop.city || '')}" data-phone="${escapeHtml(shop.phone || '')}" onclick="openEditShopModalFromButton(this)" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">नाम संपादित करें</button>
-            <button onclick="adminToggleBlockShopkeeper('${escapeHtml(shop.id)}', '${escapeHtml(status)}')" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs cursor-pointer">${actionBtnText}</button>
-            <button onclick="adminDeleteShopkeeper('${escapeHtml(shop.id)}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs cursor-pointer">Delete</button>
+            <button onclick="openEditShopModal('${s.id}', '${s.name}', '${s.city}', '${s.phone}')" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit</button>
+            <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs cursor-pointer">${actionBtnText}</button>
+            <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs cursor-pointer">Delete</button>
           </td>
-        </tr>`;
+        </tr>`
       }).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
     }
 
@@ -1524,118 +1475,51 @@ async function loadAdminAppeals() {
     }
 }
     }// --- एडमिन डिफ़ॉल्टर बैनर और डेटा फिक्स लॉजिक ---
-function normalizeDefaulterList(value) {
-    if (!value) return [];
-    try {
-        const parsed = typeof value === 'string' ? JSON.parse(value) : value;
-        if (Array.isArray(parsed)) {
-            return parsed.filter(item => item && item.name).map(item => ({ name: String(item.name), amount: item.amount == null ? '' : String(item.amount) }));
-        }
-        if (parsed && typeof parsed === 'object' && parsed.name) {
-            return [{ name: String(parsed.name), amount: parsed.amount == null ? '' : String(parsed.amount) }];
-        }
-    } catch (_) {
-        // Treat older plain-text banner values as a single editable entry.
-    }
-    return [{ name: String(value), amount: '' }];
-}
-
-function renderDefaulterBanner() {
-    const banner = document.getElementById('permanentCustomBanner');
-    if (!banner) return;
-    const span = document.createElement('span');
-    const message = defaultCustomers.length
-        ? `⚠️ डिफ़ॉल्टर सूचना: ${defaultCustomers.map(customer => customer.amount ? `${customer.name} - बकाया राशि: ₹${customer.amount}` : customer.name).join('　 •　 ')}`
-        : '✅ डिफ़ॉल्टर सूचना: अभी कोई ग्राहक सूचीबद्ध नहीं है।';
-    span.textContent = message;
-    banner.replaceChildren(span);
-
-    const list = document.getElementById('adminDefaulterList');
-    if (!list) return;
-    list.innerHTML = defaultCustomers.length ? defaultCustomers.map((customer, index) => `
-      <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm">
-        <span><b class="text-white">${escapeHtml(customer.name)}</b><span class="ml-2 text-amber-300">${customer.amount ? `₹${escapeHtml(customer.amount)}` : 'राशि नहीं दी गई'}</span></span>
-        <span class="flex gap-2">
-          <button onclick="editDefaulter(${index})" class="rounded-lg bg-slate-800 px-3 py-1 text-xs text-blue-300">बदलें</button>
-          <button onclick="removeDefaulter(${index})" class="rounded-lg bg-red-950 px-3 py-1 text-xs text-red-300">हटाएँ</button>
-        </span>
-      </div>`).join('') : '<p class="text-xs text-slate-500">अभी कोई ग्राहक नहीं जोड़ा गया।</p>';
-}
-
 async function fetchDefaultCustomerBanner() {
     try {
-        const { data, error } = await supabaseClient.from('settings')
-            .select('value').eq('key', 'default_customer_banner').maybeSingle();
-        if (error) throw error;
-        defaultCustomers = normalizeDefaulterList(data?.value);
-        renderDefaulterBanner();
+        if (typeof supabaseClient === 'undefined') return;
+        const { data, error } = await supabaseClient
+            .from('settings')
+            .select('value')
+            .eq('key', 'default_customer_banner')
+            .single();
+
+        const permBanner = document.getElementById('permanentCustomBanner');
+        if (permBanner && data && data.value) {
+            permBanner.innerHTML = `<span>⚠️ <b>डिफ़ॉल्ट / डिफ़ॉल्टर सूचना:</b> ${data.value}</span>`;
+        }
     } catch (err) {
-        console.error('डिफ़ॉल्टर बैनर लोड नहीं हुआ:', err.message);
+        console.log('बैनर लोड हो रहा है...');
     }
-}
-
-function editDefaulter(index) {
-    const customer = defaultCustomers[index];
-    if (!customer) return;
-    document.getElementById('adminDefaulterName').value = customer.name;
-    document.getElementById('adminDefaulterAmount').value = customer.amount;
-    document.getElementById('adminDefaulterEditIndex').value = String(index);
-    document.getElementById('adminDefaulterSaveButton').textContent = 'बदलाव सेव करें';
-}
-
-async function persistDefaulters() {
-    const { error } = await supabaseClient.from('settings').upsert({
-        key: 'default_customer_banner',
-        value: JSON.stringify(defaultCustomers)
-    }, { onConflict: 'key' });
-    if (error) throw error;
-    renderDefaulterBanner();
 }
 
 async function updateDefaultCustomerBanner() {
-    const nameInput = document.getElementById('adminDefaulterName');
-    const amountInput = document.getElementById('adminDefaulterAmount');
-    const name = nameInput.value.trim();
-    const amount = amountInput.value.trim();
-    if (!name) {
-        alert('कृपया ग्राहक का नाम दर्ज करें।');
+    const custName = document.getElementById('adminDefaulterName')?.value.trim();
+    const defAmount = document.getElementById('adminDefaulterAmount')?.value.trim();
+
+    if (!custName) {
+        alert('कृपया डिफ़ॉल्ट कस्टमर का नाम दर्ज करें।');
         return;
     }
 
-    const editIndex = Number(document.getElementById('adminDefaulterEditIndex').value);
-    const customer = { name, amount };
-    if (editIndex >= 0 && editIndex < defaultCustomers.length) defaultCustomers[editIndex] = customer;
-    else defaultCustomers.push(customer);
+    const bannerText = defAmount ? `${custName} - बक़ाया राशि: ₹${defAmount}` : custName;
 
     try {
-        await persistDefaulters();
-        nameInput.value = '';
-        amountInput.value = '';
-        document.getElementById('adminDefaulterEditIndex').value = '-1';
-        document.getElementById('adminDefaulterSaveButton').textContent = 'ग्राहक जोड़ें';
-        alert('✓ डिफ़ॉल्टर बैनर अपडेट हो गया।');
-    } catch (err) {
-        alert('बैनर सेव नहीं हुआ: ' + err.message);
-        await fetchDefaultCustomerBanner();
-    }
-}
+        const { error } = await supabaseClient
+            .from('settings')
+            .upsert({ key: 'default_customer_banner', value: bannerText });
 
-async function removeDefaulter(index) {
-    if (!defaultCustomers[index] || !confirm('इस ग्राहक को बैनर से हटाएँ?')) return;
-    const removed = defaultCustomers.splice(index, 1)[0];
-    try {
-        await persistDefaulters();
-        const editIndex = Number(document.getElementById('adminDefaulterEditIndex').value);
-        if (editIndex === index) {
-            document.getElementById('adminDefaulterName').value = '';
-            document.getElementById('adminDefaulterAmount').value = '';
-            document.getElementById('adminDefaulterEditIndex').value = '-1';
-            document.getElementById('adminDefaulterSaveButton').textContent = 'ग्राहक जोड़ें';
+        if (error) {
+            alert('डिफ़ॉल्टर बैनर सेव करने में विफल।');
+            return;
         }
+
+        alert('सफलतापूर्वक! डिफ़ॉल्ट कस्टमर/डिफ़ॉल्टर बैनर अपडेट कर दिया गया है।');
+        fetchDefaultCustomerBanner();
+        document.getElementById('adminDefaulterName').value = '';
+        document.getElementById('adminDefaulterAmount').value = '';
     } catch (err) {
-        defaultCustomers.splice(index, 0, removed);
-        renderDefaulterBanner();
-        alert('ग्राहक हटाया नहीं जा सका: ' + err.message);
+        console.error('एरर:', err);
     }
 }
 
