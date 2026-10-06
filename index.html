@@ -46,7 +46,7 @@
       </div>
 
       <div class="flex items-center gap-3">
-        <div class="relative flex items-center gap-1">
+        <div id="broadcastControls" class="hidden relative flex items-center gap-1">
           <!-- Bell Icon -->
           <button onclick="showGlobalBroadcastNotification()" class="p-2 text-slate-300 hover:text-white relative cursor-pointer">
             <i data-lucide="bell" class="w-5 h-5"></i>
@@ -66,11 +66,8 @@
       </div>
     </div>
   </header>
-<div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-3 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
-    <span>⭐ डिफ़ॉल्ट सूचना: डेटा लोड हो रहा है...</span>
-</div>
   <!-- ================= SINGLE PERMANENT BANNER ================= -->
-  <div class="max-w-7xl mx-auto px-4 mt-3 w-full">
+  <div id="permanentBannerContainer" class="hidden max-w-7xl mx-auto px-4 mt-3 w-full">
     <div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
       <span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
     </div>
@@ -88,7 +85,7 @@
       </div>
       <div class="flex justify-end gap-3">
         <button onclick="closeGlobalModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium cursor-pointer">कैंसिल करें</button>
-        <button onclick="clearGlobalAlert()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium cursor-pointer">हटाएं (Clear)</button>
+        <button id="clearBroadcastButton" onclick="clearGlobalAlert()" class="hidden px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium cursor-pointer">हटाएं (Clear)</button>
       </div>
     </div>
   </div>
@@ -193,11 +190,11 @@
     </div>
 
     <!-- 3. FULL MASTER ADMIN DASHBOARD -->
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg mt-4">
+    <div id="adminBannerControls" class="hidden bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg mt-4">
     <h3 class="text-md font-bold text-amber-400 mb-3">⚙️ डिफ़ॉल्ट कस्टमर / डिफ़ॉल्टर बैनर सेट करें (केवल एडमिन)</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
         <input type="text" id="adminDefaulterName" placeholder="कस्टमर का नाम..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-        <input type="number" id="adminDefaulterAmount" placeholder="बकाया राशि (रुपये में)..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+        <input type="number" id="adminDefaulterAmount" min="0" placeholder="बकाया राशि (रुपये में)..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
     </div>
     <button onclick="updateDefaultCustomerBanner()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm w-full">बैनर अपडेट करें</button>
 </div>
@@ -454,7 +451,7 @@
               <input type="number" id="rule180" value="50" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-red-500 font-bold" />
             </div>
           </div>
-          <button onclick="alert('✓ स्कोरिंग रूल्स सफलतापूर्वक अपडेट हो गए हैं!')" class="bg-slate-800 hover:bg-slate-750 text-amber-400 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">नियम सेव करें</button>
+          <button onclick="saveScoringRules()" class="bg-slate-800 hover:bg-slate-750 text-amber-400 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">नियम सेव करें</button>
         </section>
 
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
@@ -560,13 +557,6 @@
         lucide.createIcons();
       }
       
-      // एडमिन पैनल के लिए अपील डेटा लोड करना
-      loadAdminAppeals();
-
-      if(localStorage.getItem('ld_global_broadcast')) {
-        const dot = document.getElementById('broadcastDot');
-        if (dot) dot.classList.remove('hidden');
-      }
     });
 
     // ------------------------------------------------------------
@@ -587,7 +577,7 @@
     }
 
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      if (session && event === 'SIGNED_IN') {
+      if (session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
         const userEmail = session.user.email;
         const userName = session.user.user_metadata.full_name || "New Shop";
         
@@ -630,6 +620,11 @@
         document.getElementById('authView').classList.remove('hidden');
         document.getElementById('shopkeeperDashboard').classList.add('hidden');
         document.getElementById('adminDashboard').classList.add('hidden');
+        document.getElementById('adminBannerControls').classList.add('hidden');
+        document.getElementById('permanentBannerContainer').classList.add('hidden');
+        document.getElementById('broadcastControls').classList.add('hidden');
+        document.getElementById('clearBroadcastButton').classList.add('hidden');
+        document.getElementById('globalNotificationModal').classList.add('hidden');
         document.getElementById('userBadge').classList.add('hidden');
       }
     });
@@ -641,18 +636,28 @@
     // ------------------------------------------------------------
     // GLOBAL BROADCAST NOTIFICATIONS & POPUPS
     // ------------------------------------------------------------
-    function showGlobalBroadcastNotification() {
-      const data = localStorage.getItem('ld_global_broadcast');
+    async function loadGlobalBroadcastIndicator() {
+      const { data } = await supabaseClient.from('settings').select('value').eq('key', 'global_broadcast').maybeSingle();
+      const dot = document.getElementById('broadcastDot');
+      if (dot) dot.classList.toggle('hidden', !data?.value);
+    }
+
+    async function showGlobalBroadcastNotification() {
       const modal = document.getElementById('globalNotificationModal');
       const msgDiv = document.getElementById('globalModalMessage');
-
-      if (data && modal && msgDiv) {
-        const obj = JSON.parse(data);
-        msgDiv.innerHTML = `
-          <p class="mb-2">${obj.message}</p>
-          <span class="text-xs text-slate-400">समय: ${new Date(obj.time).toLocaleString('hi-IN')}</span>
-        `;
-        modal.classList.remove('hidden');
+      const { data, error } = await supabaseClient.from('settings').select('value').eq('key', 'global_broadcast').maybeSingle();
+      if (error) {
+        alert('ब्रॉडकास्ट लोड नहीं हो सका। कृपया बाद में फिर प्रयास करें।');
+        return;
+      }
+      if (data?.value && modal && msgDiv) {
+        try {
+          const obj = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          msgDiv.textContent = `${obj.message || ''} · समय: ${new Date(obj.time).toLocaleString('hi-IN')}`;
+          modal.classList.remove('hidden');
+        } catch (parseError) {
+          alert('ब्रॉडकास्ट संदेश पढ़ा नहीं जा सका।');
+        }
       } else {
         alert('कोई नया ग्लोबल ब्रॉडकास्ट अलर्ट उपलब्ध नहीं है।');
       }
@@ -665,8 +670,12 @@
       }
     }
 
-    function clearGlobalAlert() {
-      localStorage.removeItem('ld_global_broadcast');
+    async function clearGlobalAlert() {
+      const { error } = await supabaseClient.from('settings').delete().eq('key', 'global_broadcast');
+      if (error) {
+        alert('ब्रॉडकास्ट हटाया नहीं जा सका।');
+        return;
+      }
       closeGlobalModal();
       const dot = document.getElementById('broadcastDot');
       if (dot) dot.classList.add('hidden');
@@ -675,13 +684,18 @@
 
     async function publishGlobalBroadcast() {
       const msg = document.getElementById('broadcastInput').value.trim();
-      if(!msg) { alert('कृपया संदेश दर्ज करें!'); return; }
-      localStorage.setItem('ld_global_broadcast', JSON.stringify({ message: msg, time: new Date().toISOString() }));
-      alert('✓ ग्लोबल ब्रॉडकास्ट पूरे नेटवर्क पर लाइव कर दिया गया है!');
-      document.getElementById('broadcastInput').value = "";
+      if (!msg) { alert('कृपया संदेश दर्ज करें!'); return; }
+      const value = JSON.stringify({ message: msg, time: new Date().toISOString() });
+      const { error } = await supabaseClient.from('settings').upsert({ key: 'global_broadcast', value });
+      if (error) {
+        alert('ब्रॉडकास्ट सेव नहीं हुआ। कृपया डेटाबेस अनुमति जाँचें।');
+        return;
+      }
+      document.getElementById('broadcastInput').value = '';
       const dot = document.getElementById('broadcastDot');
       if (dot) dot.classList.remove('hidden');
-      logActivity("ADMIN", "Published Global Broadcast Notification");
+      await logActivity('ADMIN', 'Published Global Broadcast Notification');
+      alert('✓ ग्लोबल ब्रॉडकास्ट पूरे नेटवर्क पर लाइव कर दिया गया है!');
     }
 
     // ------------------------------------------------------------
@@ -744,18 +758,51 @@
 
     function calculateSmartScore(days, totalDues, uniqueShopsCount = 1) {
       if (days <= 0 && totalDues <= 0) return 100;
-      const months = days / 30;
-      let amountPenalty = Math.sqrt(totalDues) * 0.5;
-      let timePenalty = months * 1.2;
-      let totalPenalty = amountPenalty + timePenalty;
-      let baseScore = Math.round(100 - totalPenalty);
-      if (uniqueShopsCount >= 2) {
-        let drop = 100 - baseScore;
-        baseScore -= drop; 
+      const rules = JSON.parse(localStorage.getItem('ld_scoring_rules') || '{"30":15,"90":35,"180":50}');
+      const amountPenalty = Math.sqrt(Math.max(0, totalDues)) * 0.5;
+      const timePenalty = Math.max(0, days) / 30 * 1.2;
+      const agePenalty = days >= 180 ? Number(rules['180']) : days >= 90 ? Number(rules['90']) : days >= 30 ? Number(rules['30']) : 0;
+      let baseScore = Math.round(100 - amountPenalty - timePenalty - agePenalty);
+      if (uniqueShopsCount >= 2) baseScore -= (100 - baseScore);
+      return Math.max(1, Math.min(100, baseScore));
+    }
+
+    async function loadScoringRules() {
+      let rules = {};
+      try {
+        rules = JSON.parse(localStorage.getItem('ld_scoring_rules') || '{}');
+        const { data, error } = await supabaseClient.from('settings').select('value').eq('key', 'scoring_rules').maybeSingle();
+        if (!error && data?.value) {
+          rules = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          localStorage.setItem('ld_scoring_rules', JSON.stringify(rules));
+        }
+      } catch (error) {
+        console.error('स्कोरिंग नियम लोड नहीं हुए:', error);
       }
-      if (baseScore < 1) baseScore = 1;
-      if (baseScore > 100) baseScore = 100;
-      return baseScore;
+      if (rules['30'] != null) document.getElementById('rule30').value = rules['30'];
+      if (rules['90'] != null) document.getElementById('rule90').value = rules['90'];
+      if (rules['180'] != null) document.getElementById('rule180').value = rules['180'];
+      filterAdminViews();
+    }
+
+    async function saveScoringRules() {
+      const rules = {
+        '30': Number(document.getElementById('rule30').value),
+        '90': Number(document.getElementById('rule90').value),
+        '180': Number(document.getElementById('rule180').value)
+      };
+      if (Object.values(rules).some(value => !Number.isFinite(value) || value < 0 || value > 100)) {
+        alert('हर पेनल्टी 0 से 100 के बीच दर्ज करें।');
+        return;
+      }
+      localStorage.setItem('ld_scoring_rules', JSON.stringify(rules));
+      const { error } = await supabaseClient.from('settings').upsert({ key: 'scoring_rules', value: JSON.stringify(rules) });
+      if (error) {
+        alert('नियम इस ब्राउज़र में सेव हुए, लेकिन क्लाउड सिंक विफल रहा: ' + error.message);
+        return;
+      }
+      alert('✓ स्कोरिंग रूल्स क्लाउड में सेव हो गए हैं।');
+      filterAdminViews();
     }
 
     async function logActivity(shopId, actionText) {
@@ -778,7 +825,8 @@
       const reason = document.getElementById('appealReason').value.trim();
       if(!phone || !reason) { alert('सभी विवरण भरें!'); return; }
 
-      await supabaseClient.from('appeals').insert([{ shop_id: currentUser.shop_id, customer_phone: phone, reason: reason, status: 'pending' }]);
+      const { error } = await supabaseClient.from('appeals').insert([{ shop_id: currentUser.shop_id, customer_phone: phone, reason: reason, status: 'pending' }]);
+      if (error) { alert('अपील भेजने में विफल: ' + error.message); return; }
       alert('✓ आपकी अपील एडमिन को भेज दी गई है!');
       logActivity(currentUser.shop_id, `Submitted appeal for customer phone ${phone}`);
       closeAppealModal();
@@ -840,10 +888,18 @@
     function initDashboard() {
       document.getElementById('authView').classList.add('hidden');
       document.getElementById('userBadge').classList.remove('hidden');
+      document.getElementById('broadcastControls').classList.remove('hidden');
+      document.getElementById('permanentBannerContainer').classList.remove('hidden');
+      loadGlobalBroadcastIndicator();
+      fetchDefaultCustomerBanner();
+      loadScoringRules();
       const displayId = currentUser.shop_id || 'ACTIVE';
       document.getElementById('shopkeeperDisplayCode').innerText = displayId;
 
-      if (currentUser.role === 'admin' || displayId === 'JBSMK000001') {
+      const isAdmin = currentUser.role === 'admin' || displayId === 'JBSMK000001';
+      document.getElementById('clearBroadcastButton').classList.toggle('hidden', !isAdmin);
+      document.getElementById('adminBannerControls').classList.toggle('hidden', !isAdmin);
+      if (isAdmin) {
         document.getElementById('adminDashboard').classList.remove('hidden');
         renderAdminAll();
       } else {
@@ -1093,9 +1149,15 @@ async function renderAdminAppeals() {
 
     async function adminAddTransactionDirect(e) {
       e.preventDefault();
+      const phone = document.getElementById('admTxPhone').value.trim();
+      const amount = Number(document.getElementById('admTxAmount').value);
+      if (!/^\d{10}$/.test(phone) || !Number.isFinite(amount) || amount <= 0) {
+        alert('सही 10-अंकों का मोबाइल नंबर और 0 से अधिक रकम दर्ज करें।');
+        return;
+      }
       const shopId = document.getElementById('admTxShopCode').value.trim().toUpperCase();
       const customDate = document.getElementById('admTxDate').value;
-      await supabaseClient.from('transactions').insert([{
+      const { error } = await supabaseClient.from('transactions').insert([{
         shop_id: shopId,
         customer_name: document.getElementById('admTxCustName').value.trim(),
         customer_phone: document.getElementById('admTxPhone').value.trim(),
@@ -1106,7 +1168,8 @@ async function renderAdminAppeals() {
         status: "pending",
         created_at: customDate ? new Date(customDate).toISOString() : new Date().toISOString()
       }]);
-      await logActivity(shopId, `Admin added direct transaction`);
+      if (error) { alert('लेन-देन सेव नहीं हुआ: ' + error.message); return; }
+      await logActivity(shopId, 'Admin added direct transaction');
       e.target.reset();
       renderAdminAll();
     }
@@ -1117,6 +1180,42 @@ async function renderAdminAppeals() {
       renderAdminAll();
     }
 
+    function parseCSVLine(line) {
+      const values = [];
+      let value = '';
+      let quoted = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"' && line[i + 1] === '"' && quoted) {
+          value += '"';
+          i++;
+        } else if (char === '"') {
+          quoted = !quoted;
+        } else if (char === ',' && !quoted) {
+          values.push(value.trim());
+          value = '';
+        } else {
+          value += char;
+        }
+      }
+      values.push(value.trim());
+      return values;
+    }
+
+    function downloadAdminSampleCSV() {
+      const csv = [
+        'ShopID,Name,Mobile,Amount,Aadhaar,PAN,Date,Notes',
+        'SRSAM1234,Sample Customer,9876543210,1500,,,2025-01-15,Sample credit entry'
+      ].join('\n');
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+      link.download = 'lenden_sample.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(link.href);
+    }
+
     async function importAdminCSV(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1125,17 +1224,21 @@ async function renderAdminAppeals() {
         const lines = evt.target.result.split(/\r\n|\n/);
         const newRecords = [];
         for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].trim().split(',');
-          if (cols.length >= 4) {
+          if (!lines[i].trim()) continue;
+          const cols = parseCSVLine(lines[i]);
+          const amount = Number(cols[3]);
+          if (cols.length >= 4 && cols[0] && cols[1] && /^\\d{10}$/.test(cols[2]) && Number.isFinite(amount) && amount > 0) {
+            const parsedDate = cols[6] ? new Date(cols[6]) : new Date();
             newRecords.push({
-              shop_id: cols[0].trim().toUpperCase(),
-              customer_name: cols[1].trim(),
-              customer_phone: cols[2].trim(),
-              amount: parseFloat(cols[3].trim()),
-              customer_aadhaar: cols[4] ? cols[4].trim() : null,
-              customer_pan: cols[5] ? cols[5].trim().toUpperCase() : null,
-              created_at: cols[6] ? new Date(cols[6]).toISOString() : new Date().toISOString(),
-              status: "pending"
+              shop_id: cols[0].toUpperCase(),
+              customer_name: cols[1],
+              customer_phone: cols[2],
+              amount,
+              customer_aadhaar: cols[4] || null,
+              customer_pan: cols[5] ? cols[5].toUpperCase() : null,
+              created_at: Number.isNaN(parsedDate.getTime()) ? new Date().toISOString() : parsedDate.toISOString(),
+              notes: cols[7] || null,
+              status: 'pending'
             });
           }
         }
@@ -1217,6 +1320,12 @@ async function renderAdminAppeals() {
 
     async function handleAddTransaction(e) {
       e.preventDefault();
+      const phone = document.getElementById('txCustPhone').value.trim();
+      const amount = Number(document.getElementById('txAmount').value);
+      if (!/^\d{10}$/.test(phone) || !Number.isFinite(amount) || amount <= 0) {
+        alert('सही 10-अंकों का मोबाइल नंबर और 0 से अधिक रकम दर्ज करें।');
+        return;
+      }
       const customDate = document.getElementById('txDate').value;
       const { error } = await supabaseClient.from('transactions').insert([{
         shop_id: currentUser.shop_id,
@@ -1468,9 +1577,9 @@ async function fetchDefaultCustomerBanner() {
             .eq('key', 'default_customer_banner')
             .single();
 
-        const permBanner = document.getElementById('permanentCustomBanner');
+                  const permBanner = document.getElementById('permanentCustomBanner');
         if (permBanner && data && data.value) {
-            permBanner.innerHTML = `<span>⚠️ <b>डिफ़ॉल्ट / डिफ़ॉल्टर सूचना:</b> ${data.value}</span>`;
+            permBanner.textContent = `⚠️ डिफ़ॉल्ट / डिफ़ॉल्टर सूचना: ${data.value}`;
         }
     } catch (err) {
         console.log('बैनर लोड हो रहा है...');
@@ -1511,41 +1620,40 @@ async function updateDefaultCustomerBanner() {
 function downloadCloudBackup() {
     try {
         const backupData = {
-            shopkeepers: typeof rawAdminShopkeepers !== 'undefined' ? rawAdminShopkeepers : [],
-            timestamp: new Date().toISOString()
+            shopkeepers: rawAdminShopkeepers,
+            transactions: rawAdminTxs,
+            auditLogs: rawAuditLogs,
+            appeals: rawAppeals,
+            exportDate: new Date().toISOString()
         };
         const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `shri_radhe_radhe_jewellers_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.download = `lenden_registry_backup_${new Date().toISOString().slice(0, 10)}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        alert('सफलतापूर्वक! JSON बैकअप फाइल डाउनलोड हो गई है।');
+        alert('सफलतापूर्वक! पूरा JSON बैकअप डाउनलोड हो गया है।');
     } catch (err) {
+        console.error('डाउनलोड एरर:', err);
         alert('JSON डाउनलोड करने में विफल रहा।');
     }
 }
 
 // डेटा सिंक फंक्शन
 async function syncCloudData() {
-    alert('डेटा सिंक किया जा रहा है...');
     try {
-        if (typeof loadAdminAppeals === 'function') await loadAdminAppeals();
-        await fetchDefaultCustomerBanner();
-        if (typeof renderAdminAll === 'function') renderAdminAll();
+        await Promise.all([renderAdminAll(), fetchDefaultCustomerBanner(), loadGlobalBroadcastIndicator()]);
         alert('डेटा सफलतापूर्वक सिंक हो गया है!');
     } catch (error) {
+        console.error('सिंक करने में त्रुटि:', error);
         alert('डेटा सिंक करने में विफल।');
     }
 }
 
-// पेज लोड होते ही बैनर फेच करें
-document.addEventListener('DOMContentLoaded', () => {
-    fetchDefaultCustomerBanner();
-});// सेफगार्ड ताकि renderAdminAll की एरर कभी न आए
+// सेफगार्ड ताकि renderAdminAll की एरर कभी न आए
 if (typeof renderAdminAll !== 'function') {
     window.renderAdminAll = function() {
         console.log('Admin view rendered safely.');
