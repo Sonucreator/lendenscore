@@ -72,12 +72,53 @@
     table thead { background: #f7f9fc !important; }
     tbody tr:hover { background-color: #f5f8ff !important; }
     footer { color: #69758a !important; background: #fff !important; border-color: #e4e9f1 !important; }
+    .mobile-bottom-nav, .mobile-bottom-nav.hidden { display: none; }
+    #shopScoreSection, #shopAddSection, #shopLedgerSection, #adminDashboard { scroll-margin-top: 5.5rem; }
     @media (max-width: 640px) {
       header { padding: .75rem !important; }
       header p { max-width: 190px; line-height: 1.35; }
       main { padding: .75rem !important; }
       main section, #adminDashboard section { border-radius: 1rem !important; }
       table { min-width: 680px; }
+      body { padding-bottom: 5.5rem; }
+      .mobile-bottom-nav:not(.hidden) {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        position: fixed;
+        inset: auto 0 0;
+        z-index: 40;
+        padding: .55rem .35rem max(.55rem, env(safe-area-inset-bottom));
+        background: rgba(255, 255, 255, .97);
+        border-top: 1px solid #e4e9f1;
+        box-shadow: 0 -5px 20px rgba(15, 23, 42, .08);
+        backdrop-filter: blur(12px);
+      }
+      .mobile-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: .2rem;
+        min-height: 3.2rem;
+        color: #69758a;
+        font-size: .65rem;
+        font-weight: 700;
+      }
+      .mobile-nav-item.is-active { color: #2563eb; }
+      .mobile-nav-item svg { width: 1.2rem; height: 1.2rem; }
+      .mobile-nav-add { color: #fff; }
+      .mobile-nav-add span {
+        display: grid;
+        place-items: center;
+        width: 2.8rem;
+        height: 2.8rem;
+        margin-top: -1.2rem;
+        border: 4px solid #f3f6fb;
+        border-radius: 9999px;
+        background: #2563eb;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, .3);
+      }
+      .mobile-nav-add svg { width: 1.5rem; height: 1.5rem; }
     }
   </style>
 </head>
@@ -175,7 +216,7 @@
         </div>
       </section>
 
-      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
+      <section id="shopScoreSection" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
         <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
           <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
             <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i> ग्राहक लेन-देन स्कोर व नेटवर्क जांच
@@ -195,7 +236,7 @@
         <div id="customerScoreCard" class="hidden mt-4 p-4 rounded-2xl border"></div>
       </section>
 
-      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
+      <section id="shopAddSection" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
         <h2 class="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
           <i data-lucide="plus-circle" class="w-4 h-4 text-amber-400"></i> नया सिंगल लेन-देन जोड़ें
         </h2>
@@ -215,7 +256,7 @@
         </form>
       </section>
 
-      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
+      <section id="shopLedgerSection" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
         <div class="flex justify-between items-center mb-3">
           <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
             <i data-lucide="wallet" class="w-4 h-4 text-amber-400"></i> आपकी दुकान का हिसाब
@@ -519,6 +560,25 @@
 
   </main>
 
+  <!-- Mobile quick navigation, shown after login on small screens -->
+  <nav id="mobileBottomNav" class="mobile-bottom-nav hidden" aria-label="मुख्य नेविगेशन">
+    <button type="button" class="mobile-nav-item is-active" data-nav="home" onclick="navigateApp('home')">
+      <i data-lucide="layout-dashboard"></i><span>डैशबोर्ड</span>
+    </button>
+    <button type="button" class="mobile-nav-item" data-nav="score" onclick="navigateApp('score')">
+      <i data-lucide="search"></i><span>स्कोर</span>
+    </button>
+    <button type="button" class="mobile-nav-item mobile-nav-add" data-nav="add" aria-label="नया लेन-देन जोड़ें" onclick="navigateApp('add')">
+      <span><i data-lucide="plus"></i></span><small>जोड़ें</small>
+    </button>
+    <button type="button" class="mobile-nav-item" data-nav="ledger" onclick="navigateApp('ledger')">
+      <i data-lucide="wallet"></i><span>हिसाब</span>
+    </button>
+    <button type="button" class="mobile-nav-item" data-nav="more" onclick="navigateApp('more')">
+      <i data-lucide="more-horizontal"></i><span>अधिक</span>
+    </button>
+  </nav>
+
   <!-- ================= APPEAL MODAL ================= -->
   <div id="appealModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 max-w-md w-full rounded-3xl p-6 space-y-4 shadow-2xl">
@@ -601,6 +661,15 @@
     let currentUser = null;
     let searchMode = 'ALL';
 
+    function createBackupFileName() {
+      const idCode = currentUser?.shop_id || document.getElementById('shopkeeperDisplayCode')?.textContent || 'ADMIN';
+      const prefix = idCode.replace(/[^a-z]/gi, '').slice(0, 2).toUpperCase() || 'ID';
+      const now = new Date();
+      const pad = value => String(value).padStart(2, '0');
+      const dateTime = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+      return `${prefix}_${dateTime}.json`;
+    }
+
     // ------------------------------------------------------------
     // DOM LOADED & CORE UI SETUP
     // ------------------------------------------------------------
@@ -616,6 +685,8 @@
         const dot = document.getElementById('broadcastDot');
         if (dot) dot.classList.remove('hidden');
       }
+
+      fetchDefaultCustomerBanner();
     });
 
     // ------------------------------------------------------------
@@ -681,6 +752,7 @@
         document.getElementById('adminDashboard').classList.add('hidden');
         document.getElementById('defaultBannerAdminControls').classList.add('hidden');
         document.getElementById('userBadge').classList.add('hidden');
+        document.getElementById('mobileBottomNav').classList.add('hidden');
       }
     });
 
@@ -752,7 +824,7 @@
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
         const dlAnchor = document.createElement('a');
         dlAnchor.setAttribute("href", dataStr);
-        dlAnchor.setAttribute("download", `lenden_registry_backup_${new Date().toISOString().slice(0,10)}.json`);
+        dlAnchor.setAttribute("download", createBackupFileName());
         document.body.appendChild(dlAnchor);
         dlAnchor.click();
         dlAnchor.remove();
@@ -890,8 +962,45 @@
       input.focus();
     }
 
+    function navigateApp(destination) {
+      if (!currentUser) return;
+      const isAdmin = currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001';
+      const nav = document.getElementById('mobileBottomNav');
+      nav.querySelectorAll('[data-nav]').forEach(button => {
+        button.classList.toggle('is-active', button.dataset.nav === destination);
+      });
+
+      if (isAdmin) {
+        if (destination === 'score') switchAdminSection('customers');
+        else if (destination === 'ledger') switchAdminSection('transactions');
+        else if (destination === 'more') switchAdminSection('settings');
+        else if (destination === 'add') {
+          switchAdminSection('transactions');
+          document.getElementById('admTxShopCode').focus({ preventScroll: true });
+        } else {
+          document.getElementById('adminDashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return;
+      }
+
+      if (destination === 'score') {
+        document.getElementById('shopScoreSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('customerSearchInput').focus({ preventScroll: true });
+      } else if (destination === 'add') {
+        document.getElementById('shopAddSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('txCustName').focus({ preventScroll: true });
+      } else if (destination === 'ledger') {
+        document.getElementById('shopLedgerSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (destination === 'more') {
+        openAppealModal();
+      } else {
+        document.getElementById('shopkeeperDashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
     function initDashboard() {
       document.getElementById('authView').classList.add('hidden');
+      document.getElementById('mobileBottomNav').classList.remove('hidden');
       document.getElementById('userBadge').classList.remove('hidden');
       const displayId = currentUser.shop_id || 'ACTIVE';
       document.getElementById('shopkeeperDisplayCode').innerText = displayId;
@@ -1312,24 +1421,10 @@ async function renderAdminAppeals() {
           <td><span class="text-[10px] ${t.status === 'cleared' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-400'} px-2 py-0.5 rounded-full font-bold">${t.status.toUpperCase()}</span></td>
           <td>${t.status !== 'cleared' ? `<button onclick="clearTransaction('${t.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">क्लियर</button>` : '✓ चुकता'}</td>
         </tr>`).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई लेन-देन नहीं।</td></tr>`;
-      lucide.createIcons();document.addEventListener('DOMContentLoaded', () => {
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+      lucide.createIcons();
     }
-    
-    // 1. पेज लोड होते ही लाइव बैनर और अपील लोड करें
-    fetchGlobalBanner();
-    loadAdminAppeals();
-    
-    // 2. शॉपकीपर मास्टर और कस्टमर स्कोर डेटा लोड करें
-    setTimeout(() => {
-        if (typeof renderAdminAll === 'function') {
-            renderAdminAll();
-        } else {
-            loadMasterDataManually();
-        }
-    }, 1000);
-});
+
+
 
 // ================= 1. लाइव एडिटेबल बैनर लॉजिक (डेटाबेस से सिंक) =================
 async function fetchGlobalBanner() {
@@ -1426,7 +1521,7 @@ async function loadMasterDataManually() {
 }
 
 // ================= 3. JSON बैकअप डाउनलोड (पॉप-अप अलर्ट के साथ) =================
-function downloadCloudBackup() {
+function downloadCloudBackupLegacy() {
     try {
         const backupData = {
             shopkeepers: typeof rawAdminShopkeepers !== 'undefined' ? rawAdminShopkeepers : [],
@@ -1438,7 +1533,7 @@ function downloadCloudBackup() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `shri_radhe_radhe_jewellers_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.download = createBackupFileName();
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1452,7 +1547,7 @@ function downloadCloudBackup() {
 }
 
 // ================= 4. डेटा सिंक फंक्शन =================
-async function syncCloudData() {
+async function syncCloudDataLegacy() {
     alert('डेटा सिंक किया जा रहा है...');
     try {
         await loadAdminAppeals();
@@ -1469,7 +1564,7 @@ async function syncCloudData() {
 }
 
 // ================= 5. ग्लोबल ब्रॉडकास्ट नोटिफिकेशन (बेल आइकन के लिए) =================
-function showGlobalBroadcastNotification() {
+function showGlobalBroadcastNotificationLegacy() {
     const data = localStorage.getItem('ld_global_broadcast');
     if (data) {
         const obj = JSON.parse(data);
@@ -1480,7 +1575,7 @@ function showGlobalBroadcastNotification() {
 }
 
 // ================= 6. एडमिन अपील लिस्ट लोड करना =================
-async function loadAdminAppeals() {
+async function loadAdminAppealsLegacy() {
     try {
         if (typeof supabaseClient === 'undefined') return;
 
@@ -1512,7 +1607,7 @@ async function loadAdminAppeals() {
         console.error('अपील एरर:', err);
     }
 }
-    }// --- एडमिन डिफ़ॉल्टर बैनर और डेटा फिक्स लॉजिक ---
+    // --- एडमिन डिफ़ॉल्टर बैनर और डेटा फिक्स लॉजिक ---
 async function fetchDefaultCustomerBanner() {
     try {
         if (typeof supabaseClient === 'undefined') return;
@@ -1562,7 +1657,7 @@ async function updateDefaultCustomerBanner() {
 }
 
 // JSON बैकअप पॉप-अप के साथ
-function downloadCloudBackup() {
+function downloadCloudBackupLegacy2() {
     try {
         const backupData = {
             shopkeepers: typeof rawAdminShopkeepers !== 'undefined' ? rawAdminShopkeepers : [],
@@ -1572,7 +1667,7 @@ function downloadCloudBackup() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `shri_radhe_radhe_jewellers_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.download = createBackupFileName();
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1584,7 +1679,7 @@ function downloadCloudBackup() {
 }
 
 // डेटा सिंक फंक्शन
-async function syncCloudData() {
+async function syncCloudDataLegacy2() {
     alert('डेटा सिंक किया जा रहा है...');
     try {
         if (typeof loadAdminAppeals === 'function') await loadAdminAppeals();
@@ -1596,10 +1691,7 @@ async function syncCloudData() {
     }
 }
 
-// पेज लोड होते ही बैनर फेच करें
-document.addEventListener('DOMContentLoaded', () => {
-    fetchDefaultCustomerBanner();
-});// सेफगार्ड ताकि renderAdminAll की एरर कभी न आए
+// सेफगार्ड ताकि renderAdminAll की एरर कभी न आए
 if (typeof renderAdminAll !== 'function') {
     window.renderAdminAll = function() {
         console.log('Admin view rendered safely.');
