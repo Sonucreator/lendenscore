@@ -165,7 +165,12 @@
       .mobile-nav-add svg { width: 1.5rem; height: 1.5rem; }
     }
 
-    /* Navigation displays one shopkeeper view at a time on every screen size. */
+    /* Keep login and dashboard views mutually exclusive on every screen size. */
+    #shopkeeperDashboard.hidden,
+    #adminDashboard.hidden,
+    #authView.hidden { display: none !important; }
+    #shopkeeperDashboard:not(.hidden),
+    #adminDashboard:not(.hidden) { display: block; }
     #shopkeeperDashboard > section.hidden { display: none !important; }
     #shopkeeperDashboard > section:not(.hidden) { margin-top: 0; }
 
@@ -854,6 +859,7 @@
         document.getElementById('defaultBannerAdminControls').classList.add('hidden');
         document.getElementById('userBadge').classList.add('hidden');
         document.getElementById('mobileBottomNav').classList.add('hidden');
+        window.scrollTo(0, 0);
       }
     });
 
@@ -890,7 +896,15 @@
       const msgDiv = document.getElementById('globalModalMessage');
 
       if (data && modal && msgDiv) {
-        const obj = JSON.parse(data);
+        let obj;
+        try {
+          obj = JSON.parse(data);
+        } catch (error) {
+          localStorage.removeItem('ld_global_broadcast');
+          document.getElementById('broadcastDot')?.classList.add('hidden');
+          alert('ग्लोबल ब्रॉडकास्ट डेटा पढ़ा नहीं जा सका।');
+          return;
+        }
         const message = document.createElement('p');
         message.className = 'mb-2';
         message.textContent = obj.message || '';
@@ -1023,14 +1037,28 @@
     async function submitAppeal() {
       const phone = document.getElementById('appealCustPhone').value.trim();
       const reason = document.getElementById('appealReason').value.trim();
-      if(!phone || !reason) { alert('सभी विवरण भरें!'); return; }
+      if (!currentUser || !phone || !reason) { alert('सभी विवरण भरें!'); return; }
 
-      await supabaseClient.from('appeals').insert([{ shop_id: currentUser.shop_id, customer_phone: phone, reason: reason, status: 'pending' }]);
-      alert('✓ आपकी अपील एडमिन को भेज दी गई है!');
-      logActivity(currentUser.shop_id, `Submitted appeal for customer phone ${phone}`);
+      if (isDemoMode) {
+        alert('डेमो मोड में अपील सेव नहीं होती।');
+      } else {
+        const { error } = await supabaseClient.from('appeals').insert([{
+          shop_id: currentUser.shop_id,
+          customer_phone: phone,
+          reason,
+          status: 'pending'
+        }]);
+        if (error) {
+          alert('अपील भेजने में विफल: ' + error.message);
+          return;
+        }
+        alert('✓ आपकी अपील एडमिन को भेज दी गई है!');
+        logActivity(currentUser.shop_id, `Submitted appeal for customer phone ${phone}`);
+      }
+
       closeAppealModal();
-      document.getElementById('appealCustPhone').value = "";
-      document.getElementById('appealReason').value = "";
+      document.getElementById('appealCustPhone').value = '';
+      document.getElementById('appealReason').value = '';
     }
 
     async function loadAdminAppeals() {
@@ -1135,10 +1163,13 @@
       document.getElementById('shopkeeperDisplayCode').innerText = displayId;
 
       if (currentUser.role === 'admin' || displayId === 'JBSMK000001') {
+        document.getElementById('shopkeeperDashboard').classList.add('hidden');
         document.getElementById('adminDashboard').classList.remove('hidden');
         document.getElementById('defaultBannerAdminControls').classList.remove('hidden');
         renderAdminAll();
       } else {
+        document.getElementById('adminDashboard').classList.add('hidden');
+        document.getElementById('defaultBannerAdminControls').classList.add('hidden');
         document.getElementById('shopkeeperDashboard').classList.remove('hidden');
         document.getElementById('dashShopTitle').innerText = currentUser.name || displayId;
         renderShopkeeperView();
@@ -1269,7 +1300,7 @@
 
     function renderFilteredAdminShopkeepers(query) {
       const tbody = document.getElementById('adminShopkeepersList');
-      tbody.innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || s.name.toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
+      tbody.innerHTML = rawAdminShopkeepers.filter(s => !query || String(s.shop_id || '').toLowerCase().includes(query) || String(s.name || '').toLowerCase().includes(query) || String(s.email || '').toLowerCase().includes(query)).map(s => {
         let statusBadge = s.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
         let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber';
         let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
@@ -1304,7 +1335,7 @@
           if (diff > custMap[key].unpaidDays) custMap[key].unpaidDays = diff;
         }
       });
-      let custList = Object.values(custMap).filter(c => !query || c.name.toLowerCase().includes(query) || c.phone.includes(query) || c.aadhaar.toLowerCase().includes(query) || c.pan.toLowerCase().includes(query));
+      let custList = Object.values(custMap).filter(c => !query || String(c.name || '').toLowerCase().includes(query) || String(c.phone || '').includes(query) || String(c.aadhaar || '').toLowerCase().includes(query) || String(c.pan || '').toLowerCase().includes(query));
       tbody.innerHTML = custList.map(c => {
         const uniqueShopsCount = c.shopsSet.size;
         const score = calculateSmartScore(c.unpaidDays, c.dues, uniqueShopsCount);
@@ -1327,7 +1358,7 @@
 
     function renderFilteredAdminTransactions(query) {
       const tbody = document.getElementById('adminTxList');
-      tbody.innerHTML = rawAdminTxs.filter(t => !query || t.shop_id.toLowerCase().includes(query) || t.customer_name.toLowerCase().includes(query) || t.customer_phone.includes(query)).map(t => `
+      tbody.innerHTML = rawAdminTxs.filter(t => !query || String(t.shop_id || '').toLowerCase().includes(query) || String(t.customer_name || '').toLowerCase().includes(query) || String(t.customer_phone || '').includes(query)).map(t => `
         <tr class="text-slate-300 ${t.status === 'cleared' ? 'opacity-60 bg-slate-950/40' : ''}">
           <td class="py-3 px-2 font-mono text-amber-300">${t.shop_id}</td>
           <td class="font-bold text-white">${t.customer_name}</td>
@@ -1379,6 +1410,22 @@
       renderAdminAll();
     }
 
+    function downloadAdminSampleCSV() {
+      const csv = [
+        'ShopID,Name,Mobile,Amount,Aadhaar,PAN,Date,Notes',
+        'SRSAM1001,Sample Customer,9876543210,1500,,,2025-01-15,Sample entry'
+      ].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'sample-transactions.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
     async function importAdminCSV(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1389,14 +1436,23 @@
         for (let i = 1; i < lines.length; i++) {
           const cols = lines[i].trim().split(',');
           if (cols.length >= 4) {
+            const shopId = (cols[0] || '').trim().toUpperCase();
+            const customerName = (cols[1] || '').trim();
+            const customerPhone = (cols[2] || '').trim();
+            const amount = Number((cols[3] || '').trim());
+            if (!shopId || !customerName || !customerPhone || !Number.isFinite(amount) || amount <= 0) continue;
+
+            const parsedDate = cols[6] ? new Date(cols[6].trim()) : new Date();
+            const transactionDate = Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
             newRecords.push({
-              shop_id: cols[0].trim().toUpperCase(),
-              customer_name: cols[1].trim(),
-              customer_phone: cols[2].trim(),
-              amount: parseFloat(cols[3].trim()),
+              shop_id: shopId,
+              customer_name: customerName,
+              customer_phone: customerPhone,
+              amount,
               customer_aadhaar: cols[4] ? cols[4].trim() : null,
               customer_pan: cols[5] ? cols[5].trim().toUpperCase() : null,
-              created_at: cols[6] ? new Date(cols[6]).toISOString() : new Date().toISOString(),
+              created_at: transactionDate.toISOString(),
+              notes: cols[7] ? cols[7].trim() : null,
               status: "pending"
             });
           }
@@ -1561,49 +1617,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', fetchDefaultCustomerBanner);
-
-// ================= 3. JSON बैकअप डाउनलोड (पॉप-अप अलर्ट के साथ) =================
-function downloadCloudBackup() {
-    try {
-        const backupData = {
-            shopkeepers: typeof rawAdminShopkeepers !== 'undefined' ? rawAdminShopkeepers : [],
-            transactions: typeof rawAdminTxs !== 'undefined' ? rawAdminTxs : [],
-            timestamp: new Date().toISOString()
-        };
-        
-        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = createBackupFileName();
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        alert('सफलतापूर्वक! JSON बैकअप फाइल डाउनलोड हो गई है। कृपया अपने डाउनलोड्स फोल्डर को चेक करें।');
-    } catch (err) {
-        console.error('डाउनलोड एरर:', err);
-        alert('JSON डाउनलोड करने में विफल रहा।');
-    }
-}
-
-// ================= 4. डेटा सिंक फंक्शन =================
-async function syncCloudData() {
-    alert('डेटा सिंक किया जा रहा है...');
-    try {
-        await loadAdminAppeals();
-        await fetchGlobalBanner();
-        await loadMasterDataManually();
-        if (typeof renderAdminAll === 'function') {
-            renderAdminAll();
-        }
-        alert('डेटा सफलतापूर्वक सिंक (Sync) हो गया है!');
-    } catch (error) {
-        console.error('सिंक करने में त्रुटि:', error);
-        alert('डेटा सिंक करने में विफल। कृपया इंटरनेट कनेक्शन जांचें।');
-    }
-}
 
     // --- एडमिन डिफ़ॉल्टर बैनर और डेटा फिक्स लॉजिक ---
 async function fetchDefaultCustomerBanner() {
