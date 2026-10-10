@@ -165,19 +165,9 @@
       .mobile-nav-add svg { width: 1.5rem; height: 1.5rem; }
     }
 
-    /* Responsive ledger layout: keep the familiar dashboard, adapt its density by screen size. */
-    @media (min-width: 1024px) {
-      #shopkeeperDashboard {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        align-items: start;
-        gap: 1.25rem;
-      }
-      #shopkeeperDashboard > section:first-child,
-      #shopLedgerSection { grid-column: 1 / -1; }
-      #shopkeeperDashboard > section { margin-top: 0; }
-      #shopScoreSection, #shopAddSection { min-height: 100%; }
-    }
+    /* Navigation displays one shopkeeper view at a time on every screen size. */
+    #shopkeeperDashboard > section.hidden { display: none !important; }
+    #shopkeeperDashboard > section:not(.hidden) { margin-top: 0; }
 
     .overflow-x-auto {
       max-width: 100%;
@@ -313,7 +303,7 @@
 
     <!-- 2. SHOPKEEPER DASHBOARD -->
     <div id="shopkeeperDashboard" class="hidden space-y-5">
-      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex justify-between items-center">
+      <section id="shopHomeSection" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex justify-between items-center">
         <div>
           <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
           <p class="text-[11px] text-slate-400">सेंट्रल कम्युनिटी रजिस्ट्री • लाइव क्लाउड डेटा सिंक</p>
@@ -1110,24 +1100,31 @@
           switchAdminSection('transactions');
           document.getElementById('admTxShopCode').focus({ preventScroll: true });
         } else {
-          document.getElementById('adminDashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          switchAdminSection('shopkeepers');
         }
+        document.getElementById('adminDashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
         return;
       }
 
+      const shopViews = {
+        home: 'shopHomeSection',
+        score: 'shopScoreSection',
+        add: 'shopAddSection',
+        ledger: 'shopLedgerSection'
+      };
+      const activeView = destination === 'more' ? 'home' : destination;
+      Object.entries(shopViews).forEach(([view, id]) => {
+        document.getElementById(id).classList.toggle('hidden', view !== activeView);
+      });
+
       if (destination === 'score') {
-        document.getElementById('shopScoreSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
         document.getElementById('customerSearchInput').focus({ preventScroll: true });
       } else if (destination === 'add') {
-        document.getElementById('shopAddSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
         document.getElementById('txCustName').focus({ preventScroll: true });
-      } else if (destination === 'ledger') {
-        document.getElementById('shopLedgerSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else if (destination === 'more') {
         openAppealModal();
-      } else {
-        document.getElementById('shopkeeperDashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function initDashboard() {
@@ -1146,6 +1143,7 @@
         document.getElementById('dashShopTitle').innerText = currentUser.name || displayId;
         renderShopkeeperView();
       }
+      navigateApp('home');
       lucide.createIcons();
     }
 
