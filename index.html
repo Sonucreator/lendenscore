@@ -2,7 +2,7 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>लेन-देन | MASTER REGISTRY</title>
   
   <meta name="theme-color" content="#f3f6fb" />
@@ -72,54 +72,8 @@
     table thead { background: #f7f9fc !important; }
     tbody tr:hover { background-color: #f5f8ff !important; }
     footer { color: #69758a !important; background: #fff !important; border-color: #e4e9f1 !important; }
-    .mobile-bottom-nav.hidden { display: none; }
-    body { padding-bottom: 6rem; }
-    @media (min-width: 641px) {
-      .mobile-bottom-nav:not(.hidden) {
-        display: grid;
-        grid-template-columns: repeat(5, minmax(90px, 1fr));
-        position: fixed;
-        inset: auto 50% 1rem auto;
-        transform: translateX(50%);
-        z-index: 40;
-        width: min(560px, calc(100% - 2rem));
-        padding: .55rem;
-        background: rgba(255, 255, 255, .97);
-        border: 1px solid #e4e9f1;
-        border-radius: 1rem;
-        box-shadow: 0 5px 20px rgba(15, 23, 42, .12);
-        backdrop-filter: blur(12px);
-      }
-      .mobile-nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: .2rem;
-        min-height: 3.2rem;
-        color: #69758a;
-        font-size: .7rem;
-        font-weight: 700;
-      }
-      .mobile-nav-item.is-active { color: #2563eb; }
-      .mobile-nav-item svg { width: 1.2rem; height: 1.2rem; }
-      .mobile-nav-add { color: #fff; }
-      .mobile-nav-add span {
-        display: grid;
-        place-items: center;
-        width: 2.8rem;
-        height: 2.8rem;
-        margin-top: -1.2rem;
-        border: 4px solid #f3f6fb;
-        border-radius: 9999px;
-        background: #2563eb;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, .3);
-      }
-      .mobile-nav-add svg { width: 1.5rem; height: 1.5rem; }
-    }
-    #shopScoreSection, #shopAddSection, #shopLedgerSection, #adminDashboard,
-    #secShopkeepers, #secCustomers, #secTransactions, #secAnalytics, #secAudit, #secSettings { scroll-margin-top: 5.5rem; }
-    #adminDashboard .admin-nav-hidden { display: none !important; }
+    .mobile-bottom-nav, .mobile-bottom-nav.hidden { display: none; }
+    #shopScoreSection, #shopAddSection, #shopLedgerSection, #adminDashboard { scroll-margin-top: 5.5rem; }
     @media (max-width: 640px) {
       header { padding: .75rem !important; }
       header p { max-width: 190px; line-height: 1.35; }
@@ -165,62 +119,6 @@
         box-shadow: 0 4px 12px rgba(37, 99, 235, .3);
       }
       .mobile-nav-add svg { width: 1.5rem; height: 1.5rem; }
-    }
-
-    /* Keep login and dashboard views mutually exclusive on every screen size. */
-    #shopkeeperDashboard.hidden,
-    #adminDashboard.hidden,
-    #authView.hidden { display: none !important; }
-    #shopkeeperDashboard:not(.hidden),
-    #adminDashboard:not(.hidden) { display: block; }
-    #shopkeeperDashboard > section.hidden { display: none !important; }
-    #shopkeeperDashboard > section:not(.hidden) { margin-top: 0; }
-
-    .overflow-x-auto {
-      max-width: 100%;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: thin;
-    }
-    input, textarea, select, button { min-width: 0; }
-    button { touch-action: manipulation; }
-    :focus-visible { outline: 3px solid rgba(37, 99, 235, .35); outline-offset: 2px; }
-
-    @media (max-width: 640px) {
-      header > div { gap: .5rem; }
-      header .w-10 { width: 2.25rem; height: 2.25rem; flex: 0 0 auto; }
-      header h1 { font-size: .9rem; }
-      header p { font-size: .55rem; letter-spacing: .06em; }
-      #userBadge { gap: .35rem; }
-      #userBadge > div { padding: .35rem .55rem; font-size: .65rem; }
-      #userBadge button { padding: .4rem .55rem; }
-      #permanentCustomBanner { align-items: flex-start; font-size: .75rem; line-height: 1.45; }
-      #authView { margin-top: 1.5rem; padding: 1.5rem; }
-      #shopkeeperDashboard > section { padding: 1rem; }
-      #shopkeeperDashboard > section:first-child { align-items: flex-start; gap: .75rem; }
-      #shopkeeperDashboard > section:first-child button { max-width: 10rem; }
-      #shopScoreSection > div:first-child { align-items: flex-start; }
-      #shopScoreSection > div:first-child > div { max-width: 100%; overflow-x: auto; }
-      #customerSearchInput, input, textarea, select { font-size: 16px !important; }
-      #shopAddSection form, #secTransactions form { grid-template-columns: minmax(0, 1fr); }
-      #shopAddSection form > *, #secTransactions form > * { grid-column: 1 / -1; }
-      #adminDashboard > .grid { gap: .5rem; }
-      #adminDashboard > .grid > div { padding: .75rem; min-width: 0; }
-      #adminDashboard > .flex.flex-wrap.border-b {
-        flex-wrap: nowrap;
-        gap: 1.25rem;
-        overflow-x: auto;
-        white-space: nowrap;
-        scrollbar-width: none;
-      }
-      #adminDashboard > .flex.flex-wrap.border-b::-webkit-scrollbar { display: none; }
-      table { min-width: 680px; }
-      .overflow-x-auto table { margin-bottom: .15rem; }
-      footer { padding-bottom: calc(.75rem + env(safe-area-inset-bottom)); }
-    }
-
-    @media (min-width: 641px) and (max-width: 1023px) {
-      #shopAddSection form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      #shopAddSection form > button { grid-column: 1 / -1; }
     }
   </style>
 </head>
@@ -302,14 +200,16 @@
         <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Google (Gmail) से लॉगिन करें
       </button>
+      
       <div id="authStatusMsg" class="mt-4 text-xs font-bold text-center hidden"></div>
     </div>
 
     <!-- 2. SHOPKEEPER DASHBOARD -->
     <div id="shopkeeperDashboard" class="hidden space-y-5">
-      <section id="shopHomeSection" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex justify-between items-center">
+      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex justify-between items-center">
         <div>
           <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
+          <p id="dashOwnerName" class="text-[11px] text-slate-400"></p>
           <p class="text-[11px] text-slate-400">सेंट्रल कम्युनिटी रजिस्ट्री • लाइव क्लाउड डेटा सिंक</p>
         </div>
         <div class="flex gap-2">
@@ -343,8 +243,8 @@
         </h2>
         <form onsubmit="handleAddTransaction(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
           <input type="text" id="txCustName" placeholder="ग्राहक का नाम *" required class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-amber-400" />
-          <input type="tel" id="txCustPhone" placeholder="मोबाइल नंबर *" required maxlength="10" pattern="[0-9]{10}" inputmode="numeric" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono outline-none focus:border-amber-400" />
-          <input type="number" id="txAmount" placeholder="उधारी रकम (₹) *" required min="0.01" step="0.01" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-amber-400 font-bold font-mono outline-none focus:border-amber-400" />
+          <input type="tel" id="txCustPhone" placeholder="मोबाइल नंबर *" required maxlength="10" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono outline-none focus:border-amber-400" />
+          <input type="number" id="txAmount" placeholder="उधारी रकम (₹) *" required class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-amber-400 font-bold font-mono outline-none focus:border-amber-400" />
           <div>
             <label class="block text-[10px] text-slate-400 mb-1">उधारी की तारीख (वैकल्पिक)</label>
             <input type="date" id="txDate" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono outline-none focus:border-amber-400" />
@@ -384,9 +284,17 @@
     </div>
 
     <!-- 3. FULL MASTER ADMIN DASHBOARD -->
+    <div id="defaultBannerAdminControls" class="hidden bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg mt-4">
+    <h3 class="text-md font-bold text-amber-400 mb-3">⚙️ डिफ़ॉल्ट कस्टमर / डिफ़ॉल्टर बैनर सेट करें (केवल एडमिन)</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <input type="text" id="adminDefaulterName" placeholder="कस्टमर का नाम..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+        <input type="number" id="adminDefaulterAmount" placeholder="बकाया राशि (रुपये में)..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+    </div>
+    <button onclick="updateDefaultCustomerBanner()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm w-full">बैनर अपडेट करें</button>
+</div>
     <div id="adminDashboard" class="hidden space-y-6">
 
-      <div id="adminOverviewHeader" class="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
         <div>
           <h2 class="text-sm font-extrabold text-amber-400 flex items-center gap-2">
             <i data-lucide="shield-alert" class="w-4 h-4"></i> सुपर एडमिन मास्टर कंट्रोल
@@ -404,7 +312,7 @@
       </div>
 
       <!-- Shopkeeper Appeals Table in Admin -->
-      <div id="adminAppealsPanel" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
         <h3 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2">
           <i data-lucide="clipboard-list" class="w-4 h-4"></i> शॉपकीपर अपील लिस्ट (Admin Panel)
         </h3>
@@ -425,14 +333,14 @@
       </div>
 
       <!-- Admin Search & Filter Bar -->
-      <section id="adminSearchPanel" class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-4 shadow-xl">
+      <section class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-4 shadow-xl">
         <div class="relative w-full">
           <i data-lucide="search" class="w-4 h-4 text-amber-400 absolute left-4 top-3.5"></i>
           <input type="text" id="adminUniversalSearch" oninput="filterAdminViews()" placeholder="मास्टर सर्च पैनल: नाम, मोबाइल, पहचान, पैन, दुकान कोड दर्ज करें..." class="w-full bg-slate-950 border border-slate-700 rounded-2xl pl-11 pr-4 py-3 text-sm focus:border-amber-400 font-mono text-amber-300 outline-none" />
         </div>
       </section>
 
-      <div id="adminStatsPanel" class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow">
           <div class="text-[11px] text-slate-400">कुल पंजीकृत दुकानें</div>
           <div id="statShopkeepers" class="text-lg font-black text-amber-400 mt-1 font-mono">0</div>
@@ -451,7 +359,7 @@
         </div>
       </div>
 
-      <div id="adminSectionTabs" class="flex flex-wrap border-b border-slate-800 gap-4 text-sm font-semibold">
+      <div class="flex flex-wrap border-b border-slate-800 gap-4 text-sm font-semibold">
         <button id="adminTab1" onclick="switchAdminSection('shopkeepers')" class="pb-2.5 tab-active cursor-pointer">दुकानदार मास्टर</button>
         <button id="adminTab2" onclick="switchAdminSection('customers')" class="pb-2.5 text-slate-400 cursor-pointer">ग्राहक व स्कोर कंट्रोल</button>
         <button id="adminTab3" onclick="switchAdminSection('transactions')" class="pb-2.5 text-slate-400 cursor-pointer">बल्क CSV व लेन-देन</button>
@@ -471,7 +379,8 @@
               <thead class="text-slate-400 uppercase border-b border-slate-800 bg-slate-950/40 font-mono">
                 <tr>
                   <th class="py-3 px-2">ID कोड</th>
-                  <th>मालिक / दुकान</th>
+                  <th>दुकान का नाम</th>
+                  <th>मालिक का नाम</th>
                   <th>ईमेल</th>
                   <th>शहर</th>
                   <th>फोन</th>
@@ -543,10 +452,10 @@
           <form onsubmit="adminAddTransactionDirect(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
             <input type="text" id="admTxShopCode" placeholder="दुकान ID *" required class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 uppercase font-mono text-white outline-none focus:border-amber-400" />
             <input type="text" id="admTxCustName" placeholder="ग्राहक का नाम *" required class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-amber-400" />
-            <input type="tel" id="admTxPhone" placeholder="मोबाइल नंबर *" required maxlength="10" pattern="[0-9]{10}" inputmode="numeric" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 font-mono text-white outline-none focus:border-amber-400" />
+            <input type="tel" id="admTxPhone" placeholder="मोबाइल नंबर *" required maxlength="10" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 font-mono text-white outline-none focus:border-amber-400" />
             <input type="text" id="admTxAadhaar" placeholder="पहचान संख्या" maxlength="12" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 font-mono text-white outline-none focus:border-amber-400" />
             <input type="text" id="admTxPan" placeholder="पैन कार्ड" maxlength="10" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 uppercase font-mono text-white outline-none focus:border-amber-400" />
-            <input type="number" id="admTxAmount" placeholder="रकम (₹) *" required min="0.01" step="0.01" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-amber-400 font-bold outline-none focus:border-amber-400 font-mono" />
+            <input type="number" id="admTxAmount" placeholder="रकम (₹) *" required class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-amber-400 font-bold outline-none focus:border-amber-400 font-mono" />
             <div>
               <label class="block text-[10px] text-slate-400 mb-1">उधारी की तारीख</label>
               <input type="date" id="admTxDate" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono outline-none focus:border-amber-400" />
@@ -623,10 +532,6 @@
           <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
             <i data-lucide="sliders" class="w-4 h-4"></i> क्रेडिट स्कोरिंग इंजन रूल्स (Scoring Rules Configuration)
           </h2>
-          <div class="flex flex-wrap gap-4">
-            <button type="button" onclick="switchAdminSection('audit'); document.getElementById('secAudit').scrollIntoView({ behavior: 'smooth', block: 'start' })" class="text-xs font-bold text-blue-600 hover:underline">एक्टिविटी लॉग देखें</button>
-            <button type="button" onclick="openAdminAppealsPanel()" class="text-xs font-bold text-blue-600 hover:underline">अपील लिस्ट देखें</button>
-          </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
             <div class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl space-y-1">
               <span class="text-slate-400">30 दिन पुरानी उधारी पेनल्टी</span>
@@ -645,6 +550,35 @@
         </section>
 
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
+          <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">डेमो अवधि और दुकान रिचार्ज</h2>
+          <p class="text-xs text-slate-400">रिचार्ज एडमिन द्वारा भुगतान पुष्टि के बाद दर्ज करें। यह पेमेंट गेटवे नहीं है।</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <input type="number" id="demoDaysInput" min="0" placeholder="नए अकाउंट के डेमो दिन" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
+            <button type="button" onclick="saveDemoDays()" class="bg-slate-800 text-amber-400 font-bold px-3 py-2 rounded-xl text-xs">डेमो दिन सेव करें</button>
+          </div>
+          <form onsubmit="recordRecharge(event)" class="grid grid-cols-1 md:grid-cols-4 gap-2">
+            <input type="text" id="rechargeShopId" required placeholder="दुकान ID" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm uppercase" />
+            <input type="number" id="rechargeDays" required min="1" placeholder="दिन" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
+            <input type="number" id="rechargeAmount" min="0" step="0.01" placeholder="रकम (₹)" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
+            <input type="text" id="rechargeReference" placeholder="भुगतान संदर्भ (वैकल्पिक)" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
+            <button type="submit" class="md:col-span-4 bg-amber-500 text-slate-950 font-bold px-3 py-2.5 rounded-xl text-xs">रिचार्ज दर्ज करें और विवरण शेयर करें</button>
+          </form>
+          <p id="rechargeStatus" class="text-xs text-slate-400" aria-live="polite"></p>
+        </section>
+
+        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
+          <h2 class="text-sm font-bold text-amber-400">डिफ़ॉल्टर सूची</h2>
+          <form onsubmit="saveDefaulter(event)" class="grid grid-cols-1 md:grid-cols-4 gap-2">
+            <input type="hidden" id="defaulterEditId" />
+            <input type="text" id="defaulterName" required placeholder="नाम *" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
+            <input type="tel" id="defaulterPhone" placeholder="मोबाइल" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
+            <input type="number" id="defaulterAmount" min="0" step="0.01" placeholder="बकाया राशि (₹)" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
+            <button type="submit" id="defaulterSaveButton" class="bg-amber-500 text-slate-950 font-bold px-3 py-2 rounded-xl text-xs">डिफ़ॉल्टर जोड़ें</button>
+          </form>
+          <div id="defaulterList" class="space-y-2 text-sm"></div>
+        </section>
+
+        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
           <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
             <i data-lucide="megaphone" class="w-4 h-4"></i> ग्लोबल रिस्क ब्रॉडकास्ट नोटिफिकेशन (Global Risk Broadcast)
           </h2>
@@ -657,7 +591,7 @@
 
   </main>
 
-  <!-- Shared quick navigation shown after login on mobile and desktop -->
+  <!-- Mobile quick navigation, shown after login on small screens -->
   <nav id="mobileBottomNav" class="mobile-bottom-nav hidden" aria-label="मुख्य नेविगेशन">
     <button type="button" class="mobile-nav-item is-active" data-nav="home" onclick="navigateApp('home')">
       <i data-lucide="layout-dashboard"></i><span>डैशबोर्ड</span>
@@ -695,8 +629,12 @@
       <h3 class="text-sm font-bold text-amber-400">दुकानदार विवरण संपादित करें (Edit Shopkeeper)</h3>
       <input type="hidden" id="editShopRowId" />
       <div>
-        <label class="block text-[10px] text-slate-400 mb-1">दुकान / मालिक का नाम</label>
+        <label class="block text-[10px] text-slate-400 mb-1">दुकान का नाम</label>
         <input type="text" id="editShopNameInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
+      </div>
+      <div>
+        <label class="block text-[10px] text-slate-400 mb-1">मालिक का नाम</label>
+        <input type="text" id="editShopOwnerInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
       </div>
       <div>
         <label class="block text-[10px] text-slate-400 mb-1">शहर (City)</label>
@@ -756,7 +694,6 @@
     let rawAppeals = [];
     let rawAuditLogs = [];
     let currentUser = null;
-    let authProcessingUserId = null;
     let searchMode = 'ALL';
 
     function createBackupFileName() {
@@ -803,12 +740,9 @@
     }
 
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      if (session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
-        const sessionUserId = session.user.id;
-        if (authProcessingUserId === sessionUserId) return;
-        authProcessingUserId = sessionUserId;
+      if (session && event === 'SIGNED_IN') {
         const userEmail = session.user.email;
-        const userName = session.user.user_metadata?.full_name || "New Shop";
+        const userName = session.user.user_metadata.full_name || "New Shop";
         
         if (userEmail === MASTER_ADMIN_EMAIL) {
           currentUser = { shop_id: "JBSMK000001", name: "Master Admin", email: userEmail, role: "admin", status: "active" };
@@ -818,18 +752,12 @@
 
         let { data: shopRecord, error } = await supabaseClient.from('shopkeepers').select('*').eq('email', userEmail).single();
 
-        if (error && error.code !== 'PGRST116') {
-          console.error('Shopkeeper lookup failed:', error);
-          alert('अकाउंट जाँचने में समस्या हुई। कृपया कुछ देर बाद फिर कोशिश करें।');
-          await supabaseClient.auth.signOut();
-          return;
-        }
-
         if (!shopRecord) {
           const autoCode = "SRSAM" + Math.floor(1000 + Math.random() * 9000); 
           await supabaseClient.from('shopkeepers').insert([{ 
             shop_id: autoCode, 
-            name: userName, 
+            owner_name: userName,
+            shop_name: null,
             email: userEmail, 
             city: "SAMALKHA", 
             phone: "0000000000",
@@ -848,19 +776,23 @@
           await supabaseClient.auth.signOut();
         } else {
           currentUser = shopRecord;
+          const accessAllowed = await checkShopAccess(currentUser);
+          if (!accessAllowed) {
+            alert('⏳ आपकी डेमो/सब्सक्रिप्शन अवधि समाप्त हो गई है। रिचार्ज के लिए एडमिन से संपर्क करें।');
+            await supabaseClient.auth.signOut();
+            return;
+          }
           initDashboard();
           await logActivity(currentUser.shop_id, "Logged in via Google");
         }
       } else if (event === 'SIGNED_OUT') {
-        authProcessingUserId = null;
         currentUser = null;
         document.getElementById('authView').classList.remove('hidden');
         document.getElementById('shopkeeperDashboard').classList.add('hidden');
         document.getElementById('adminDashboard').classList.add('hidden');
-
+        document.getElementById('defaultBannerAdminControls').classList.add('hidden');
         document.getElementById('userBadge').classList.add('hidden');
         document.getElementById('mobileBottomNav').classList.add('hidden');
-        window.scrollTo(0, 0);
       }
     });
 
@@ -877,15 +809,7 @@
       const msgDiv = document.getElementById('globalModalMessage');
 
       if (data && modal && msgDiv) {
-        let obj;
-        try {
-          obj = JSON.parse(data);
-        } catch (error) {
-          localStorage.removeItem('ld_global_broadcast');
-          document.getElementById('broadcastDot')?.classList.add('hidden');
-          alert('ग्लोबल ब्रॉडकास्ट डेटा पढ़ा नहीं जा सका।');
-          return;
-        }
+        const obj = JSON.parse(data);
         const message = document.createElement('p');
         message.className = 'mb-2';
         message.textContent = obj.message || '';
@@ -959,8 +883,7 @@
     async function syncCloudData() {
       alert('🔄 डेटा सिंक किया जा रहा है...');
       try {
-        const synced = await renderAdminAll();
-        if (!synced) throw new Error('डेटाबेस से डेटा लोड नहीं हुआ।');
+        await renderAdminAll();
         alert('✅ डेटा सफलतापूर्वक सिंक (Sync) हो गया है!');
       } catch (error) {
         console.error('सिंक करने में त्रुटि:', error);
@@ -1018,24 +941,14 @@
     async function submitAppeal() {
       const phone = document.getElementById('appealCustPhone').value.trim();
       const reason = document.getElementById('appealReason').value.trim();
-      if (!currentUser || !phone || !reason) { alert('सभी विवरण भरें!'); return; }
+      if(!phone || !reason) { alert('सभी विवरण भरें!'); return; }
 
-      const { error } = await supabaseClient.from('appeals').insert([{
-        shop_id: currentUser.shop_id,
-        customer_phone: phone,
-        reason,
-        status: 'pending'
-      }]);
-      if (error) {
-        alert('अपील भेजने में विफल: ' + error.message);
-        return;
-      }
+      await supabaseClient.from('appeals').insert([{ shop_id: currentUser.shop_id, customer_phone: phone, reason: reason, status: 'pending' }]);
       alert('✓ आपकी अपील एडमिन को भेज दी गई है!');
       logActivity(currentUser.shop_id, `Submitted appeal for customer phone ${phone}`);
-
       closeAppealModal();
-      document.getElementById('appealCustPhone').value = '';
-      document.getElementById('appealReason').value = '';
+      document.getElementById('appealCustPhone').value = "";
+      document.getElementById('appealReason').value = "";
     }
 
     async function loadAdminAppeals() {
@@ -1098,44 +1011,31 @@
       });
 
       if (isAdmin) {
-        const adminDestination = {
-          home: 'shopkeepers',
-          score: 'customers',
-          add: 'transactions',
-          ledger: 'analytics',
-          more: 'settings'
-        }[destination] || 'shopkeepers';
-        ['adminAppealsPanel', 'adminSearchPanel', 'adminStatsPanel', 'adminSectionTabs'].forEach(id => {
-          document.getElementById(id)?.classList.add('admin-nav-hidden');
-        });
-        switchAdminSection(adminDestination);
-        const targetSection = document.getElementById('sec' + adminDestination.charAt(0).toUpperCase() + adminDestination.slice(1));
-        targetSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (destination === 'add') {
+        if (destination === 'score') switchAdminSection('customers');
+        else if (destination === 'ledger') switchAdminSection('transactions');
+        else if (destination === 'more') switchAdminSection('settings');
+        else if (destination === 'add') {
+          switchAdminSection('transactions');
           document.getElementById('admTxShopCode').focus({ preventScroll: true });
+        } else {
+          document.getElementById('adminDashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         return;
       }
 
-      const shopViews = {
-        home: 'shopHomeSection',
-        score: 'shopScoreSection',
-        add: 'shopAddSection',
-        ledger: 'shopLedgerSection'
-      };
-      const activeView = destination === 'more' ? 'home' : destination;
-      Object.entries(shopViews).forEach(([view, id]) => {
-        document.getElementById(id).classList.toggle('hidden', view !== activeView);
-      });
-
       if (destination === 'score') {
+        document.getElementById('shopScoreSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
         document.getElementById('customerSearchInput').focus({ preventScroll: true });
       } else if (destination === 'add') {
+        document.getElementById('shopAddSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
         document.getElementById('txCustName').focus({ preventScroll: true });
+      } else if (destination === 'ledger') {
+        document.getElementById('shopLedgerSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else if (destination === 'more') {
         openAppealModal();
+      } else {
+        document.getElementById('shopkeeperDashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function initDashboard() {
@@ -1146,17 +1046,16 @@
       document.getElementById('shopkeeperDisplayCode').innerText = displayId;
 
       if (currentUser.role === 'admin' || displayId === 'JBSMK000001') {
-        document.getElementById('shopkeeperDashboard').classList.add('hidden');
         document.getElementById('adminDashboard').classList.remove('hidden');
+        document.getElementById('defaultBannerAdminControls').classList.remove('hidden');
+        loadAdminSettings();
         renderAdminAll();
       } else {
-        document.getElementById('adminDashboard').classList.add('hidden');
-
         document.getElementById('shopkeeperDashboard').classList.remove('hidden');
-        document.getElementById('dashShopTitle').innerText = currentUser.name || displayId;
+        document.getElementById('dashShopTitle').innerText = currentUser.shop_name || 'दुकान का नाम दर्ज नहीं';
+        document.getElementById('dashOwnerName').innerText = `मालिक: ${currentUser.owner_name || 'नाम उपलब्ध नहीं'}`;
         renderShopkeeperView();
       }
-      navigateApp('home');
       lucide.createIcons();
     }
 
@@ -1165,13 +1064,6 @@
         document.getElementById(s).classList.toggle('hidden', s !== ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)));
         document.getElementById('adminTab' + (idx+1)).className = s === ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)) ? 'pb-2.5 tab-active cursor-pointer' : 'pb-2.5 text-slate-400 cursor-pointer';
       });
-      document.getElementById('adminAppealsPanel')?.classList.add('admin-nav-hidden');
-    }
-
-    function openAdminAppealsPanel() {
-      switchAdminSection('none');
-      document.getElementById('adminAppealsPanel').classList.remove('admin-nav-hidden');
-      document.getElementById('adminAppealsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     async function renderAdminAll() {
@@ -1181,11 +1073,6 @@
         supabaseClient.from('appeals').select('*').order('created_at', { ascending: false }),
         supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(50)
       ]);
-      const queryError = [shopsRes, txsRes, appealsRes, logsRes].find(result => result.error);
-      if (queryError) {
-        console.error('Admin data load error:', queryError.error);
-        return false;
-      }
 
       rawAdminShopkeepers = shopsRes.data || [];
       rawAdminTxs = txsRes.data || [];
@@ -1198,14 +1085,16 @@
                                                                                                                                                                                
       filterAdminViews();
       loadAdminAppeals();
-      return true;
     }
 
-    function openEditShopModal(id, name, city, phone, pin) {
+    function openEditShopModal(id) {
+      const shop = rawAdminShopkeepers.find(record => String(record.id) === String(id));
+      if (!shop) return;
       document.getElementById('editShopRowId').value = id;
-      document.getElementById('editShopNameInput').value = name || '';
-      document.getElementById('editShopCityInput').value = city || '';
-      document.getElementById('editShopPhoneInput').value = phone || '';
+      document.getElementById('editShopNameInput').value = shop.shop_name || '';
+      document.getElementById('editShopOwnerInput').value = shop.owner_name || '';
+      document.getElementById('editShopCityInput').value = shop.city || '';
+      document.getElementById('editShopPhoneInput').value = shop.phone || '';
       document.getElementById('editShopModal').classList.remove('hidden');
     }
 
@@ -1215,11 +1104,12 @@
 
     async function saveShopkeeperEdit() {
       const rowId = document.getElementById('editShopRowId').value;
-      const name = document.getElementById('editShopNameInput').value.trim();
+      const shopName = document.getElementById('editShopNameInput').value.trim();
+      const ownerName = document.getElementById('editShopOwnerInput').value.trim();
       const city = document.getElementById('editShopCityInput').value.trim().toUpperCase();
       const phone = document.getElementById('editShopPhoneInput').value.trim();
 
-      const { error } = await supabaseClient.from('shopkeepers').update({ name: name, city: city, phone: phone }).eq('id', rowId);
+      const { error } = await supabaseClient.from('shopkeepers').update({ shop_name: shopName || null, owner_name: ownerName, city: city, phone: phone }).eq('id', rowId);
       if(!error) {
         alert('✓ विवरण सफलतापूर्वक अपडेट कर दिया गया है!');
         closeEditShopModal();
@@ -1295,25 +1185,29 @@
 
     function renderFilteredAdminShopkeepers(query) {
       const tbody = document.getElementById('adminShopkeepersList');
-      tbody.innerHTML = rawAdminShopkeepers.filter(s => !query || String(s.shop_id || '').toLowerCase().includes(query) || String(s.name || '').toLowerCase().includes(query) || String(s.email || '').toLowerCase().includes(query)).map(s => {
+      tbody.innerHTML = rawAdminShopkeepers.filter(s => {
+        const searchable = [s.shop_id, s.shop_name, s.owner_name, s.email].join(' ').toLowerCase();
+        return !query || searchable.includes(query);
+      }).map(s => {
         let statusBadge = s.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
         let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber';
         let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
         return `
         <tr class="text-slate-300">
           <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
-          <td><b>${s.name || 'Store'}</b></td>
+          <td><b>${s.shop_name || 'दुकान का नाम दर्ज नहीं'}</b></td>
+          <td>${s.owner_name || 'मालिक का नाम दर्ज नहीं'}</td>
           <td class="text-slate-400">${s.email || '-'}</td>
           <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
-          <td class="font-mono text-slate-400">${s.phone}</td>
-          <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${s.status}</span></td>
+          <td class="font-mono text-slate-400">${s.phone || '-'}</td>
+          <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${s.status || 'unknown'}</span></td>
           <td class="text-right pr-2 space-x-1">
-            <button onclick="openEditShopModal('${s.id}', '${s.name}', '${s.city}', '${s.phone}')" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit</button>
+            <button onclick="openEditShopModal('${s.id}')" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit</button>
             <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs cursor-pointer">${actionBtnText}</button>
             <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs cursor-pointer">Delete</button>
           </td>
         </tr>`
-      }).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
+      }).join('') || `<tr><td colspan="8" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
     }
 
     function renderFilteredAdminCustomers(query) {
@@ -1330,7 +1224,7 @@
           if (diff > custMap[key].unpaidDays) custMap[key].unpaidDays = diff;
         }
       });
-      let custList = Object.values(custMap).filter(c => !query || String(c.name || '').toLowerCase().includes(query) || String(c.phone || '').includes(query) || String(c.aadhaar || '').toLowerCase().includes(query) || String(c.pan || '').toLowerCase().includes(query));
+      let custList = Object.values(custMap).filter(c => !query || c.name.toLowerCase().includes(query) || c.phone.includes(query) || c.aadhaar.toLowerCase().includes(query) || c.pan.toLowerCase().includes(query));
       tbody.innerHTML = custList.map(c => {
         const uniqueShopsCount = c.shopsSet.size;
         const score = calculateSmartScore(c.unpaidDays, c.dues, uniqueShopsCount);
@@ -1353,7 +1247,7 @@
 
     function renderFilteredAdminTransactions(query) {
       const tbody = document.getElementById('adminTxList');
-      tbody.innerHTML = rawAdminTxs.filter(t => !query || String(t.shop_id || '').toLowerCase().includes(query) || String(t.customer_name || '').toLowerCase().includes(query) || String(t.customer_phone || '').includes(query)).map(t => `
+      tbody.innerHTML = rawAdminTxs.filter(t => !query || t.shop_id.toLowerCase().includes(query) || t.customer_name.toLowerCase().includes(query) || t.customer_phone.includes(query)).map(t => `
         <tr class="text-slate-300 ${t.status === 'cleared' ? 'opacity-60 bg-slate-950/40' : ''}">
           <td class="py-3 px-2 font-mono text-amber-300">${t.shop_id}</td>
           <td class="font-bold text-white">${t.customer_name}</td>
@@ -1382,32 +1276,21 @@
     async function adminAddTransactionDirect(e) {
       e.preventDefault();
       const shopId = document.getElementById('admTxShopCode').value.trim().toUpperCase();
-      const phone = document.getElementById('admTxPhone').value.trim();
-      const amount = Number(document.getElementById('admTxAmount').value);
       const customDate = document.getElementById('admTxDate').value;
-      if (!shopId || !/^\d{10}$/.test(phone) || !Number.isFinite(amount) || amount <= 0) {
-        alert('दुकान ID, 10 अंकों का मोबाइल और शून्य से अधिक रकम दर्ज करें।');
-        return;
-      }
-      const { error } = await supabaseClient.from('transactions').insert([{
+      await supabaseClient.from('transactions').insert([{
         shop_id: shopId,
         customer_name: document.getElementById('admTxCustName').value.trim(),
-        customer_phone: phone,
+        customer_phone: document.getElementById('admTxPhone').value.trim(),
         customer_aadhaar: document.getElementById('admTxAadhaar').value.trim() || null,
         customer_pan: document.getElementById('admTxPan').value.trim().toUpperCase() || null,
-        amount,
+        amount: parseFloat(document.getElementById('admTxAmount').value),
         notes: document.getElementById('admTxNotes').value.trim() || null,
         status: "pending",
-        created_at: customDate ? new Date(customDate + 'T12:00:00').toISOString() : new Date().toISOString()
+        created_at: customDate ? new Date(customDate).toISOString() : new Date().toISOString()
       }]);
-      if (error) {
-        alert('लेन-देन सेव नहीं हुआ: ' + error.message);
-        return;
-      }
-      await logActivity(shopId, 'Admin added direct transaction');
+      await logActivity(shopId, `Admin added direct transaction`);
       e.target.reset();
-      await renderAdminAll();
-      alert('✓ मास्टर लेन-देन सेव हो गया।');
+      renderAdminAll();
     }
 
     async function adminDeleteTx(txId) {
@@ -1419,41 +1302,16 @@
     function downloadAdminSampleCSV() {
       const csv = [
         'ShopID,Name,Mobile,Amount,Aadhaar,PAN,Date,Notes',
-        'SRSAM1001,Sample Customer,9876543210,1500,,,2025-01-15,Sample entry'
+        'SRSAM1234,उदाहरण ग्राहक,9876543210,1500,,,2025-01-15,उदाहरण नोट'
       ].join('\n');
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = url;
-      link.download = 'sample-transactions.csv';
+      link.href = URL.createObjectURL(new Blob(['\\uFEFF', csv], { type: 'text/csv;charset=utf-8' }));
+      link.download = 'admin-transaction-sample.csv';
+      const objectUrl = link.href;
       document.body.appendChild(link);
       link.click();
       link.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }
-
-    function parseCSVRow(line) {
-      const cells = [];
-      let cell = '';
-      let quoted = false;
-      for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        if (char === '"') {
-          if (quoted && line[i + 1] === '"') {
-            cell += '"';
-            i++;
-          } else {
-            quoted = !quoted;
-          }
-        } else if (char === ',' && !quoted) {
-          cells.push(cell.trim());
-          cell = '';
-        } else {
-          cell += char;
-        }
-      }
-      cells.push(cell.trim());
-      return cells;
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
     }
 
     async function importAdminCSV(e) {
@@ -1464,47 +1322,27 @@
         const lines = evt.target.result.split(/\r\n|\n/);
         const newRecords = [];
         for (let i = 1; i < lines.length; i++) {
-          if (!lines[i].trim()) continue;
-          const cols = parseCSVRow(lines[i]);
+          const cols = lines[i].trim().split(',');
           if (cols.length >= 4) {
-            const shopId = (cols[0] || '').trim().toUpperCase();
-            const customerName = (cols[1] || '').trim();
-            const customerPhone = (cols[2] || '').trim();
-            const amount = Number((cols[3] || '').trim());
-            if (!shopId || !customerName || !/^\d{10}$/.test(customerPhone) || !Number.isFinite(amount) || amount <= 0) continue;
-
-            const rawDate = (cols[6] || '').trim();
-            const parsedDate = rawDate ? new Date(/^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? `${rawDate}T12:00:00` : rawDate) : new Date();
-            const transactionDate = Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
             newRecords.push({
-              shop_id: shopId,
-              customer_name: customerName,
-              customer_phone: customerPhone,
-              amount,
+              shop_id: cols[0].trim().toUpperCase(),
+              customer_name: cols[1].trim(),
+              customer_phone: cols[2].trim(),
+              amount: parseFloat(cols[3].trim()),
               customer_aadhaar: cols[4] ? cols[4].trim() : null,
               customer_pan: cols[5] ? cols[5].trim().toUpperCase() : null,
-              created_at: transactionDate.toISOString(),
-              notes: cols[7] ? cols[7].trim() : null,
+              created_at: cols[6] ? new Date(cols[6]).toISOString() : new Date().toISOString(),
               status: "pending"
             });
           }
         }
-        if (!newRecords.length) {
-          alert('CSV में कोई मान्य रिकॉर्ड नहीं मिला। फ़ॉर्मेट जाँचें: ShopID, Name, Mobile, Amount, Aadhaar, PAN, Date, Notes');
-          return;
+        if (newRecords.length > 0) {
+          await supabaseClient.from('transactions').insert(newRecords);
+          await logActivity("ADMIN", `Bulk CSV uploaded with ${newRecords.length} records`);
+          renderAdminAll();
+          alert(`✓ ${newRecords.length} रिकॉर्ड अपलोड हो गए!`);
         }
-
-        const { error } = await supabaseClient.from('transactions').insert(newRecords);
-        if (error) {
-          console.error('CSV upload error:', error);
-          alert('CSV अपलोड विफल: ' + error.message);
-          return;
-        }
-        await logActivity("ADMIN", `Bulk CSV uploaded with ${newRecords.length} records`);
-        await renderAdminAll();
-        alert(`✓ ${newRecords.length} रिकॉर्ड अपलोड हो गए!`);
       };
-      reader.onerror = () => alert('CSV फ़ाइल पढ़ी नहीं जा सकी। कृपया दूसरी फ़ाइल चुनें।');
       reader.readAsText(file);
       e.target.value = "";
     }
@@ -1522,8 +1360,8 @@
       else if (searchMode === 'AADHAAR') query = query.eq('customer_aadhaar', q);
       else if (searchMode === 'PAN') query = query.ilike('customer_pan', q);
       else query = query.or(`customer_phone.eq.${q},customer_aadhaar.eq.${q},customer_pan.ilike.${q}`);
-      const { data } = await query;
-      const custTxs = data || [];
+
+      const { data: custTxs } = await query;
       let maxOverdueDays = 0, totalUnpaid = 0, hasUnpaid = false;
       const now = new Date();
       let pendingList = [];
@@ -1577,12 +1415,6 @@
     async function handleAddTransaction(e) {
       e.preventDefault();
       const customDate = document.getElementById('txDate').value;
-      const phone = document.getElementById('txCustPhone').value.trim();
-      const amount = Number(document.getElementById('txAmount').value);
-      if (!/^\d{10}$/.test(phone) || !Number.isFinite(amount) || amount <= 0) {
-        alert('10 अंकों का मोबाइल नंबर और शून्य से अधिक रकम दर्ज करें।');
-        return;
-      }
       const { error } = await supabaseClient.from('transactions').insert([{
         shop_id: currentUser.shop_id,
         customer_name: document.getElementById('txCustName').value.trim(),
@@ -1592,17 +1424,14 @@
         customer_pan: document.getElementById('txCustPan').value.trim().toUpperCase() || null,
         notes: document.getElementById('txNotes').value.trim() || null,
         status: "pending",
-        created_at: customDate ? new Date(customDate + 'T12:00:00').toISOString() : new Date().toISOString()
+        created_at: customDate ? new Date(customDate).toISOString() : new Date().toISOString()
       }]);
 
       if (!error) {
-        await renderShopkeeperView();
-        await logActivity(currentUser.shop_id, "Added single transaction");
+        renderShopkeeperView();
+        logActivity(currentUser.shop_id, "Added single transaction");
         e.target.reset();
         alert("✓ लेन-देन दर्ज हो गया!");
-      } else {
-        console.error('Transaction insert error:', error);
-        alert('लेन-देन सेव नहीं हुआ: ' + error.message);
       }
     }
 
@@ -1614,12 +1443,7 @@
     }
 
     async function renderShopkeeperView() {
-      const { data: myTxData, error } = await supabaseClient.from('transactions').select('*').eq('shop_id', currentUser.shop_id).order('created_at', { ascending: false });
-      if (error) {
-        console.error('Shopkeeper transactions load error:', error);
-        alert('लेन-देन लोड नहीं हुए: ' + error.message);
-      }
-      const myTxs = myTxData || [];
+      const { data: myTxs } = await supabaseClient.from('transactions').select('*').eq('shop_id', currentUser.shop_id).order('created_at', { ascending: false });
       const tbody = document.getElementById('shopkeeperTxList');
       tbody.innerHTML = (myTxs || []).map(t => `
         <tr class="text-slate-300 ${t.status === 'cleared' ? 'opacity-60' : ''}">
@@ -1635,6 +1459,189 @@
     }
 
     document.addEventListener('DOMContentLoaded', fetchDefaultCustomerBanner);
+
+
+
+    // Persist app configuration in the existing settings table.
+async function readSetting(key, fallback) {
+    const { data, error } = await supabaseClient.from('settings').select('value').eq('key', key).maybeSingle();
+    if (error || !data) return fallback;
+    try {
+        return typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+    } catch (_) {
+        return data.value ?? fallback;
+    }
+}
+
+async function writeSetting(key, value) {
+    const { error } = await supabaseClient.from('settings').upsert({ key, value: JSON.stringify(value) });
+    if (error) throw error;
+}
+
+async function checkShopAccess(shop) {
+    try {
+        const accessRegistry = await readSetting('shop_access_registry', {});
+        const record = accessRegistry[shop.shop_id];
+        if (record?.expires_at) return new Date(record.expires_at).getTime() > Date.now();
+
+        const demoDaysValue = await readSetting('demo_days', 7);
+        const demoDays = Math.max(0, Number(demoDaysValue) || 0);
+        if (demoDays === 0) return false;
+        const started = new Date();
+        const expires = new Date(started.getTime() + demoDays * 86400000);
+        accessRegistry[shop.shop_id] = { started_at: started.toISOString(), expires_at: expires.toISOString(), type: 'demo' };
+        await writeSetting('shop_access_registry', accessRegistry);
+        return true;
+    } catch (error) {
+        console.error('Access check failed:', error);
+        return false;
+    }
+}
+
+async function loadAdminSettings() {
+    try {
+        const [days, defaulters] = await Promise.all([
+            readSetting('demo_days', 7),
+            readSetting('defaulters', [])
+        ]);
+        document.getElementById('demoDaysInput').value = Number(days) || 0;
+        renderDefaulters(Array.isArray(defaulters) ? defaulters : []);
+    } catch (error) {
+        console.error('Admin settings load failed:', error);
+    }
+}
+
+async function saveDemoDays() {
+    const input = document.getElementById('demoDaysInput');
+    const days = Number(input.value);
+    if (!Number.isInteger(days) || days < 0) return alert('डेमो दिन 0 या उससे अधिक पूर्णांक होना चाहिए।');
+    try {
+        await writeSetting('demo_days', days);
+        alert('डेमो अवधि सेव हो गई। यह नए अकाउंट पर लागू होगी।');
+    } catch (error) {
+        alert('सेटिंग सेव नहीं हुई: ' + error.message);
+    }
+}
+
+async function recordRecharge(event) {
+    event.preventDefault();
+    const shopId = document.getElementById('rechargeShopId').value.trim().toUpperCase();
+    const days = Number(document.getElementById('rechargeDays').value);
+    const amount = Number(document.getElementById('rechargeAmount').value || 0);
+    const reference = document.getElementById('rechargeReference').value.trim();
+    if (!Number.isInteger(days) || days < 1 || amount < 0) return alert('दिन और राशि सही दर्ज करें।');
+
+    try {
+        const registry = await readSetting('shop_access_registry', {});
+        const previousExpiry = registry[shopId]?.expires_at ? new Date(registry[shopId].expires_at).getTime() : 0;
+        const start = Math.max(Date.now(), previousExpiry);
+        const expiresAt = new Date(start + days * 86400000);
+        const entry = { shop_id: shopId, days, amount, reference, recharged_at: new Date().toISOString(), expires_at: expiresAt.toISOString() };
+        registry[shopId] = { ...entry, type: 'recharge' };
+        await writeSetting('shop_access_registry', registry);
+        await logActivity(currentUser?.shop_id || 'ADMIN', `Recorded ${days}-day recharge for ${shopId}`);
+
+        const details = `Len-Den recharge\nShop ID: ${shopId}\nDuration: ${days} days\nAmount: ₹${amount}\nReference: ${reference || 'N/A'}\nValid until: ${expiresAt.toLocaleDateString('en-IN')}`;
+        const status = document.getElementById('rechargeStatus');
+        status.textContent = 'रिचार्ज सेव हुआ।';
+        if (navigator.share) {
+            try { await navigator.share({ title: 'Recharge details', text: details }); }
+            catch (shareError) { if (shareError.name !== 'AbortError') await copyRechargeDetails(details); }
+        } else {
+            await copyRechargeDetails(details);
+        }
+        event.target.reset();
+    } catch (error) {
+        alert('रिचार्ज सेव नहीं हुआ: ' + error.message);
+    }
+}
+
+async function copyRechargeDetails(details) {
+    try {
+        await navigator.clipboard.writeText(details);
+        document.getElementById('rechargeStatus').textContent = 'रिचार्ज विवरण क्लिपबोर्ड पर कॉपी हुआ।';
+    } catch (_) {
+        window.prompt('रिचार्ज विवरण कॉपी करें:', details);
+    }
+}
+
+async function saveDefaulter(event) {
+    event.preventDefault();
+    const id = document.getElementById('defaulterEditId').value;
+    const item = {
+        id: id || `def-${Date.now()}`,
+        name: document.getElementById('defaulterName').value.trim(),
+        phone: document.getElementById('defaulterPhone').value.trim(),
+        amount: document.getElementById('defaulterAmount').value.trim()
+    };
+    try {
+        const list = await readSetting('defaulters', []);
+        const updated = Array.isArray(list) ? [...list] : [];
+        const index = updated.findIndex(entry => entry.id === id);
+        if (index >= 0) updated[index] = item;
+        else updated.unshift(item);
+        await writeSetting('defaulters', updated);
+        event.target.reset();
+        document.getElementById('defaulterEditId').value = '';
+        document.getElementById('defaulterSaveButton').textContent = 'डिफ़ॉल्टर जोड़ें';
+        renderDefaulters(updated);
+    } catch (error) {
+        alert('डिफ़ॉल्टर सेव नहीं हुआ: ' + error.message);
+    }
+}
+
+function renderDefaulters(list) {
+    const container = document.getElementById('defaulterList');
+    container.replaceChildren();
+    if (!list.length) {
+        container.textContent = 'कोई डिफ़ॉल्टर दर्ज नहीं है।';
+        return;
+    }
+    list.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'flex flex-wrap justify-between items-center gap-2 border border-slate-700 rounded-xl p-3';
+        const detail = document.createElement('span');
+        detail.textContent = `${item.name || ''}${item.phone ? ` • ${item.phone}` : ''}${item.amount ? ` • ₹${item.amount}` : ''}`;
+        const actions = document.createElement('div');
+        actions.className = 'flex gap-2';
+        const edit = document.createElement('button');
+        edit.type = 'button';
+        edit.className = 'text-blue-600 font-bold';
+        edit.textContent = 'संपादित करें';
+        edit.addEventListener('click', () => editDefaulter(item.id));
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'text-red-600 font-bold';
+        remove.textContent = 'हटाएं';
+        remove.addEventListener('click', () => removeDefaulter(item.id));
+        actions.append(edit, remove);
+        row.append(detail, actions);
+        container.append(row);
+    });
+}
+
+async function editDefaulter(id) {
+    const list = await readSetting('defaulters', []);
+    const item = (Array.isArray(list) ? list : []).find(entry => entry.id === id);
+    if (!item) return;
+    document.getElementById('defaulterEditId').value = item.id;
+    document.getElementById('defaulterName').value = item.name || '';
+    document.getElementById('defaulterPhone').value = item.phone || '';
+    document.getElementById('defaulterAmount').value = item.amount || '';
+    document.getElementById('defaulterSaveButton').textContent = 'बदलाव सेव करें';
+}
+
+async function removeDefaulter(id) {
+    if (!confirm('इस डिफ़ॉल्टर को हटाएं?')) return;
+    try {
+        const list = await readSetting('defaulters', []);
+        const updated = (Array.isArray(list) ? list : []).filter(item => item.id !== id);
+        await writeSetting('defaulters', updated);
+        renderDefaulters(updated);
+    } catch (error) {
+        alert('डिफ़ॉल्टर हटाया नहीं जा सका: ' + error.message);
+    }
+}
 
     // --- एडमिन डिफ़ॉल्टर बैनर और डेटा फिक्स लॉजिक ---
 async function fetchDefaultCustomerBanner() {
@@ -1655,6 +1662,35 @@ async function fetchDefaultCustomerBanner() {
     }
 }
 
+async function updateDefaultCustomerBanner() {
+    const custName = document.getElementById('adminDefaulterName')?.value.trim();
+    const defAmount = document.getElementById('adminDefaulterAmount')?.value.trim();
+
+    if (!custName) {
+        alert('कृपया डिफ़ॉल्ट कस्टमर का नाम दर्ज करें।');
+        return;
+    }
+
+    const bannerText = defAmount ? `${custName} - बक़ाया राशि: ₹${defAmount}` : custName;
+
+    try {
+        const { error } = await supabaseClient
+            .from('settings')
+            .upsert({ key: 'default_customer_banner', value: bannerText });
+
+        if (error) {
+            alert('डिफ़ॉल्टर बैनर सेव करने में विफल।');
+            return;
+        }
+
+        alert('सफलतापूर्वक! डिफ़ॉल्ट कस्टमर/डिफ़ॉल्टर बैनर अपडेट कर दिया गया है।');
+        fetchDefaultCustomerBanner();
+        document.getElementById('adminDefaulterName').value = '';
+        document.getElementById('adminDefaulterAmount').value = '';
+    } catch (err) {
+        console.error('एरर:', err);
+    }
+}
 
 
   </script>
