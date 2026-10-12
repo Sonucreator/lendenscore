@@ -28,50 +28,8 @@
       font-weight: 700;
     }
 
-    /* Clean, light business-app styling */
-    body {
-      background: #f3f6fb !important;
-      color: #172033 !important;
-    }
-    header {
-      background: rgba(255, 255, 255, .96) !important;
-      border-color: #e4e9f1 !important;
-      box-shadow: 0 2px 12px rgba(15, 23, 42, .05);
-    }
-    header h1 { color: #172033 !important; }
-    main { padding-top: 1.25rem !important; }
-    main section, #authView, #adminDashboard > div, #adminDashboard section {
-      background-color: #fff !important;
-      border-color: #e4e9f1 !important;
-      box-shadow: 0 4px 18px rgba(20, 35, 60, .06) !important;
-    }
-    #authView { color: #172033 !important; }
-    .bg-slate-950, .bg-slate-950\/40, .bg-slate-950\/30,
-    .bg-slate-900, .bg-slate-900\/90, .bg-slate-900\/50,
-    .bg-slate-800, .bg-slate-800\/50 {
-      background-color: #f7f9fc !important;
-    }
-    .text-white, .text-slate-100, .text-slate-200, .text-slate-300 {
-      color: #172033 !important;
-    }
-    .text-slate-400, .text-slate-500 { color: #69758a !important; }
-    .border-slate-800, .border-slate-700 { border-color: #e2e8f0 !important; }
-    input, textarea, select {
-      background-color: #f8fafc !important;
-      border-color: #d7dfeb !important;
-      color: #172033 !important;
-    }
-    input::placeholder, textarea::placeholder { color: #8a95a8 !important; }
-    .bg-amber-500 { background-color: #2563eb !important; }
-    button.bg-amber-500:hover { background-color: #1d4ed8 !important; }
-    .text-amber-400, .text-amber-300 { color: #2563eb !important; }
-    .tab-active { border-color: #2563eb !important; color: #2563eb !important; }
-    .border-amber-500\/40 { border-color: #bfdbfe !important; }
+    /* Keep the original slate-and-amber business-app theme. */
     button { transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease; }
-    button:hover { filter: brightness(.98); }
-    table thead { background: #f7f9fc !important; }
-    tbody tr:hover { background-color: #f5f8ff !important; }
-    footer { color: #69758a !important; background: #fff !important; border-color: #e4e9f1 !important; }
     .mobile-bottom-nav, .mobile-bottom-nav.hidden { display: none; }
     #shopScoreSection, #shopAddSection, #shopLedgerSection, #adminDashboard { scroll-margin-top: 5.5rem; }
     @media (max-width: 640px) {
@@ -104,7 +62,7 @@
         font-size: .65rem;
         font-weight: 700;
       }
-      .mobile-nav-item.is-active { color: #2563eb; }
+      .mobile-nav-item.is-active { color: #f59e0b; }
       .mobile-nav-item svg { width: 1.2rem; height: 1.2rem; }
       .mobile-nav-add { color: #fff; }
       .mobile-nav-add span {
@@ -113,10 +71,10 @@
         width: 2.8rem;
         height: 2.8rem;
         margin-top: -1.2rem;
-        border: 4px solid #f3f6fb;
+        border: 4px solid #020617;
         border-radius: 9999px;
-        background: #2563eb;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, .3);
+        background: #f59e0b;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, .3);
       }
       .mobile-nav-add svg { width: 1.5rem; height: 1.5rem; }
     }
