@@ -1,6 +1,184 @@
-body{
-  padding: 25px;
+/* Vyapar-inspired business dashboard styling */
+:root {
+  --app-blue: #1769d2;
+  --app-blue-dark: #1257b0;
+  --app-ink: #172b4d;
+  --app-muted: #6b7a90;
+  --app-line: #e5ebf3;
+  --app-surface: #ffffff;
+  --app-canvas: #f4f7fb;
+  --app-green: #168653;
+  --app-red: #d64545;
 }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+body {
+  padding: 0;
+  background: var(--app-canvas) !important;
+  color: var(--app-ink) !important;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
 .title {
-	color: #5C6AC4;
+  color: var(--app-blue);
+}
+
+header {
+  min-height: 4.5rem;
+  border-bottom: 1px solid var(--app-line) !important;
+  box-shadow: 0 3px 14px rgba(24, 47, 78, .07) !important;
+}
+
+header h1 {
+  letter-spacing: .035em;
+}
+
+main {
+  max-width: 80rem;
+}
+
+main section,
+#authView,
+#adminDashboard > div,
+#adminDashboard section {
+  border: 1px solid var(--app-line) !important;
+  border-radius: 1.15rem !important;
+  box-shadow: 0 5px 20px rgba(28, 52, 84, .055) !important;
+}
+
+#shopkeeperDashboard > section:first-child,
+#adminDashboard > div:first-child {
+  background: linear-gradient(115deg, #fff 0%, #f7faff 100%) !important;
+}
+
+#permanentCustomBanner {
+  min-height: 2.9rem;
+  background: #eff6ff !important;
+  border-color: #cfe1ff !important;
+  color: #1d4f91 !important;
+}
+
+button {
+  border-radius: .7rem;
+  font-weight: 700;
+}
+
+button.bg-amber-500,
+.bg-amber-500 {
+  background: var(--app-blue) !important;
+  color: #fff !important;
+  box-shadow: 0 3px 8px rgba(23, 105, 210, .16);
+}
+
+button.bg-amber-500:hover,
+.bg-amber-500:hover {
+  background: var(--app-blue-dark) !important;
+}
+
+.text-amber-400,
+.text-amber-300,
+.tab-active {
+  color: var(--app-blue) !important;
+}
+
+.tab-active {
+  border-color: var(--app-blue) !important;
+}
+
+input,
+textarea,
+select {
+  min-height: 2.7rem;
+  border-radius: .7rem !important;
+  background: #fbfcfe !important;
+  border-color: #d9e2ef !important;
+  transition: border-color .16s ease, box-shadow .16s ease, background-color .16s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #70a7ed !important;
+  box-shadow: 0 0 0 3px rgba(23, 105, 210, .11);
+  outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8794a8 !important;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+table thead {
+  background: #f5f8fc !important;
+}
+
+table th {
+  color: #687990 !important;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .035em;
+  white-space: nowrap;
+}
+
+table td {
+  border-color: #edf1f6 !important;
+  vertical-align: middle;
+}
+
+tbody tr:hover {
+  background: #f6f9ff !important;
+}
+
+footer {
+  border-color: var(--app-line) !important;
+  color: var(--app-muted) !important;
+}
+
+#mobileBottomNav:not(.hidden) {
+  background: rgba(255, 255, 255, .97);
+}
+
+@media (max-width: 640px) {
+  html {
+    scroll-padding-top: 5rem;
+  }
+
+  header {
+    min-height: 4rem;
+  }
+
+  header p {
+    font-size: .58rem !important;
+  }
+
+  main {
+    padding: .75rem !important;
+  }
+
+  main section,
+  #adminDashboard section {
+    border-radius: 1rem !important;
+  }
+
+  #permanentCustomBanner {
+    align-items: flex-start;
+    font-size: .75rem;
+  }
+
+  .mobile-nav-item {
+    border-radius: .8rem;
+  }
+
+  table {
+    min-width: 680px;
+  }
 }
