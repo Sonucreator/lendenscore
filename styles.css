@@ -324,3 +324,62 @@ footer {
 .risk-fill { background: linear-gradient(90deg, #f9a29a, #d64545); }
 #transactionModal { overflow-y: auto; }
 #transactionModal > div { max-height: 90vh; overflow-y: auto; }
+
+.admin-tab-nav {
+  position: sticky;
+  top: 4.5rem;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  overflow-x: auto;
+  padding: .45rem;
+  border: 1px solid var(--app-line);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, .97);
+  box-shadow: 0 4px 14px rgba(28, 52, 84, .08);
+  scrollbar-width: thin;
+}
+
+.admin-tab {
+  flex: 0 0 auto;
+  padding: .7rem .85rem;
+  border: 1px solid transparent;
+  border-radius: .75rem;
+  background: transparent;
+  color: var(--app-muted);
+  font-size: .82rem;
+  white-space: nowrap;
+  transition: background-color .16s ease, color .16s ease, border-color .16s ease;
+}
+
+.admin-tab:hover:not(.tab-active) {
+  color: var(--app-blue);
+  background: #f1f6fd;
+}
+
+.admin-tab.tab-active {
+  color: var(--app-blue) !important;
+  background: #eef5ff;
+  border-color: #cfe1ff;
+  box-shadow: inset 0 -2px 0 var(--app-blue);
+}
+
+.admin-tab:focus-visible,
+.shop-tab:focus-visible,
+.mobile-nav-item:focus-visible {
+  outline: 3px solid rgba(23, 105, 210, .3);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .admin-tab-nav {
+    top: 4rem;
+    border-radius: .85rem;
+  }
+
+  .admin-tab {
+    padding: .65rem .75rem;
+    font-size: .75rem;
+  }
+}
