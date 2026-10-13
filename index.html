@@ -28,8 +28,50 @@
       font-weight: 700;
     }
 
-    /* Keep the original slate-and-amber business-app theme. */
+    /* Clean, light business-app styling */
+    body {
+      background: #f3f6fb !important;
+      color: #172033 !important;
+    }
+    header {
+      background: rgba(255, 255, 255, .96) !important;
+      border-color: #e4e9f1 !important;
+      box-shadow: 0 2px 12px rgba(15, 23, 42, .05);
+    }
+    header h1 { color: #172033 !important; }
+    main { padding-top: 1.25rem !important; }
+    main section, #authView, #adminDashboard > div, #adminDashboard section {
+      background-color: #fff !important;
+      border-color: #e4e9f1 !important;
+      box-shadow: 0 4px 18px rgba(20, 35, 60, .06) !important;
+    }
+    #authView { color: #172033 !important; }
+    .bg-slate-950, .bg-slate-950\/40, .bg-slate-950\/30,
+    .bg-slate-900, .bg-slate-900\/90, .bg-slate-900\/50,
+    .bg-slate-800, .bg-slate-800\/50 {
+      background-color: #f7f9fc !important;
+    }
+    .text-white, .text-slate-100, .text-slate-200, .text-slate-300 {
+      color: #172033 !important;
+    }
+    .text-slate-400, .text-slate-500 { color: #69758a !important; }
+    .border-slate-800, .border-slate-700 { border-color: #e2e8f0 !important; }
+    input, textarea, select {
+      background-color: #f8fafc !important;
+      border-color: #d7dfeb !important;
+      color: #172033 !important;
+    }
+    input::placeholder, textarea::placeholder { color: #8a95a8 !important; }
+    .bg-amber-500 { background-color: #2563eb !important; }
+    button.bg-amber-500:hover { background-color: #1d4ed8 !important; }
+    .text-amber-400, .text-amber-300 { color: #2563eb !important; }
+    .tab-active { border-color: #2563eb !important; color: #2563eb !important; }
+    .border-amber-500\/40 { border-color: #bfdbfe !important; }
     button { transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease; }
+    button:hover { filter: brightness(.98); }
+    table thead { background: #f7f9fc !important; }
+    tbody tr:hover { background-color: #f5f8ff !important; }
+    footer { color: #69758a !important; background: #fff !important; border-color: #e4e9f1 !important; }
     .mobile-bottom-nav, .mobile-bottom-nav.hidden { display: none; }
     #shopScoreSection, #shopAddSection, #shopLedgerSection, #adminDashboard { scroll-margin-top: 5.5rem; }
     @media (max-width: 640px) {
@@ -62,7 +104,7 @@
         font-size: .65rem;
         font-weight: 700;
       }
-      .mobile-nav-item.is-active { color: #f59e0b; }
+      .mobile-nav-item.is-active { color: #2563eb; }
       .mobile-nav-item svg { width: 1.2rem; height: 1.2rem; }
       .mobile-nav-add { color: #fff; }
       .mobile-nav-add span {
@@ -71,14 +113,15 @@
         width: 2.8rem;
         height: 2.8rem;
         margin-top: -1.2rem;
-        border: 4px solid #020617;
+        border: 4px solid #f3f6fb;
         border-radius: 9999px;
-        background: #f59e0b;
-        box-shadow: 0 4px 12px rgba(245, 158, 11, .3);
+        background: #2563eb;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, .3);
       }
       .mobile-nav-add svg { width: 1.5rem; height: 1.5rem; }
     }
   </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between select-none">
 
@@ -167,7 +210,6 @@
       <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex justify-between items-center">
         <div>
           <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
-          <p id="dashOwnerName" class="text-[11px] text-slate-400"></p>
           <p class="text-[11px] text-slate-400">सेंट्रल कम्युनिटी रजिस्ट्री • लाइव क्लाउड डेटा सिंक</p>
         </div>
         <div class="flex gap-2">
@@ -337,8 +379,7 @@
               <thead class="text-slate-400 uppercase border-b border-slate-800 bg-slate-950/40 font-mono">
                 <tr>
                   <th class="py-3 px-2">ID कोड</th>
-                  <th>दुकान का नाम</th>
-                  <th>मालिक का नाम</th>
+                  <th>मालिक / दुकान</th>
                   <th>ईमेल</th>
                   <th>शहर</th>
                   <th>फोन</th>
@@ -508,35 +549,6 @@
         </section>
 
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
-          <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">डेमो अवधि और दुकान रिचार्ज</h2>
-          <p class="text-xs text-slate-400">रिचार्ज एडमिन द्वारा भुगतान पुष्टि के बाद दर्ज करें। यह पेमेंट गेटवे नहीं है।</p>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-            <input type="number" id="demoDaysInput" min="0" placeholder="नए अकाउंट के डेमो दिन" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
-            <button type="button" onclick="saveDemoDays()" class="bg-slate-800 text-amber-400 font-bold px-3 py-2 rounded-xl text-xs">डेमो दिन सेव करें</button>
-          </div>
-          <form onsubmit="recordRecharge(event)" class="grid grid-cols-1 md:grid-cols-4 gap-2">
-            <input type="text" id="rechargeShopId" required placeholder="दुकान ID" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm uppercase" />
-            <input type="number" id="rechargeDays" required min="1" placeholder="दिन" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
-            <input type="number" id="rechargeAmount" min="0" step="0.01" placeholder="रकम (₹)" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
-            <input type="text" id="rechargeReference" placeholder="भुगतान संदर्भ (वैकल्पिक)" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
-            <button type="submit" class="md:col-span-4 bg-amber-500 text-slate-950 font-bold px-3 py-2.5 rounded-xl text-xs">रिचार्ज दर्ज करें और विवरण शेयर करें</button>
-          </form>
-          <p id="rechargeStatus" class="text-xs text-slate-400" aria-live="polite"></p>
-        </section>
-
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
-          <h2 class="text-sm font-bold text-amber-400">डिफ़ॉल्टर सूची</h2>
-          <form onsubmit="saveDefaulter(event)" class="grid grid-cols-1 md:grid-cols-4 gap-2">
-            <input type="hidden" id="defaulterEditId" />
-            <input type="text" id="defaulterName" required placeholder="नाम *" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
-            <input type="tel" id="defaulterPhone" placeholder="मोबाइल" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
-            <input type="number" id="defaulterAmount" min="0" step="0.01" placeholder="बकाया राशि (₹)" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" />
-            <button type="submit" id="defaulterSaveButton" class="bg-amber-500 text-slate-950 font-bold px-3 py-2 rounded-xl text-xs">डिफ़ॉल्टर जोड़ें</button>
-          </form>
-          <div id="defaulterList" class="space-y-2 text-sm"></div>
-        </section>
-
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
           <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
             <i data-lucide="megaphone" class="w-4 h-4"></i> ग्लोबल रिस्क ब्रॉडकास्ट नोटिफिकेशन (Global Risk Broadcast)
           </h2>
@@ -587,12 +599,8 @@
       <h3 class="text-sm font-bold text-amber-400">दुकानदार विवरण संपादित करें (Edit Shopkeeper)</h3>
       <input type="hidden" id="editShopRowId" />
       <div>
-        <label class="block text-[10px] text-slate-400 mb-1">दुकान का नाम</label>
+        <label class="block text-[10px] text-slate-400 mb-1">दुकान / मालिक का नाम</label>
         <input type="text" id="editShopNameInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
-      </div>
-      <div>
-        <label class="block text-[10px] text-slate-400 mb-1">मालिक का नाम</label>
-        <input type="text" id="editShopOwnerInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
       </div>
       <div>
         <label class="block text-[10px] text-slate-400 mb-1">शहर (City)</label>
@@ -714,8 +722,7 @@
           const autoCode = "SRSAM" + Math.floor(1000 + Math.random() * 9000); 
           await supabaseClient.from('shopkeepers').insert([{ 
             shop_id: autoCode, 
-            owner_name: userName,
-            shop_name: null,
+            name: userName, 
             email: userEmail, 
             city: "SAMALKHA", 
             phone: "0000000000",
@@ -734,12 +741,6 @@
           await supabaseClient.auth.signOut();
         } else {
           currentUser = shopRecord;
-          const accessAllowed = await checkShopAccess(currentUser);
-          if (!accessAllowed) {
-            alert('⏳ आपकी डेमो/सब्सक्रिप्शन अवधि समाप्त हो गई है। रिचार्ज के लिए एडमिन से संपर्क करें।');
-            await supabaseClient.auth.signOut();
-            return;
-          }
           initDashboard();
           await logActivity(currentUser.shop_id, "Logged in via Google");
         }
@@ -1006,12 +1007,10 @@
       if (currentUser.role === 'admin' || displayId === 'JBSMK000001') {
         document.getElementById('adminDashboard').classList.remove('hidden');
         document.getElementById('defaultBannerAdminControls').classList.remove('hidden');
-        loadAdminSettings();
         renderAdminAll();
       } else {
         document.getElementById('shopkeeperDashboard').classList.remove('hidden');
-        document.getElementById('dashShopTitle').innerText = currentUser.shop_name || 'दुकान का नाम दर्ज नहीं';
-        document.getElementById('dashOwnerName').innerText = `मालिक: ${currentUser.owner_name || 'नाम उपलब्ध नहीं'}`;
+        document.getElementById('dashShopTitle').innerText = currentUser.name || displayId;
         renderShopkeeperView();
       }
       lucide.createIcons();
@@ -1045,14 +1044,11 @@
       loadAdminAppeals();
     }
 
-    function openEditShopModal(id) {
-      const shop = rawAdminShopkeepers.find(record => String(record.id) === String(id));
-      if (!shop) return;
+    function openEditShopModal(id, name, city, phone, pin) {
       document.getElementById('editShopRowId').value = id;
-      document.getElementById('editShopNameInput').value = shop.shop_name || '';
-      document.getElementById('editShopOwnerInput').value = shop.owner_name || '';
-      document.getElementById('editShopCityInput').value = shop.city || '';
-      document.getElementById('editShopPhoneInput').value = shop.phone || '';
+      document.getElementById('editShopNameInput').value = name || '';
+      document.getElementById('editShopCityInput').value = city || '';
+      document.getElementById('editShopPhoneInput').value = phone || '';
       document.getElementById('editShopModal').classList.remove('hidden');
     }
 
@@ -1062,12 +1058,11 @@
 
     async function saveShopkeeperEdit() {
       const rowId = document.getElementById('editShopRowId').value;
-      const shopName = document.getElementById('editShopNameInput').value.trim();
-      const ownerName = document.getElementById('editShopOwnerInput').value.trim();
+      const name = document.getElementById('editShopNameInput').value.trim();
       const city = document.getElementById('editShopCityInput').value.trim().toUpperCase();
       const phone = document.getElementById('editShopPhoneInput').value.trim();
 
-      const { error } = await supabaseClient.from('shopkeepers').update({ shop_name: shopName || null, owner_name: ownerName, city: city, phone: phone }).eq('id', rowId);
+      const { error } = await supabaseClient.from('shopkeepers').update({ name: name, city: city, phone: phone }).eq('id', rowId);
       if(!error) {
         alert('✓ विवरण सफलतापूर्वक अपडेट कर दिया गया है!');
         closeEditShopModal();
@@ -1143,29 +1138,25 @@
 
     function renderFilteredAdminShopkeepers(query) {
       const tbody = document.getElementById('adminShopkeepersList');
-      tbody.innerHTML = rawAdminShopkeepers.filter(s => {
-        const searchable = [s.shop_id, s.shop_name, s.owner_name, s.email].join(' ').toLowerCase();
-        return !query || searchable.includes(query);
-      }).map(s => {
+      tbody.innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || s.name.toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
         let statusBadge = s.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
         let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber';
         let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
         return `
         <tr class="text-slate-300">
           <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
-          <td><b>${s.shop_name || 'दुकान का नाम दर्ज नहीं'}</b></td>
-          <td>${s.owner_name || 'मालिक का नाम दर्ज नहीं'}</td>
+          <td><b>${s.name || 'Store'}</b></td>
           <td class="text-slate-400">${s.email || '-'}</td>
           <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
-          <td class="font-mono text-slate-400">${s.phone || '-'}</td>
-          <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${s.status || 'unknown'}</span></td>
+          <td class="font-mono text-slate-400">${s.phone}</td>
+          <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${s.status}</span></td>
           <td class="text-right pr-2 space-x-1">
-            <button onclick="openEditShopModal('${s.id}')" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit</button>
+            <button onclick="openEditShopModal('${s.id}', '${s.name}', '${s.city}', '${s.phone}')" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit</button>
             <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs cursor-pointer">${actionBtnText}</button>
             <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs cursor-pointer">Delete</button>
           </td>
         </tr>`
-      }).join('') || `<tr><td colspan="8" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
+      }).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
     }
 
     function renderFilteredAdminCustomers(query) {
@@ -1255,21 +1246,6 @@
       if(!confirm("हटाना चाहते हैं?")) return;
       await supabaseClient.from('transactions').delete().eq('id', txId);
       renderAdminAll();
-    }
-
-    function downloadAdminSampleCSV() {
-      const csv = [
-        'ShopID,Name,Mobile,Amount,Aadhaar,PAN,Date,Notes',
-        'SRSAM1234,उदाहरण ग्राहक,9876543210,1500,,,2025-01-15,उदाहरण नोट'
-      ].join('\n');
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(new Blob(['\\uFEFF', csv], { type: 'text/csv;charset=utf-8' }));
-      link.download = 'admin-transaction-sample.csv';
-      const objectUrl = link.href;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
     }
 
     async function importAdminCSV(e) {
@@ -1418,186 +1394,46 @@
 
     document.addEventListener('DOMContentLoaded', fetchDefaultCustomerBanner);
 
-
-
-    // Persist app configuration in the existing settings table.
-async function readSetting(key, fallback) {
-    const { data, error } = await supabaseClient.from('settings').select('value').eq('key', key).maybeSingle();
-    if (error || !data) return fallback;
+// ================= 3. JSON बैकअप डाउनलोड (पॉप-अप अलर्ट के साथ) =================
+function downloadCloudBackup() {
     try {
-        return typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
-    } catch (_) {
-        return data.value ?? fallback;
+        const backupData = {
+            shopkeepers: typeof rawAdminShopkeepers !== 'undefined' ? rawAdminShopkeepers : [],
+            transactions: typeof rawAdminTxs !== 'undefined' ? rawAdminTxs : [],
+            timestamp: new Date().toISOString()
+        };
+        
+        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = createBackupFileName();
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        alert('सफलतापूर्वक! JSON बैकअप फाइल डाउनलोड हो गई है। कृपया अपने डाउनलोड्स फोल्डर को चेक करें।');
+    } catch (err) {
+        console.error('डाउनलोड एरर:', err);
+        alert('JSON डाउनलोड करने में विफल रहा।');
     }
 }
 
-async function writeSetting(key, value) {
-    const { error } = await supabaseClient.from('settings').upsert({ key, value: JSON.stringify(value) });
-    if (error) throw error;
-}
-
-async function checkShopAccess(shop) {
+// ================= 4. डेटा सिंक फंक्शन =================
+async function syncCloudData() {
+    alert('डेटा सिंक किया जा रहा है...');
     try {
-        const accessRegistry = await readSetting('shop_access_registry', {});
-        const record = accessRegistry[shop.shop_id];
-        if (record?.expires_at) return new Date(record.expires_at).getTime() > Date.now();
-
-        const demoDaysValue = await readSetting('demo_days', 7);
-        const demoDays = Math.max(0, Number(demoDaysValue) || 0);
-        if (demoDays === 0) return false;
-        const started = new Date();
-        const expires = new Date(started.getTime() + demoDays * 86400000);
-        accessRegistry[shop.shop_id] = { started_at: started.toISOString(), expires_at: expires.toISOString(), type: 'demo' };
-        await writeSetting('shop_access_registry', accessRegistry);
-        return true;
-    } catch (error) {
-        console.error('Access check failed:', error);
-        return false;
-    }
-}
-
-async function loadAdminSettings() {
-    try {
-        const [days, defaulters] = await Promise.all([
-            readSetting('demo_days', 7),
-            readSetting('defaulters', [])
-        ]);
-        document.getElementById('demoDaysInput').value = Number(days) || 0;
-        renderDefaulters(Array.isArray(defaulters) ? defaulters : []);
-    } catch (error) {
-        console.error('Admin settings load failed:', error);
-    }
-}
-
-async function saveDemoDays() {
-    const input = document.getElementById('demoDaysInput');
-    const days = Number(input.value);
-    if (!Number.isInteger(days) || days < 0) return alert('डेमो दिन 0 या उससे अधिक पूर्णांक होना चाहिए।');
-    try {
-        await writeSetting('demo_days', days);
-        alert('डेमो अवधि सेव हो गई। यह नए अकाउंट पर लागू होगी।');
-    } catch (error) {
-        alert('सेटिंग सेव नहीं हुई: ' + error.message);
-    }
-}
-
-async function recordRecharge(event) {
-    event.preventDefault();
-    const shopId = document.getElementById('rechargeShopId').value.trim().toUpperCase();
-    const days = Number(document.getElementById('rechargeDays').value);
-    const amount = Number(document.getElementById('rechargeAmount').value || 0);
-    const reference = document.getElementById('rechargeReference').value.trim();
-    if (!Number.isInteger(days) || days < 1 || amount < 0) return alert('दिन और राशि सही दर्ज करें।');
-
-    try {
-        const registry = await readSetting('shop_access_registry', {});
-        const previousExpiry = registry[shopId]?.expires_at ? new Date(registry[shopId].expires_at).getTime() : 0;
-        const start = Math.max(Date.now(), previousExpiry);
-        const expiresAt = new Date(start + days * 86400000);
-        const entry = { shop_id: shopId, days, amount, reference, recharged_at: new Date().toISOString(), expires_at: expiresAt.toISOString() };
-        registry[shopId] = { ...entry, type: 'recharge' };
-        await writeSetting('shop_access_registry', registry);
-        await logActivity(currentUser?.shop_id || 'ADMIN', `Recorded ${days}-day recharge for ${shopId}`);
-
-        const details = `Len-Den recharge\nShop ID: ${shopId}\nDuration: ${days} days\nAmount: ₹${amount}\nReference: ${reference || 'N/A'}\nValid until: ${expiresAt.toLocaleDateString('en-IN')}`;
-        const status = document.getElementById('rechargeStatus');
-        status.textContent = 'रिचार्ज सेव हुआ।';
-        if (navigator.share) {
-            try { await navigator.share({ title: 'Recharge details', text: details }); }
-            catch (shareError) { if (shareError.name !== 'AbortError') await copyRechargeDetails(details); }
-        } else {
-            await copyRechargeDetails(details);
+        await loadAdminAppeals();
+        await fetchGlobalBanner();
+        await loadMasterDataManually();
+        if (typeof renderAdminAll === 'function') {
+            renderAdminAll();
         }
-        event.target.reset();
+        alert('डेटा सफलतापूर्वक सिंक (Sync) हो गया है!');
     } catch (error) {
-        alert('रिचार्ज सेव नहीं हुआ: ' + error.message);
-    }
-}
-
-async function copyRechargeDetails(details) {
-    try {
-        await navigator.clipboard.writeText(details);
-        document.getElementById('rechargeStatus').textContent = 'रिचार्ज विवरण क्लिपबोर्ड पर कॉपी हुआ।';
-    } catch (_) {
-        window.prompt('रिचार्ज विवरण कॉपी करें:', details);
-    }
-}
-
-async function saveDefaulter(event) {
-    event.preventDefault();
-    const id = document.getElementById('defaulterEditId').value;
-    const item = {
-        id: id || `def-${Date.now()}`,
-        name: document.getElementById('defaulterName').value.trim(),
-        phone: document.getElementById('defaulterPhone').value.trim(),
-        amount: document.getElementById('defaulterAmount').value.trim()
-    };
-    try {
-        const list = await readSetting('defaulters', []);
-        const updated = Array.isArray(list) ? [...list] : [];
-        const index = updated.findIndex(entry => entry.id === id);
-        if (index >= 0) updated[index] = item;
-        else updated.unshift(item);
-        await writeSetting('defaulters', updated);
-        event.target.reset();
-        document.getElementById('defaulterEditId').value = '';
-        document.getElementById('defaulterSaveButton').textContent = 'डिफ़ॉल्टर जोड़ें';
-        renderDefaulters(updated);
-    } catch (error) {
-        alert('डिफ़ॉल्टर सेव नहीं हुआ: ' + error.message);
-    }
-}
-
-function renderDefaulters(list) {
-    const container = document.getElementById('defaulterList');
-    container.replaceChildren();
-    if (!list.length) {
-        container.textContent = 'कोई डिफ़ॉल्टर दर्ज नहीं है।';
-        return;
-    }
-    list.forEach(item => {
-        const row = document.createElement('div');
-        row.className = 'flex flex-wrap justify-between items-center gap-2 border border-slate-700 rounded-xl p-3';
-        const detail = document.createElement('span');
-        detail.textContent = `${item.name || ''}${item.phone ? ` • ${item.phone}` : ''}${item.amount ? ` • ₹${item.amount}` : ''}`;
-        const actions = document.createElement('div');
-        actions.className = 'flex gap-2';
-        const edit = document.createElement('button');
-        edit.type = 'button';
-        edit.className = 'text-blue-600 font-bold';
-        edit.textContent = 'संपादित करें';
-        edit.addEventListener('click', () => editDefaulter(item.id));
-        const remove = document.createElement('button');
-        remove.type = 'button';
-        remove.className = 'text-red-600 font-bold';
-        remove.textContent = 'हटाएं';
-        remove.addEventListener('click', () => removeDefaulter(item.id));
-        actions.append(edit, remove);
-        row.append(detail, actions);
-        container.append(row);
-    });
-}
-
-async function editDefaulter(id) {
-    const list = await readSetting('defaulters', []);
-    const item = (Array.isArray(list) ? list : []).find(entry => entry.id === id);
-    if (!item) return;
-    document.getElementById('defaulterEditId').value = item.id;
-    document.getElementById('defaulterName').value = item.name || '';
-    document.getElementById('defaulterPhone').value = item.phone || '';
-    document.getElementById('defaulterAmount').value = item.amount || '';
-    document.getElementById('defaulterSaveButton').textContent = 'बदलाव सेव करें';
-}
-
-async function removeDefaulter(id) {
-    if (!confirm('इस डिफ़ॉल्टर को हटाएं?')) return;
-    try {
-        const list = await readSetting('defaulters', []);
-        const updated = (Array.isArray(list) ? list : []).filter(item => item.id !== id);
-        await writeSetting('defaulters', updated);
-        renderDefaulters(updated);
-    } catch (error) {
-        alert('डिफ़ॉल्टर हटाया नहीं जा सका: ' + error.message);
+        console.error('सिंक करने में त्रुटि:', error);
+        alert('डेटा सिंक करने में विफल। कृपया इंटरनेट कनेक्शन जांचें।');
     }
 }
 
