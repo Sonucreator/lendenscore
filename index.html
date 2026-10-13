@@ -160,13 +160,6 @@
       </div>
     </div>
   </header>
-  <!-- ================= SINGLE PERMANENT BANNER ================= -->
-  <div class="max-w-7xl mx-auto px-4 mt-3 w-full">
-    <div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
-      <span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
-    </div>
-  </div>
-
   <!-- ================= GLOBAL NOTIFICATION MODAL ================= -->
   <div id="globalNotificationModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl text-slate-100">
@@ -203,6 +196,11 @@
       </button>
       
       <div id="authStatusMsg" class="mt-4 text-xs font-bold text-center hidden"></div>
+    </div>
+
+    <!-- Default customer/defaulter banner: shown only after authentication -->
+    <div id="permanentCustomBanner" class="hidden bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md">
+      ⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b>
     </div>
 
     <!-- 2. SHOPKEEPER DASHBOARD -->
@@ -828,6 +826,7 @@
         document.getElementById('shopkeeperDashboard').classList.add('hidden');
         document.getElementById('adminDashboard').classList.add('hidden');
         document.getElementById('defaultBannerAdminControls').classList.add('hidden');
+        document.getElementById('permanentCustomBanner').classList.add('hidden');
         document.getElementById('userBadge').classList.add('hidden');
         document.getElementById('mobileBottomNav').classList.add('hidden');
       }
@@ -1083,6 +1082,7 @@
 
     function initDashboard() {
       document.getElementById('authView').classList.add('hidden');
+      document.getElementById('permanentCustomBanner').classList.remove('hidden');
       document.getElementById('mobileBottomNav').classList.remove('hidden');
       document.getElementById('userBadge').classList.remove('hidden');
       const displayId = currentUser.shop_id || 'ACTIVE';
