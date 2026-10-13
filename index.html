@@ -402,14 +402,14 @@
         <div class="summary-card"><span>पेड प्लान</span><b id="statPaidShops">0</b></div>
       </div>
 
-      <div class="flex flex-wrap border-b border-slate-800 gap-4 text-sm font-semibold">
-        <button id="adminTab1" onclick="switchAdminSection('shopkeepers')" class="pb-2.5 tab-active cursor-pointer">दुकानदार मास्टर</button>
-        <button id="adminTab2" onclick="switchAdminSection('customers')" class="pb-2.5 text-slate-400 cursor-pointer">ग्राहक व स्कोर कंट्रोल</button>
-        <button id="adminTab3" onclick="switchAdminSection('transactions')" class="pb-2.5 text-slate-400 cursor-pointer">बल्क CSV व लेन-देन</button>
-        <button id="adminTab4" onclick="switchAdminSection('analytics')" class="pb-2.5 text-slate-400 cursor-pointer">एनालिटिक्स & चार्ट्स</button>
-        <button id="adminTab5" onclick="switchAdminSection('audit')" class="pb-2.5 text-slate-400 cursor-pointer">एक्टिविटी लॉग</button>
-        <button id="adminTab6" onclick="switchAdminSection('settings')" class="pb-2.5 text-slate-400 cursor-pointer">इंजन रूल्स & ब्रॉडकास्ट</button>
-      </div>
+      <nav class="admin-tab-nav" aria-label="एडमिन सेक्शन नेविगेशन">
+        <button type="button" id="adminTab1" class="admin-tab tab-active" aria-current="page" onclick="switchAdminSection('shopkeepers')">दुकानदार मास्टर</button>
+        <button type="button" id="adminTab2" class="admin-tab" onclick="switchAdminSection('customers')">ग्राहक व स्कोर कंट्रोल</button>
+        <button type="button" id="adminTab3" class="admin-tab" onclick="switchAdminSection('transactions')">बल्क CSV व लेन-देन</button>
+        <button type="button" id="adminTab4" class="admin-tab" onclick="switchAdminSection('analytics')">एनालिटिक्स &amp; चार्ट्स</button>
+        <button type="button" id="adminTab5" class="admin-tab" onclick="switchAdminSection('audit')">एक्टिविटी लॉग</button>
+        <button type="button" id="adminTab6" class="admin-tab" onclick="switchAdminSection('settings')">इंजन रूल्स &amp; ब्रॉडकास्ट</button>
+      </nav>
 
       <!-- SECTION A: SHOPKEEPERS MASTER -->
       <div id="secShopkeepers" class="space-y-5">
@@ -671,8 +671,9 @@
       <h3 class="text-sm font-bold text-amber-400">दुकानदार विवरण संपादित करें (Edit Shopkeeper)</h3>
       <input type="hidden" id="editShopRowId" />
       <div>
-        <label class="block text-[10px] text-slate-400 mb-1">दुकान / मालिक का नाम</label>
-        <input type="text" id="editShopNameInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
+        <label class="block text-[10px] text-slate-400 mb-1">दुकानदार / मालिक का नाम</label>
+        <input type="text" id="editShopNameInput" placeholder="मालिक का पूरा नाम" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
+        <p class="mt-1 text-[10px] text-slate-500">यह नाम shopkeepers.name में सेव होगा। अलग दुकान का नाम तभी दिखेगा जब वह Supabase रिकॉर्ड में उपलब्ध हो।</p>
       </div>
       <div>
         <label class="block text-[10px] text-slate-400 mb-1">शहर (City)</label>
@@ -781,7 +782,9 @@
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (session && event === 'SIGNED_IN') {
         const userEmail = session.user.email;
-        const userName = session.user.user_metadata.full_name || "New Shop";
+        const metadata = session.user.user_metadata || {};
+        const profileName = metadata.full_name || metadata.name || [metadata.given_name, metadata.family_name].filter(Boolean).join(' ').trim();
+        const userName = profileName || userEmail?.split('@')[0] || 'दुकानदार';
         
         if (userEmail === MASTER_ADMIN_EMAIL) {
           currentUser = { shop_id: "JBSMK000001", name: "Master Admin", email: userEmail, role: "admin", status: "active" };
@@ -816,6 +819,11 @@
           alert('⏳ आपका डेमो / प्लान समाप्त हो गया है। रीचार्ज के लिए एडमिन से संपर्क करें।');
           await supabaseClient.auth.signOut();
         } else {
+          if (profileName && /^(store|shop|new shop|unknown|n\/?a)$/i.test(String(shopRecord.name || '').trim())) {
+            const { error: nameUpdateError } = await supabaseClient.from('shopkeepers').update({ name: profileName }).eq('id', shopRecord.id);
+            if (nameUpdateError) console.warn('दुकानदार का नाम अपडेट नहीं हो सका:', nameUpdateError.message);
+            else shopRecord.name = profileName;
+          }
           currentUser = shopRecord;
           initDashboard();
           await logActivity(currentUser.shop_id, "Logged in via Google");
@@ -1094,7 +1102,10 @@
         renderAdminAll();
       } else {
         document.getElementById('shopkeeperDashboard').classList.remove('hidden');
-        document.getElementById('dashShopTitle').innerText = currentUser.name || displayId;
+        const shopkeeperName = String(currentUser.name || '').trim();
+        document.getElementById('dashShopTitle').innerText = shopkeeperName && !/^(store|shop|new shop|unknown|n\/?a)$/i.test(shopkeeperName)
+          ? shopkeeperName
+          : 'दुकानदार का नाम सेट करें';
         renderShopkeeperView();
         updateShopSettings();
         navigateApp('home');
@@ -1106,7 +1117,11 @@
       const activeSection = 'sec' + sec.charAt(0).toUpperCase() + sec.slice(1);
       ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit', 'secSettings'].forEach((section, idx) => {
         document.getElementById(section).classList.toggle('hidden', section !== activeSection);
-        document.getElementById('adminTab' + (idx + 1)).className = section === activeSection ? 'pb-2.5 tab-active cursor-pointer' : 'pb-2.5 text-slate-400 cursor-pointer';
+        const tab = document.getElementById('adminTab' + (idx + 1));
+        const isActive = section === activeSection;
+        tab.classList.toggle('tab-active', isActive);
+        if (isActive) tab.setAttribute('aria-current', 'page');
+        else tab.removeAttribute('aria-current');
       });
       document.getElementById('adminMasterHeader').classList.toggle('hidden', sec !== 'shopkeepers');
       document.getElementById('defaultBannerAdminControls').classList.toggle('hidden', sec !== 'settings');
@@ -1252,24 +1267,37 @@
       document.getElementById('statPaidShops').innerText = paidShops.length;
     }
 
+    function getShopkeeperDisplayNames(shop) {
+      const isPlaceholder = value => !value || /^(store|shop|new shop|unknown|n\/?a)$/i.test(String(value).trim());
+      const ownerName = [shop.owner_name, shop.proprietor_name, shop.full_name, shop.contact_name, shop.name]
+        .find(value => !isPlaceholder(value));
+      const businessName = [shop.shop_name, shop.store_name, shop.business_name, shop.trade_name]
+        .find(value => !isPlaceholder(value));
+      return {
+        owner: ownerName || 'मालिक का नाम उपलब्ध नहीं',
+        business: businessName || 'दुकान का नाम उपलब्ध नहीं'
+      };
+    }
+
     function renderFilteredAdminShopkeepers(query) {
       const tbody = document.getElementById('adminShopkeepersList');
-      tbody.innerHTML = rawAdminShopkeepers.filter(s => !query || String(s.shop_id || '').toLowerCase().includes(query) || String(s.name || '').toLowerCase().includes(query) || String(s.email || '').toLowerCase().includes(query)).map(s => {
+      tbody.innerHTML = rawAdminShopkeepers.filter(s => !query || String(s.shop_id || '').toLowerCase().includes(query) || String(s.name || '').toLowerCase().includes(query) || String(s.owner_name || '').toLowerCase().includes(query) || String(s.shop_name || '').toLowerCase().includes(query) || String(s.email || '').toLowerCase().includes(query)).map(s => {
+        const identity = getShopkeeperDisplayNames(s);
         let statusBadge = s.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
         let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber';
         let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
         return `
         <tr class="text-slate-300">
-          <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
-          <td><b>${s.name || 'Store'}</b></td>
-          <td class="text-slate-400">${s.email || '-'}</td>
-          <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
-          <td class="font-mono text-slate-400">${s.phone}</td>
-          <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${s.status}</span></td>
+          <td class="py-3 px-2 font-mono text-amber-300 font-bold">${escapeHTML(s.shop_id || '—')}</td>
+          <td><b>${escapeHTML(identity.owner)}</b><span class="block text-[11px] text-slate-500">दुकान: ${escapeHTML(identity.business)}</span></td>
+          <td class="text-slate-400">${escapeHTML(s.email || '-')}</td>
+          <td class="font-mono text-slate-300 uppercase">${escapeHTML(s.city || '—')}</td>
+          <td class="font-mono text-slate-400">${escapeHTML(s.phone || '—')}</td>
+          <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${escapeHTML(s.status || 'unknown')}</span></td>
           <td class="text-right pr-2 space-x-1">
-            <button onclick="openEditShopModal('${s.id}', '${s.name}', '${s.city}', '${s.phone}')" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit</button>
-            <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs cursor-pointer">${actionBtnText}</button>
-            <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs cursor-pointer">Delete</button>
+            <button onclick="openEditShopModal(${inlineJS(s.id)}, ${inlineJS(s.name)}, ${inlineJS(s.city)}, ${inlineJS(s.phone)})" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit</button>
+            <button onclick="adminToggleBlockShopkeeper(${inlineJS(s.id)}, ${inlineJS(s.status)})" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs cursor-pointer">${actionBtnText}</button>
+            <button onclick="adminDeleteShopkeeper(${inlineJS(s.id)})" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs cursor-pointer">Delete</button>
           </td>
         </tr>`
       }).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
@@ -1327,6 +1355,10 @@
 
     function escapeHTML(value) {
       return String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+    }
+
+    function inlineJS(value) {
+      return escapeHTML(JSON.stringify(String(value ?? '')));
     }
 
     async function openTransactionDetail(txId) {
