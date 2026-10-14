@@ -72,50 +72,9 @@
     table thead { background: #f7f9fc !important; }
     tbody tr:hover { background-color: #f5f8ff !important; }
     footer { color: #69758a !important; background: #fff !important; border-color: #e4e9f1 !important; }
-    .mobile-bottom-nav.hidden { display: none !important; }
-    .mobile-bottom-nav:not(.hidden) {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      position: fixed;
-      inset: auto 1rem 1rem;
-      z-index: 40;
-      width: min(620px, calc(100% - 2rem));
-      margin-inline: auto;
-      padding: .55rem .75rem;
-      background: rgba(255, 255, 255, .97);
-      border: 1px solid #e4e9f1;
-      border-radius: 1.25rem;
-      box-shadow: 0 8px 28px rgba(15, 23, 42, .16);
-      backdrop-filter: blur(12px);
-    }
-    .mobile-nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: .2rem;
-      min-height: 3.2rem;
-      color: #69758a;
-      font-size: .65rem;
-      font-weight: 700;
-    }
-    .mobile-nav-item.is-active { color: #2563eb; }
-    .mobile-nav-item svg { width: 1.2rem; height: 1.2rem; }
-    .mobile-nav-add { color: #fff; }
-    .mobile-nav-add span {
-      display: grid;
-      place-items: center;
-      width: 2.8rem;
-      height: 2.8rem;
-      margin-top: -1.2rem;
-      border: 4px solid #f3f6fb;
-      border-radius: 9999px;
-      background: #2563eb;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, .3);
-    }
-    .mobile-nav-add svg { width: 1.5rem; height: 1.5rem; }
-    body:has(.mobile-bottom-nav:not(.hidden)) { padding-bottom: 6rem; }
+    .mobile-bottom-nav, .mobile-bottom-nav.hidden { display: none; }
     #shopScoreSection, #shopAddSection, #shopLedgerSection, #adminDashboard { scroll-margin-top: 5.5rem; }
+    #permanentCustomBanner { color: #1d4ed8 !important; background: #eff6ff !important; border-color: #bfdbfe !important; }
     @media (max-width: 640px) {
       header { padding: .75rem !important; }
       header p { max-width: 190px; line-height: 1.35; }
@@ -124,13 +83,16 @@
       table { min-width: 680px; }
       body { padding-bottom: 5.5rem; }
       .mobile-bottom-nav:not(.hidden) {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        position: fixed;
         inset: auto 0 0;
-        width: 100%;
+        z-index: 40;
         padding: .55rem .35rem max(.55rem, env(safe-area-inset-bottom));
-        border: 0;
+        background: rgba(255, 255, 255, .97);
         border-top: 1px solid #e4e9f1;
-        border-radius: 0;
         box-shadow: 0 -5px 20px rgba(15, 23, 42, .08);
+        backdrop-filter: blur(12px);
       }
       .mobile-nav-item {
         display: flex;
@@ -199,7 +161,7 @@
     </div>
   </header>
   <!-- ================= SINGLE PERMANENT BANNER ================= -->
-  <div class="max-w-7xl mx-auto px-4 mt-3 w-full">
+  <div id="bannerContainer" class="hidden max-w-7xl mx-auto px-4 mt-3 w-full">
     <div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
       <span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
     </div>
@@ -217,7 +179,7 @@
       </div>
       <div class="flex justify-end gap-3">
         <button onclick="closeGlobalModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium cursor-pointer">कैंसिल करें</button>
-        <button id="clearGlobalAlertBtn" onclick="clearGlobalAlert()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium cursor-pointer">हटाएं (Clear)</button>
+        <button onclick="clearGlobalAlert()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium cursor-pointer">हटाएं (Clear)</button>
       </div>
     </div>
   </div>
@@ -239,45 +201,38 @@
         <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Google (Gmail) से लॉगिन करें
       </button>
-      <button type="button" onclick="openDemoPreview()" class="w-full mt-3 border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-3 rounded-2xl text-sm cursor-pointer">डेमो देखें — बिना लॉगिन</button>
       
       <div id="authStatusMsg" class="mt-4 text-xs font-bold text-center hidden"></div>
     </div>
 
     <!-- 2. SHOPKEEPER DASHBOARD -->
     <div id="shopkeeperDashboard" class="hidden space-y-5">
-      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex justify-between items-center">
+      <section id="shopDashboardOverview" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex justify-between items-center">
         <div>
           <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
-          <p class="text-[11px] text-slate-400">सेंट्रल कम्युनिटी रजिस्ट्री • लाइव क्लाउड डेटा सिंक</p>
+          <p id="dashOwnerTitle" class="text-[11px] text-slate-400">सेंट्रल कम्युनिटी रजिस्ट्री • लाइव क्लाउड डेटा सिंक</p>
         </div>
         <div class="flex gap-2">
           <button onclick="openAppealModal()" class="bg-slate-800 hover:bg-slate-750 border border-slate-700 text-blue-400 font-bold px-3 py-2 rounded-xl text-xs transition cursor-pointer">अपील / सुधार भेजें</button>
         </div>
       </section>
 
-      <section id="shopRechargeSection" class="bg-slate-900/90 border border-blue-200 rounded-3xl p-5 shadow-xl">
-        <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
-          <div>
-            <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2"><i data-lucide="wallet-cards" class="w-4 h-4 text-blue-500"></i> प्लान और रिचार्ज</h2>
-            <p class="text-xs text-slate-500 mt-1">डेमो प्लान — भुगतान या असली रिचार्ज अभी उपलब्ध नहीं है।</p>
-          </div>
-          <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700">DEMO</span>
+      <section id="shopRechargeSection" class="hidden bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
+        <h2 class="text-sm font-bold text-slate-200 mb-2">🔋 रिचार्ज / प्लान बढ़ाएँ</h2>
+        <p class="text-xs text-slate-500 mb-3">पेमेंट का स्क्रीनशॉट चुनकर WhatsApp पर भेजें। एडमिन भुगतान जाँचने के बाद ही रिचार्ज की पुष्टि करेगा।</p>
+        <label class="block text-[11px] text-slate-400 mb-1" for="rechargePlanDays">रिचार्ज अवधि</label>
+        <select id="rechargePlanDays" class="w-full rounded-xl p-3 text-xs">
+          <option value="30">30 दिन</option>
+          <option value="90">90 दिन</option>
+          <option value="365">365 दिन</option>
+        </select>
+        <label class="block text-[11px] text-slate-400 mt-3 mb-1" for="rechargeProofInput">भुगतान स्क्रीनशॉट</label>
+        <input id="rechargeProofInput" type="file" accept="image/*" class="w-full rounded-xl p-3 text-xs" />
+        <div class="flex flex-wrap gap-2 mt-3">
+          <button type="button" onclick="shareRechargeProof()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs">WhatsApp पर भेजें और अनुरोध दर्ज करें</button>
+          <button type="button" onclick="openAppealModal()" class="bg-slate-800 border border-slate-700 text-slate-200 font-bold px-4 py-2.5 rounded-xl text-xs">सहायता / अपील</button>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="border border-slate-200 rounded-2xl p-4">
-            <div class="text-xs text-slate-500">स्टार्टर • 30 दिन</div><div class="text-xl font-black text-slate-800 mt-1">₹199</div>
-            <button type="button" onclick="showRechargeDemo('स्टार्टर', 199)" class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs">प्लान चुनें</button>
-          </div>
-          <div class="border border-blue-300 bg-blue-50/50 rounded-2xl p-4">
-            <div class="text-xs text-slate-500">बिज़नेस • 90 दिन</div><div class="text-xl font-black text-slate-800 mt-1">₹499</div>
-            <button type="button" onclick="showRechargeDemo('बिज़नेस', 499)" class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs">प्लान चुनें</button>
-          </div>
-          <div class="border border-slate-200 rounded-2xl p-4">
-            <div class="text-xs text-slate-500">प्रो • 365 दिन</div><div class="text-xl font-black text-slate-800 mt-1">₹1,499</div>
-            <button type="button" onclick="showRechargeDemo('प्रो', 1499)" class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs">प्लान चुनें</button>
-          </div>
-        </div>
+        <p id="rechargeStatusMsg" class="text-[11px] text-slate-500 mt-3" aria-live="polite">स्क्रीनशॉट WhatsApp नंबर 9813299777 पर भेजें। भुगतान जाँचने के बाद एडमिन ऐप में अनुरोध कन्फर्म करेगा।</p>
       </section>
 
       <section id="shopScoreSection" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
@@ -395,6 +350,19 @@
         </div>
       </div>
 
+      <!-- Recharge requests reviewed by the admin after checking WhatsApp payment proof -->
+      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
+        <h3 class="text-sm font-bold text-amber-400 mb-3">रिचार्ज अनुरोध (WhatsApp भुगतान जाँच)</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="text-slate-400 uppercase border-b border-slate-800 bg-slate-950/40 font-mono">
+              <tr><th class="py-3 px-2">दुकान / मालिक</th><th>अवधि</th><th>स्क्रीनशॉट फ़ाइल</th><th>समय</th><th>स्थिति</th><th>एक्शन</th></tr>
+            </thead>
+            <tbody id="adminRechargeRequestsList" class="divide-y divide-slate-800/60 font-medium"><tr><td colspan="6" class="text-center py-4 text-slate-500">अनुरोध लोड हो रहे हैं...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
       <!-- Admin Search & Filter Bar -->
       <section class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-4 shadow-xl">
         <div class="relative w-full">
@@ -428,8 +396,7 @@
         <button id="adminTab3" onclick="switchAdminSection('transactions')" class="pb-2.5 text-slate-400 cursor-pointer">बल्क CSV व लेन-देन</button>
         <button id="adminTab4" onclick="switchAdminSection('analytics')" class="pb-2.5 text-slate-400 cursor-pointer">एनालिटिक्स & चार्ट्स</button>
         <button id="adminTab5" onclick="switchAdminSection('audit')" class="pb-2.5 text-slate-400 cursor-pointer">एक्टिविटी लॉग</button>
-        <button id="adminTab6" onclick="switchAdminSection('settings')" class="pb-2.5 text-slate-400 cursor-pointer">इंजन रूल्स</button>
-        <button id="adminTab7" onclick="switchAdminSection('broadcast')" class="pb-2.5 text-slate-400 cursor-pointer">नोटिफिकेशन / ब्रॉडकास्ट</button>
+        <button id="adminTab6" onclick="switchAdminSection('settings')" class="pb-2.5 text-slate-400 cursor-pointer">इंजन रूल्स & ब्रॉडकास्ट</button>
       </div>
 
       <!-- SECTION A: SHOPKEEPERS MASTER -->
@@ -589,7 +556,7 @@
         </section>
       </div>
 
-      <!-- SECTION F: SCORING ENGINE RULES -->
+      <!-- SECTION F: SCORING ENGINE RULES & GLOBAL BROADCAST -->
       <div id="secSettings" class="hidden space-y-5">
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4">
           <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
@@ -612,15 +579,10 @@
           <button onclick="alert('✓ स्कोरिंग रूल्स सफलतापूर्वक अपडेट हो गए हैं!')" class="bg-slate-800 hover:bg-slate-750 text-amber-400 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">नियम सेव करें</button>
         </section>
 
-      </div>
-
-      <!-- SECTION G: NOTIFICATIONS & GLOBAL BROADCAST -->
-      <div id="secBroadcast" class="hidden space-y-5">
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
           <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
             <i data-lucide="megaphone" class="w-4 h-4"></i> ग्लोबल रिस्क ब्रॉडकास्ट नोटिफिकेशन (Global Risk Broadcast)
           </h2>
-          <p class="text-xs text-slate-500">यह संदेश Supabase में सेव होगा और सभी लॉगिन users के notification bell में दिखेगा।</p>
           <textarea id="broadcastInput" rows="3" placeholder="सभी दुकानदारों के लिए चेतावनी या सूचना यहाँ टाइप करें..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white outline-none focus:border-amber-400"></textarea>
           <button onclick="publishGlobalBroadcast()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer shadow">पूरे नेटवर्क पर ब्रॉडकास्ट भेजें</button>
         </section>
@@ -630,7 +592,7 @@
 
   </main>
 
-  <!-- Fixed quick navigation, shown after login on desktop and mobile -->
+  <!-- Mobile quick navigation, shown after login on small screens -->
   <nav id="mobileBottomNav" class="mobile-bottom-nav hidden" aria-label="मुख्य नेविगेशन">
     <button type="button" class="mobile-nav-item is-active" data-nav="home" onclick="navigateApp('home')">
       <i data-lucide="layout-dashboard"></i><span>डैशबोर्ड</span>
@@ -638,7 +600,7 @@
     <button type="button" class="mobile-nav-item" data-nav="score" onclick="navigateApp('score')">
       <i data-lucide="search"></i><span>स्कोर</span>
     </button>
-    <button type="button" class="mobile-nav-item mobile-nav-add" data-nav="add" aria-label="नई एंट्री जोड़ें" onclick="openQuickAddMenu()">
+    <button type="button" class="mobile-nav-item mobile-nav-add" data-nav="add" aria-label="नया लेन-देन जोड़ें" onclick="navigateApp('add')">
       <span><i data-lucide="plus"></i></span><small>जोड़ें</small>
     </button>
     <button type="button" class="mobile-nav-item" data-nav="ledger" onclick="navigateApp('ledger')">
@@ -648,69 +610,6 @@
       <i data-lucide="more-horizontal"></i><span>अधिक</span>
     </button>
   </nav>
-
-  <!-- Quick add menu: admin can add shops or customer transactions. -->
-  <div id="quickAddModal" class="hidden fixed inset-0 z-[80] bg-slate-950/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="quickAddTitle">
-    <div class="w-full max-w-md rounded-3xl bg-white p-5 shadow-2xl space-y-3">
-      <div class="flex items-center justify-between">
-        <h2 id="quickAddTitle" class="text-lg font-black text-slate-800">नई एंट्री जोड़ें</h2>
-        <button type="button" onclick="closeQuickAddMenu()" class="rounded-lg px-3 py-1 text-xl text-slate-500" aria-label="बंद करें">&times;</button>
-      </div>
-      <button id="quickAddCustomerBtn" type="button" onclick="startQuickCustomerEntry()" class="w-full rounded-2xl bg-blue-600 px-4 py-3 text-left font-bold text-white">+ नया ग्राहक / लेन-देन</button>
-      <button id="quickAddShopBtn" type="button" onclick="showQuickShopForm()" class="hidden w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left font-bold text-slate-700">+ नया दुकानदार जोड़ें</button>
-      <form id="quickAddShopForm" onsubmit="createShopkeeperQuick(event)" class="hidden space-y-2">
-        <input id="quickShopName" required type="text" placeholder="दुकान / मालिक का नाम *" class="w-full rounded-xl border px-3 py-2 text-sm">
-        <input id="quickShopEmail" required type="email" placeholder="Google अकाउंट ईमेल *" class="w-full rounded-xl border px-3 py-2 text-sm">
-        <div class="grid grid-cols-2 gap-2">
-          <input id="quickShopCity" type="text" placeholder="शहर" class="w-full rounded-xl border px-3 py-2 text-sm">
-          <input id="quickShopPhone" type="tel" maxlength="10" placeholder="मोबाइल नंबर" class="w-full rounded-xl border px-3 py-2 text-sm">
-        </div>
-        <p class="text-xs text-slate-500">नया अकाउंट approval के लिए pending रहेगा। दुकानदार इसी Google ईमेल से लॉगिन कर सकेगा।</p>
-        <button type="submit" class="w-full rounded-xl bg-blue-600 px-4 py-3 font-bold text-white">दुकानदार सेव करें</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ================= RECHARGE CONFIRMATION MODAL ================= -->
-  <div id="rechargeConfirmModal" class="hidden fixed inset-0 z-[70] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="rechargeConfirmTitle">
-    <div class="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
-      <h2 id="rechargeConfirmTitle" class="text-lg font-black text-slate-800">प्लान की पुष्टि करें</h2>
-      <p class="mt-2 text-sm text-slate-600">आपने यह प्लान चुना है:</p>
-      <div class="mt-4 rounded-2xl bg-blue-50 p-4">
-        <div id="rechargeConfirmPlan" class="font-bold text-slate-800"></div>
-        <div id="rechargeConfirmAmount" class="mt-1 text-xl font-black text-blue-700"></div>
-      </div>
-      <p class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">यह केवल UI demo है। पुष्टि करने से कोई भुगतान नहीं होगा और आपके खाते में असली recharge सक्रिय नहीं होगा।</p>
-      <div class="mt-5 flex gap-2">
-        <button type="button" onclick="confirmRechargeDemo()" class="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white">चयन की पुष्टि करें</button>
-        <button type="button" onclick="closeRechargeConfirm()" class="flex-1 rounded-xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-700">वापस जाएँ</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= DEMO PREVIEW MODAL ================= -->
-  <div id="demoPreviewModal" class="hidden fixed inset-0 z-[60] bg-slate-950/70 backdrop-blur-sm overflow-y-auto p-3 sm:p-6">
-    <div class="max-w-5xl mx-auto bg-white rounded-3xl p-4 sm:p-6 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between gap-3">
-        <div><span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded-full">DEMO MODE</span><h2 class="text-lg font-black text-slate-800 mt-2">दुकानदार डैशबोर्ड का पूर्वावलोकन</h2></div>
-        <button type="button" onclick="closeDemoPreview()" class="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold text-sm">बंद करें</button>
-      </div>
-      <p class="text-xs text-slate-500">यह उदाहरण डेटा है; इसमें कोई असली ग्राहक या लेन-देन नहीं है और कुछ भी सेव नहीं होता।</p>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div class="rounded-2xl bg-blue-50 p-4"><div class="text-xs text-slate-500">डेमो दुकान</div><b class="text-sm text-slate-800">RADHE STORES</b></div>
-        <div class="rounded-2xl bg-amber-50 p-4"><div class="text-xs text-slate-500">लंबित खाते</div><b class="text-lg text-slate-800">2</b></div>
-        <div class="rounded-2xl bg-emerald-50 p-4"><div class="text-xs text-slate-500">स्कोर उदाहरण</div><b class="text-lg text-slate-800">84 / 100</b></div>
-        <div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs text-slate-500">कुल डेमो बकाया</div><b class="text-lg text-slate-800">₹2,450</b></div>
-      </div>
-      <div class="border border-slate-200 rounded-2xl overflow-x-auto">
-        <table class="w-full min-w-[520px] text-left text-xs">
-          <thead class="bg-slate-50 text-slate-500"><tr><th class="p-3">ग्राहक (नकली)</th><th class="p-3">मोबाइल</th><th class="p-3">रकम</th><th class="p-3">स्थिति</th></tr></thead>
-          <tbody class="divide-y divide-slate-100 text-slate-700"><tr><td class="p-3 font-bold">डेमो ग्राहक A</td><td class="p-3 font-mono">98XXXXXX10</td><td class="p-3">₹1,500</td><td class="p-3 text-amber-700">लंबित</td></tr><tr><td class="p-3 font-bold">डेमो ग्राहक B</td><td class="p-3 font-mono">97XXXXXX20</td><td class="p-3">₹950</td><td class="p-3 text-amber-700">लंबित</td></tr></tbody>
-        </table>
-      </div>
-      <div class="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-xs text-blue-900"><b>रिचार्ज:</b> उपलब्ध प्लान अभी केवल UI demo हैं। असली भुगतान/रीचार्ज चालू करने के लिए payment provider और server-side verification जोड़ना होगा।</div>
-    </div>
-  </div>
 
   <!-- ================= APPEAL MODAL ================= -->
   <div id="appealModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur flex items-center justify-center p-4">
@@ -791,6 +690,7 @@
     let rawAdminCustomScores = {};
     let rawAppeals = [];
     let rawAuditLogs = [];
+    let rawRechargeRequests = [];
     let currentUser = null;
     let searchMode = 'ALL';
 
@@ -814,7 +714,10 @@
       // एडमिन पैनल के लिए अपील डेटा लोड करना
       loadAdminAppeals();
 
-      loadGlobalBroadcastDot();
+      if(localStorage.getItem('ld_global_broadcast')) {
+        const dot = document.getElementById('broadcastDot');
+        if (dot) dot.classList.remove('hidden');
+      }
     });
 
     // ------------------------------------------------------------
@@ -837,7 +740,7 @@
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (session && event === 'SIGNED_IN') {
         const userEmail = session.user.email;
-        const userName = session.user.user_metadata.full_name || "New Shop";
+        const userName = session.user.user_metadata.full_name || session.user.user_metadata.name || session.user.email?.split('@')[0] || 'नई दुकान';
         
         if (userEmail === MASTER_ADMIN_EMAIL) {
           currentUser = { shop_id: "JBSMK000001", name: "Master Admin", email: userEmail, role: "admin", status: "active" };
@@ -876,6 +779,7 @@
       } else if (event === 'SIGNED_OUT') {
         currentUser = null;
         document.getElementById('authView').classList.remove('hidden');
+        document.getElementById('bannerContainer').classList.add('hidden');
         document.getElementById('shopkeeperDashboard').classList.add('hidden');
         document.getElementById('adminDashboard').classList.add('hidden');
         document.getElementById('defaultBannerAdminControls').classList.add('hidden');
@@ -891,73 +795,35 @@
     // ------------------------------------------------------------
     // GLOBAL BROADCAST NOTIFICATIONS & POPUPS
     // ------------------------------------------------------------
-    async function getGlobalBroadcast() {
-      const { data, error } = await supabaseClient
-        .from('settings')
-        .select('value')
-        .eq('key', 'global_broadcast')
-        .maybeSingle();
-      if (error) throw error;
-      if (!data?.value) return null;
-      if (typeof data.value === 'string') {
-        try { return JSON.parse(data.value); }
-        catch { return { message: data.value, time: null }; }
-      }
-      return data.value;
-    }
-
-    async function loadGlobalBroadcastDot() {
-      const dot = document.getElementById('broadcastDot');
-      if (!dot) return;
-      try {
-        const broadcast = await getGlobalBroadcast();
-        dot.classList.toggle('hidden', !broadcast?.message);
-      } catch (error) {
-        console.error('ब्रॉडकास्ट लोड करने में त्रुटि:', error.message);
-      }
-    }
-
-    async function showGlobalBroadcastNotification() {
+    function showGlobalBroadcastNotification() {
+      const data = localStorage.getItem('ld_global_broadcast');
       const modal = document.getElementById('globalNotificationModal');
       const msgDiv = document.getElementById('globalModalMessage');
-      try {
-        const obj = await getGlobalBroadcast();
-        if (!obj?.message || !modal || !msgDiv) {
-          alert('कोई नया ग्लोबल ब्रॉडकास्ट अलर्ट उपलब्ध नहीं है।');
-          return;
-        }
+
+      if (data && modal && msgDiv) {
+        const obj = JSON.parse(data);
         const message = document.createElement('p');
         message.className = 'mb-2';
-        message.textContent = obj.message;
+        message.textContent = obj.message || '';
         const timestamp = document.createElement('span');
         timestamp.className = 'text-xs text-slate-400';
-        timestamp.textContent = obj.time ? `समय: ${new Date(obj.time).toLocaleString('hi-IN')}` : '';
+        timestamp.textContent = `समय: ${new Date(obj.time).toLocaleString('hi-IN')}`;
         msgDiv.replaceChildren(message, timestamp);
-        const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001');
-        document.getElementById('clearGlobalAlertBtn')?.classList.toggle('hidden', !isAdmin);
         modal.classList.remove('hidden');
-      } catch (error) {
-        console.error('ब्रॉडकास्ट लोड करने में त्रुटि:', error);
-        alert('ग्लोबल नोटिफिकेशन लोड नहीं हो सका। Supabase permissions जाँचें।');
+      } else {
+        alert('कोई नया ग्लोबल ब्रॉडकास्ट अलर्ट उपलब्ध नहीं है।');
       }
     }
 
     function closeGlobalModal() {
       const modal = document.getElementById('globalNotificationModal');
-      if (modal) modal.classList.add('hidden');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
     }
 
-    async function clearGlobalAlert() {
-      const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001');
-      if (!isAdmin) {
-        alert('ग्लोबल अलर्ट केवल एडमिन हटा सकता है।');
-        return;
-      }
-      const { error } = await supabaseClient.from('settings').delete().eq('key', 'global_broadcast');
-      if (error) {
-        alert('ग्लोबल अलर्ट हटाया नहीं जा सका: ' + error.message);
-        return;
-      }
+    function clearGlobalAlert() {
+      localStorage.removeItem('ld_global_broadcast');
       closeGlobalModal();
       const dot = document.getElementById('broadcastDot');
       if (dot) dot.classList.add('hidden');
@@ -966,21 +832,13 @@
 
     async function publishGlobalBroadcast() {
       const msg = document.getElementById('broadcastInput').value.trim();
-      if (!msg) { alert('कृपया संदेश दर्ज करें!'); return; }
-      const broadcast = { message: msg, time: new Date().toISOString() };
-      const { error } = await supabaseClient.from('settings').upsert({
-        key: 'global_broadcast',
-        value: JSON.stringify(broadcast)
-      });
-      if (error) {
-        alert('ब्रॉडकास्ट सेव नहीं हो सका: ' + error.message);
-        return;
-      }
-      document.getElementById('broadcastInput').value = '';
+      if(!msg) { alert('कृपया संदेश दर्ज करें!'); return; }
+      localStorage.setItem('ld_global_broadcast', JSON.stringify({ message: msg, time: new Date().toISOString() }));
+      alert('✓ ग्लोबल ब्रॉडकास्ट पूरे नेटवर्क पर लाइव कर दिया गया है!');
+      document.getElementById('broadcastInput').value = "";
       const dot = document.getElementById('broadcastDot');
       if (dot) dot.classList.remove('hidden');
-      alert('✓ ग्लोबल ब्रॉडकास्ट पूरे नेटवर्क पर लाइव कर दिया गया है!');
-      logActivity('ADMIN', 'Published Global Broadcast Notification');
+      logActivity("ADMIN", "Published Global Broadcast Notification");
     }
 
     // ------------------------------------------------------------
@@ -1069,36 +927,6 @@
       }
     }
 
-    function openDemoPreview() {
-      document.getElementById('demoPreviewModal').classList.remove('hidden');
-    }
-
-    function closeDemoPreview() {
-      document.getElementById('demoPreviewModal').classList.add('hidden');
-    }
-
-    let selectedRechargePlan = null;
-
-    function showRechargeDemo(planName, amount) {
-      const durations = { 'स्टार्टर': '30 दिन', 'बिज़नेस': '90 दिन', 'प्रो': '365 दिन' };
-      selectedRechargePlan = { name: planName, amount: Number(amount), duration: durations[planName] || 'डेमो अवधि' };
-      document.getElementById('rechargeConfirmPlan').textContent = `${selectedRechargePlan.name} प्लान • ${selectedRechargePlan.duration}`;
-      document.getElementById('rechargeConfirmAmount').textContent = `₹${selectedRechargePlan.amount.toLocaleString('en-IN')}`;
-      document.getElementById('rechargeConfirmModal').classList.remove('hidden');
-    }
-
-    function closeRechargeConfirm() {
-      document.getElementById('rechargeConfirmModal').classList.add('hidden');
-      selectedRechargePlan = null;
-    }
-
-    function confirmRechargeDemo() {
-      if (!selectedRechargePlan) return;
-      const { name, amount, duration } = selectedRechargePlan;
-      closeRechargeConfirm();
-      alert(`आपने ${name} प्लान (${duration}, ₹${amount.toLocaleString('en-IN')}) के चयन की पुष्टि की। यह केवल डेमो है—कोई भुगतान या असली रिचार्ज नहीं हुआ।`);
-    }
-
     function openAppealModal() { document.getElementById('appealModal').classList.remove('hidden'); }
     function closeAppealModal() { document.getElementById('appealModal').classList.add('hidden'); }
     
@@ -1166,59 +994,6 @@
       input.focus();
     }
 
-    function openQuickAddMenu() {
-      if (!currentUser) return;
-      const isAdmin = currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001';
-      document.getElementById('quickAddModal').classList.remove('hidden');
-      document.getElementById('quickAddShopBtn').classList.toggle('hidden', !isAdmin);
-      document.getElementById('quickAddShopForm').classList.add('hidden');
-      document.getElementById('quickAddCustomerBtn').classList.remove('hidden');
-    }
-
-    function closeQuickAddMenu() {
-      document.getElementById('quickAddModal').classList.add('hidden');
-    }
-
-    function startQuickCustomerEntry() {
-      closeQuickAddMenu();
-      navigateApp('add');
-    }
-
-    function showQuickShopForm() {
-      document.getElementById('quickAddCustomerBtn').classList.add('hidden');
-      document.getElementById('quickAddShopBtn').classList.add('hidden');
-      document.getElementById('quickAddShopForm').classList.remove('hidden');
-      document.getElementById('quickShopName').focus();
-    }
-
-    async function createShopkeeperQuick(event) {
-      event.preventDefault();
-      if (!currentUser || (currentUser.role !== 'admin' && currentUser.shop_id !== 'JBSMK000001')) return;
-      const name = document.getElementById('quickShopName').value.trim();
-      const email = document.getElementById('quickShopEmail').value.trim().toLowerCase();
-      const phone = document.getElementById('quickShopPhone').value.trim();
-      const city = document.getElementById('quickShopCity').value.trim().toUpperCase() || 'SAMALKHA';
-      const shopId = 'LD' + Date.now().toString().slice(-8);
-
-      const { error } = await supabaseClient.from('shopkeepers').insert([{
-        shop_id: shopId,
-        name,
-        email,
-        city,
-        phone: phone || '0000000000',
-        pin: '0000',
-        status: 'pending'
-      }]);
-      if (error) {
-        alert('दुकानदार सेव नहीं हो सका: ' + error.message);
-        return;
-      }
-      event.target.reset();
-      closeQuickAddMenu();
-      alert(`दुकानदार ${shopId} ID से pending approval में जोड़ दिया गया है।`);
-      await renderAdminAll();
-    }
-
     function navigateApp(destination) {
       if (!currentUser) return;
       const isAdmin = currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001';
@@ -1234,22 +1009,31 @@
         else if (destination === 'add') {
           switchAdminSection('transactions');
           document.getElementById('admTxShopCode').focus({ preventScroll: true });
+        } else if (destination === 'home') {
+          switchAdminSection('shopkeepers');
         } else {
           document.getElementById('adminDashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         return;
       }
 
-      if (destination === 'score') {
-        document.getElementById('shopScoreSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        document.getElementById('customerSearchInput').focus({ preventScroll: true });
-      } else if (destination === 'add') {
-        document.getElementById('shopAddSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        document.getElementById('txCustName').focus({ preventScroll: true });
-      } else if (destination === 'ledger') {
-        document.getElementById('shopLedgerSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else if (destination === 'more') {
-        openAppealModal();
+      const shopViews = {
+        home: null,
+        score: 'shopScoreSection',
+        add: 'shopAddSection',
+        ledger: 'shopLedgerSection',
+        more: 'shopRechargeSection'
+      };
+      const activeView = shopViews[destination];
+      document.getElementById('shopDashboardOverview').classList.toggle('hidden', destination !== 'home');
+      ['shopScoreSection', 'shopAddSection', 'shopLedgerSection', 'shopRechargeSection'].forEach(id => {
+        document.getElementById(id).classList.toggle('hidden', id !== activeView);
+      });
+
+      if (activeView) {
+        document.getElementById(activeView).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (destination === 'score') document.getElementById('customerSearchInput').focus({ preventScroll: true });
+        if (destination === 'add') document.getElementById('txCustName').focus({ preventScroll: true });
       } else {
         document.getElementById('shopkeeperDashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -1257,47 +1041,55 @@
 
     function initDashboard() {
       document.getElementById('authView').classList.add('hidden');
+      document.getElementById('bannerContainer').classList.remove('hidden');
       document.getElementById('mobileBottomNav').classList.remove('hidden');
       document.getElementById('userBadge').classList.remove('hidden');
       const displayId = currentUser.shop_id || 'ACTIVE';
       document.getElementById('shopkeeperDisplayCode').innerText = displayId;
 
-      loadGlobalBroadcastDot();
       if (currentUser.role === 'admin' || displayId === 'JBSMK000001') {
         document.getElementById('adminDashboard').classList.remove('hidden');
         document.getElementById('defaultBannerAdminControls').classList.remove('hidden');
         renderAdminAll();
       } else {
         document.getElementById('shopkeeperDashboard').classList.remove('hidden');
-        document.getElementById('dashShopTitle').innerText = currentUser.name || displayId;
+        const profile = currentUser;
+        const ownerName = profile.owner_name || profile.owner || profile.full_name || profile.name || profile.email?.split('@')[0] || 'नाम उपलब्ध नहीं';
+        const storeName = profile.store_name || profile.shop_name || profile.business_name || profile.store || '';
+        document.getElementById('dashShopTitle').textContent = storeName || `दुकान का नाम सेट नहीं • ${displayId}`;
+        document.getElementById('dashOwnerTitle').textContent = `मालिक: ${ownerName} • ${displayId}`;
+        navigateApp('home');
         renderShopkeeperView();
       }
       lucide.createIcons();
     }
 
     function switchAdminSection(sec) {
-      ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit', 'secSettings', 'secBroadcast'].forEach((s, idx) => {
+      ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit', 'secSettings'].forEach((s, idx) => {
         document.getElementById(s).classList.toggle('hidden', s !== ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)));
         document.getElementById('adminTab' + (idx+1)).className = s === ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)) ? 'pb-2.5 tab-active cursor-pointer' : 'pb-2.5 text-slate-400 cursor-pointer';
       });
     }
 
     async function renderAdminAll() {
-      const [shopsRes, txsRes, appealsRes, logsRes] = await Promise.all([
+            const [shopsRes, txsRes, appealsRes, logsRes, rechargeRes] = await Promise.all([
         supabaseClient.from('shopkeepers').select('*').neq('shop_id', 'JBSMK000001').order('created_at', { ascending: false }),
         supabaseClient.from('transactions').select('*').order('created_at', { ascending: false }),
         supabaseClient.from('appeals').select('*').order('created_at', { ascending: false }),
-        supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(50)
+        supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(50),
+        supabaseClient.from('recharge_requests').select('*').order('created_at', { ascending: false })
       ]);
 
       rawAdminShopkeepers = shopsRes.data || [];
       rawAdminTxs = txsRes.data || [];
       rawAppeals = appealsRes.data || [];
       rawAuditLogs = logsRes.data || rawAuditLogs;
+      rawRechargeRequests = rechargeRes.data || [];
 
       updateAdminStats();
       renderAnalyticsCharts();
       renderAuditLogsList();
+      renderAdminRechargeRequests(rechargeRes.error);
                                                                                                                                                                                
       filterAdminViews();
       loadAdminAppeals();
@@ -1397,14 +1189,15 @@
 
     function renderFilteredAdminShopkeepers(query) {
       const tbody = document.getElementById('adminShopkeepersList');
-      tbody.innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || s.name.toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
+      tbody.innerHTML = rawAdminShopkeepers.filter(s => !query || (s.shop_id || '').toLowerCase().includes(query) || (s.name || '').toLowerCase().includes(query) || (s.email || '').toLowerCase().includes(query)).map(s => {
+        const storeName = s.name || s.email?.split('@')[0] || s.shop_id || 'नाम उपलब्ध नहीं';
         let statusBadge = s.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
         let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber';
         let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
         return `
         <tr class="text-slate-300">
           <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
-          <td><b>${s.name || 'Store'}</b></td>
+          <td><b>${storeName}</b></td>
           <td class="text-slate-400">${s.email || '-'}</td>
           <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
           <td class="font-mono text-slate-400">${s.phone}</td>
@@ -1640,7 +1433,7 @@
       const tbody = document.getElementById('shopkeeperTxList');
       tbody.innerHTML = (myTxs || []).map(t => `
         <tr class="text-slate-300 ${t.status === 'cleared' ? 'opacity-60' : ''}">
-          <td class="py-3 px-2 font-bold text-white">${t.customer_name}</td>
+          <td class="py-3 px-2 font-bold text-white">${t.customer_name || 'नाम उपलब्ध नहीं'}</td>
           <td class="font-mono text-slate-400">${t.customer_phone}</td>
           <td class="font-mono text-amber-300">${t.customer_aadhaar || t.customer_pan || '-'}</td>
           <td class="text-amber-400 font-bold font-mono">₹${Number(t.amount).toLocaleString('en-IN')}</td>
@@ -1652,6 +1445,129 @@
     }
 
     document.addEventListener('DOMContentLoaded', fetchDefaultCustomerBanner);
+
+    async function shareRechargeProof() {
+      const fileInput = document.getElementById('rechargeProofInput');
+      const status = document.getElementById('rechargeStatusMsg');
+      const file = fileInput.files && fileInput.files[0];
+      if (!file || !file.type.startsWith('image/')) {
+        status.textContent = 'पहले भुगतान का इमेज स्क्रीनशॉट चुनें।';
+        status.className = 'text-[11px] text-red-500 mt-3';
+        return;
+      }
+      if (!currentUser || !currentUser.shop_id) return;
+
+      status.textContent = 'रिचार्ज अनुरोध दर्ज हो रहा है...';
+      status.className = 'text-[11px] text-slate-500 mt-3';
+      const whatsappWindow = window.open('about:blank', '_blank');
+      const planDays = Number(document.getElementById('rechargePlanDays').value);
+      const storeName = currentUser.store_name || currentUser.shop_name || currentUser.business_name || '';
+      const ownerName = currentUser.owner_name || currentUser.owner || currentUser.full_name || currentUser.name || currentUser.email || '';
+      const { error } = await supabaseClient.from('recharge_requests').insert([{
+        shop_id: currentUser.shop_id,
+        shop_name: storeName,
+        owner_name: ownerName,
+        plan_days: planDays,
+        proof_filename: file.name,
+        status: 'pending'
+      }]);
+
+      if (error) {
+        if (whatsappWindow) whatsappWindow.close();
+        status.textContent = `अनुरोध सेव नहीं हुआ: ${error.message}. Supabase में recharge_requests टेबल/नीतियाँ जाँचें।`;
+        status.className = 'text-[11px] text-red-500 mt-3';
+        return;
+      }
+
+      const message = `रिचार्ज अनुरोध\nदुकान ID: ${currentUser.shop_id}\nदुकान: ${storeName || 'नाम सेट नहीं'}\nमालिक: ${ownerName}\nप्लान: ${planDays} दिन\nकृपया भुगतान स्क्रीनशॉट सत्यापित करें।`;
+      const whatsappUrl = `https://wa.me/919813299777?text=${encodeURIComponent(message)}`;
+      if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
+      else window.location.href = whatsappUrl;
+      status.textContent = 'WhatsApp में 9813299777 की चैट खुल गई है। चुना हुआ स्क्रीनशॉट चैट में अटैच करके भेजें। भुगतान जाँच के बाद एडमिन ऐप में कन्फर्म करेगा।';
+      status.className = 'text-[11px] text-emerald-700 mt-3';
+      fileInput.value = '';
+    }
+
+    function renderAdminRechargeRequests(loadError) {
+      const tbody = document.getElementById('adminRechargeRequestsList');
+      if (!tbody) return;
+      if (loadError) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-red-500">रिचार्ज अनुरोध लोड नहीं हुए। Supabase recharge_requests टेबल/नीतियाँ जाँचें।</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = rawRechargeRequests.length ? rawRechargeRequests.map(request => {
+        const isPending = request.status === 'pending';
+        const shop = [request.shop_name, request.owner_name, request.shop_id].filter(Boolean).join(' / ');
+        return `<tr>
+          <td class="py-3 px-2">${shop || request.shop_id || '—'}</td>
+          <td>${Number(request.plan_days) || '—'} दिन</td>
+          <td>${request.proof_filename || 'WhatsApp पर जाँचें'}</td>
+          <td>${request.created_at ? new Date(request.created_at).toLocaleString('hi-IN') : '—'}</td>
+          <td>${request.status || 'pending'}</td>
+          <td>${isPending ? `<button type="button" onclick="reviewRechargeRequest('${request.id}', 'approved')" class="bg-emerald-600 text-white px-2 py-1 rounded mr-1">कन्फर्म</button><button type="button" onclick="reviewRechargeRequest('${request.id}', 'rejected')" class="bg-red-600 text-white px-2 py-1 rounded">अस्वीकार</button>` : '—'}</td>
+        </tr>`;
+      }).join('') : `<tr><td colspan="6" class="text-center py-4 text-slate-500">अभी कोई रिचार्ज अनुरोध नहीं है।</td></tr>`;
+    }
+
+    async function reviewRechargeRequest(requestId, newStatus) {
+      if (!currentUser || (currentUser.role !== 'admin' && currentUser.shop_id !== 'JBSMK000001')) {
+        alert('यह कार्य केवल एडमिन कर सकता है।');
+        return;
+      }
+      const prompt = newStatus === 'approved'
+        ? 'क्या आपने WhatsApp पर भुगतान स्क्रीनशॉट जाँच लिया है और रिचार्ज कन्फर्म करना चाहते हैं?'
+        : 'क्या आप इस रिचार्ज अनुरोध को अस्वीकार करना चाहते हैं?';
+      if (!confirm(prompt)) return;
+      const { error } = await supabaseClient.from('recharge_requests').update({ status: newStatus }).eq('id', requestId);
+      if (error) {
+        alert(`रिचार्ज अपडेट नहीं हुआ: ${error.message}`);
+        return;
+      }
+      await renderAdminAll();
+    }
+
+// ================= 3. JSON बैकअप डाउनलोड (पॉप-अप अलर्ट के साथ) =================
+function downloadCloudBackup() {
+    try {
+        const backupData = {
+            shopkeepers: typeof rawAdminShopkeepers !== 'undefined' ? rawAdminShopkeepers : [],
+            transactions: typeof rawAdminTxs !== 'undefined' ? rawAdminTxs : [],
+            timestamp: new Date().toISOString()
+        };
+        
+        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = createBackupFileName();
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        alert('सफलतापूर्वक! JSON बैकअप फाइल डाउनलोड हो गई है। कृपया अपने डाउनलोड्स फोल्डर को चेक करें।');
+    } catch (err) {
+        console.error('डाउनलोड एरर:', err);
+        alert('JSON डाउनलोड करने में विफल रहा।');
+    }
+}
+
+// ================= 4. डेटा सिंक फंक्शन =================
+async function syncCloudData() {
+    alert('डेटा सिंक किया जा रहा है...');
+    try {
+        await loadAdminAppeals();
+        await fetchGlobalBanner();
+        await loadMasterDataManually();
+        if (typeof renderAdminAll === 'function') {
+            renderAdminAll();
+        }
+        alert('डेटा सफलतापूर्वक सिंक (Sync) हो गया है!');
+    } catch (error) {
+        console.error('सिंक करने में त्रुटि:', error);
+        alert('डेटा सिंक करने में विफल। कृपया इंटरनेट कनेक्शन जांचें।');
+    }
+}
 
     // --- एडमिन डिफ़ॉल्टर बैनर और डेटा फिक्स लॉजिक ---
 async function fetchDefaultCustomerBanner() {
