@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>लेन-देन | MASTER REGISTRY</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23f59e0b'/%3E%3Ctext x='50%25' y='52%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial,sans-serif' font-size='42' font-weight='bold' fill='%230f172a'%3EL%3C/text%3E%3C/svg%3E" />
   
   <meta name="theme-color" content="#f3f6fb" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -32,6 +33,7 @@
     body {
       background: #f3f6fb !important;
       color: #172033 !important;
+      padding-bottom: 5.5rem;
     }
     header {
       background: rgba(255, 255, 255, .96) !important;
@@ -72,7 +74,50 @@
     table thead { background: #f7f9fc !important; }
     tbody tr:hover { background-color: #f5f8ff !important; }
     footer { color: #69758a !important; background: #fff !important; border-color: #e4e9f1 !important; }
-    .mobile-bottom-nav, .mobile-bottom-nav.hidden { display: none; }
+    #mobileBottomNav.hidden { display: none !important; }
+    #mobileBottomNav:not(.hidden) {
+      display: grid !important;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      width: min(100%, 720px);
+      transform: translateX(-50%);
+      z-index: 60;
+      padding: .55rem .75rem max(.55rem, env(safe-area-inset-bottom));
+      background: rgba(255, 255, 255, .97);
+      border: 1px solid #e4e9f1;
+      border-bottom: 0;
+      border-radius: 1rem 1rem 0 0;
+      box-shadow: 0 -5px 20px rgba(15, 23, 42, .08);
+      backdrop-filter: blur(12px);
+    }
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .2rem;
+      min-height: 3.2rem;
+      color: #69758a;
+      font-size: .7rem;
+      font-weight: 700;
+    }
+    .mobile-nav-item.is-active { color: #2563eb; }
+    .mobile-nav-item svg { width: 1.2rem; height: 1.2rem; }
+    .mobile-nav-add { color: #fff; }
+    .mobile-nav-add span {
+      display: grid;
+      place-items: center;
+      width: 2.8rem;
+      height: 2.8rem;
+      margin-top: -1.2rem;
+      border: 4px solid #f3f6fb;
+      border-radius: 9999px;
+      background: #2563eb;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, .3);
+    }
+    .mobile-nav-add svg { width: 1.5rem; height: 1.5rem; }
     #shopScoreSection, #shopAddSection, #shopLedgerSection, #adminDashboard { scroll-margin-top: 5.5rem; }
     #permanentCustomBanner { color: #1d4ed8 !important; background: #eff6ff !important; border-color: #bfdbfe !important; }
     @media (max-width: 640px) {
@@ -201,6 +246,10 @@
         <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Google (Gmail) से लॉगिन करें
       </button>
+      <button type="button" onclick="startDemoMode()" class="w-full mt-3 border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-3 rounded-2xl text-sm cursor-pointer">
+        अभी डेमो में ऐप देखें (बिना Gmail लॉगिन)
+      </button>
+      <p class="mt-2 text-[11px] text-slate-500">डेमो केवल स्क्रीन देखने के लिए है; इसमें डेटा सेव या Supabase से कनेक्ट नहीं होगा।</p>
       
       <div id="authStatusMsg" class="mt-4 text-xs font-bold text-center hidden"></div>
     </div>
@@ -218,21 +267,22 @@
       </section>
 
       <section id="shopRechargeSection" class="hidden bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
-        <h2 class="text-sm font-bold text-slate-200 mb-2">🔋 रिचार्ज / प्लान बढ़ाएँ</h2>
-        <p class="text-xs text-slate-500 mb-3">पेमेंट का स्क्रीनशॉट चुनकर WhatsApp पर भेजें। एडमिन भुगतान जाँचने के बाद ही रिचार्ज की पुष्टि करेगा।</p>
-        <label class="block text-[11px] text-slate-400 mb-1" for="rechargePlanDays">रिचार्ज अवधि</label>
-        <select id="rechargePlanDays" class="w-full rounded-xl p-3 text-xs">
-          <option value="30">30 दिन</option>
-          <option value="90">90 दिन</option>
-          <option value="365">365 दिन</option>
-        </select>
-        <label class="block text-[11px] text-slate-400 mt-3 mb-1" for="rechargeProofInput">भुगतान स्क्रीनशॉट</label>
-        <input id="rechargeProofInput" type="file" accept="image/*" class="w-full rounded-xl p-3 text-xs" />
-        <div class="flex flex-wrap gap-2 mt-3">
-          <button type="button" onclick="shareRechargeProof()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs">WhatsApp पर भेजें और अनुरोध दर्ज करें</button>
-          <button type="button" onclick="openAppealModal()" class="bg-slate-800 border border-slate-700 text-slate-200 font-bold px-4 py-2.5 rounded-xl text-xs">सहायता / अपील</button>
+        <h2 class="text-sm font-bold text-slate-200 mb-2">मेरा Vault और recharge</h2>
+        <p class="text-xs text-slate-500">हर वैध स्कोर खोज पर ₹1 शुल्क लगेगा, रिकॉर्ड न मिलने पर भी। भुगतान करके recharge request भेजें; Admin भुगतान जाँचकर स्वीकृत रकम आपके Vault में जोड़ेगा।</p>
+        <div class="mt-4 rounded-2xl border border-blue-100 bg-blue-50 p-4">
+          <div class="text-xs text-blue-700">Vault स्थिति <span class="text-slate-500">(धनात्मक = जमा क्रेडिट, ऋणात्मक = बकाया)</span></div>
+          <div id="shopVaultBalance" class="mt-1 text-2xl font-black text-blue-700">लोड हो रहा है…</div>
+          <button type="button" onclick="loadShopVault()" class="mt-2 text-xs font-bold text-blue-700 underline">Vault रिफ्रेश करें</button>
         </div>
-        <p id="rechargeStatusMsg" class="text-[11px] text-slate-500 mt-3" aria-live="polite">स्क्रीनशॉट WhatsApp नंबर 9813299777 पर भेजें। भुगतान जाँचने के बाद एडमिन ऐप में अनुरोध कन्फर्म करेगा।</p>
+        <p id="shopVaultStatus" class="mt-2 text-[11px] text-slate-500" role="status"></p>
+        <form onsubmit="submitRechargeRequest(event)" class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-2">
+          <input id="rechargeAmount" type="number" min="1" step="0.01" required placeholder="जमा की गई रकम (₹)" class="rounded-xl p-3 text-sm" />
+          <input id="rechargeReference" type="text" maxlength="100" placeholder="UPI / भुगतान reference (वैकल्पिक)" class="rounded-xl p-3 text-sm" />
+          <button id="rechargeSubmitBtn" type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs">Request भेजें और WhatsApp खोलें</button>
+        </form>
+        <p id="rechargeStatusMsg" class="mt-2 text-[11px] text-slate-500" role="status"></p>
+        <p class="text-[11px] text-slate-500 mt-3">डेमो अवधि: <b id="shopDemoDaysInfo" class="text-blue-600">5 दिन</b></p>
+        <button type="button" onclick="openAppealModal()" class="mt-3 bg-slate-800 border border-slate-700 text-slate-200 font-bold px-4 py-2.5 rounded-xl text-xs">सहायता / अपील</button>
       </section>
 
       <section id="shopScoreSection" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
@@ -349,19 +399,6 @@
           </table>
         </div>
       </div>
-
-      <!-- Recharge requests reviewed by the admin after checking WhatsApp payment proof -->
-      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
-        <h3 class="text-sm font-bold text-amber-400 mb-3">रिचार्ज अनुरोध (WhatsApp भुगतान जाँच)</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead class="text-slate-400 uppercase border-b border-slate-800 bg-slate-950/40 font-mono">
-              <tr><th class="py-3 px-2">दुकान / मालिक</th><th>अवधि</th><th>स्क्रीनशॉट फ़ाइल</th><th>समय</th><th>स्थिति</th><th>एक्शन</th></tr>
-            </thead>
-            <tbody id="adminRechargeRequestsList" class="divide-y divide-slate-800/60 font-medium"><tr><td colspan="6" class="text-center py-4 text-slate-500">अनुरोध लोड हो रहे हैं...</td></tr></tbody>
-          </table>
-        </div>
-      </section>
 
       <!-- Admin Search & Filter Bar -->
       <section class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-4 shadow-xl">
@@ -559,6 +596,39 @@
       <!-- SECTION F: SCORING ENGINE RULES & GLOBAL BROADCAST -->
       <div id="secSettings" class="hidden space-y-5">
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4">
+          <h2 class="text-sm font-bold text-amber-400">सभी दुकानदारों का Vault</h2>
+          <p class="text-xs text-slate-500">हर स्कोर खोज पर ₹1 बकाया दर्ज होगा। Recharge requests नीचे जाँचकर approve करें—approved रकम दुकानदार के Vault में credit होगी। नीचे वाला manual credit केवल उस भुगतान के लिए इस्तेमाल करें जिसकी request यहाँ नहीं है; एक ही भुगतान दो बार दर्ज न करें।</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <input id="vaultCollectionShopId" type="text" placeholder="दुकान ID" class="rounded-xl p-3 text-sm uppercase" />
+            <input id="vaultCollectionAmount" type="number" min="0.01" step="0.01" placeholder="प्राप्त रकम (₹)" class="rounded-xl p-3 text-sm" />
+            <button type="button" onclick="recordVaultCollection()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs">भुगतान / क्रेडिट दर्ज करें</button>
+          </div>
+          <p id="adminVaultStatus" class="text-[11px] text-slate-500" role="status"></p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="text-slate-400 border-b bg-slate-50 font-mono"><tr><th class="py-3 px-2">दुकान ID</th><th>Vault balance</th><th>स्थिति</th></tr></thead>
+              <tbody id="adminVaultList" class="divide-y"></tbody>
+            </table>
+          </div>
+          <h3 class="text-sm font-bold text-slate-200 pt-3">Recharge requests</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="text-slate-400 border-b bg-slate-50 font-mono"><tr><th class="py-3 px-2">दुकान / मालिक</th><th>माँगी रकम</th><th>Payment reference</th><th>समय / स्थिति</th><th>जाँचकर स्वीकृत रकम</th></tr></thead>
+              <tbody id="adminRechargeRequestsList" class="divide-y"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4">
+          <h2 class="text-sm font-bold text-amber-400">स्कोर शुल्क और डेमो अवधि</h2>
+          <p class="text-xs text-slate-500">स्कोर जाँच का शुल्क ₹1 प्रति खोज है। नए डेमो अकाउंट की डिफ़ॉल्ट अवधि 5 दिन है; यहाँ डेमो दिनों की संख्या बढ़ा सकते हैं।</p>
+          <div class="max-w-xs">
+            <label for="adminDemoDays" class="block text-xs text-slate-400 mb-1">डेमो अवधि (दिन)</label>
+            <input type="number" id="adminDemoDays" min="1" max="3650" value="5" class="w-full rounded-xl p-3 text-sm" />
+          </div>
+          <button type="button" onclick="saveDemoDays()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold px-4 py-2 rounded-xl text-xs">डेमो अवधि सेव करें</button>
+          <p class="text-[11px] text-slate-500">₹1 का वास्तविक शुल्क काटने के लिए अलग payment/wallet integration अभी आवश्यक है।</p>
+        </section>
+        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4">
           <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
             <i data-lucide="sliders" class="w-4 h-4"></i> क्रेडिट स्कोरिंग इंजन रूल्स (Scoring Rules Configuration)
           </h2>
@@ -576,7 +646,7 @@
               <input type="number" id="rule180" value="50" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-red-500 font-bold" />
             </div>
           </div>
-          <button onclick="alert('✓ स्कोरिंग रूल्स सफलतापूर्वक अपडेट हो गए हैं!')" class="bg-slate-800 hover:bg-slate-750 text-amber-400 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">नियम सेव करें</button>
+          <button type="button" onclick="saveScoringRules()" class="bg-slate-800 hover:bg-slate-750 text-amber-400 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">नियम सेव करें</button>
         </section>
 
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
@@ -693,6 +763,10 @@
     let rawRechargeRequests = [];
     let currentUser = null;
     let searchMode = 'ALL';
+    let isDemoMode = false;
+    let scoringRules = { rule30: 15, rule90: 35, rule180: 50 };
+    let demoAccountDays = 5;
+    let globalBroadcast = null;
 
     function createBackupFileName() {
       const idCode = currentUser?.shop_id || document.getElementById('shopkeeperDisplayCode')?.textContent || 'ADMIN';
@@ -789,25 +863,47 @@
     });
 
     async function logout() {
+      if (isDemoMode) {
+        window.location.reload();
+        return;
+      }
       await supabaseClient.auth.signOut();
+    }
+
+    function startDemoMode() {
+      isDemoMode = true;
+      currentUser = { shop_id: 'DEMO001', name: 'डेमो दुकान', role: 'shopkeeper', status: 'active' };
+      document.getElementById('authView').classList.add('hidden');
+      document.getElementById('bannerContainer').classList.add('hidden');
+      document.getElementById('shopkeeperDashboard').classList.remove('hidden');
+      document.getElementById('adminDashboard').classList.add('hidden');
+      document.getElementById('userBadge').classList.remove('hidden');
+      document.getElementById('shopkeeperDisplayCode').textContent = 'DEMO001 • PREVIEW';
+      document.getElementById('dashShopTitle').textContent = 'डेमो दुकान';
+      document.getElementById('dashOwnerTitle').textContent = 'यह केवल UI preview है • कोई डेटा सेव नहीं होगा';
+      document.getElementById('mobileBottomNav').classList.remove('hidden');
+      const rechargeSection = document.getElementById('shopRechargeSection');
+      rechargeSection.classList.remove('hidden');
+      navigateApp('home');
+      renderShopkeeperView();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     // ------------------------------------------------------------
     // GLOBAL BROADCAST NOTIFICATIONS & POPUPS
     // ------------------------------------------------------------
     function showGlobalBroadcastNotification() {
-      const data = localStorage.getItem('ld_global_broadcast');
+      const obj = globalBroadcast;
       const modal = document.getElementById('globalNotificationModal');
       const msgDiv = document.getElementById('globalModalMessage');
 
-      if (data && modal && msgDiv) {
-        const obj = JSON.parse(data);
+      if (obj && obj.message && modal && msgDiv) {
         const message = document.createElement('p');
         message.className = 'mb-2';
-        message.textContent = obj.message || '';
+        message.textContent = obj.message;
         const timestamp = document.createElement('span');
         timestamp.className = 'text-xs text-slate-400';
-        timestamp.textContent = `समय: ${new Date(obj.time).toLocaleString('hi-IN')}`;
+        timestamp.textContent = obj.time ? `समय: ${new Date(obj.time).toLocaleString('hi-IN')}` : '';
         msgDiv.replaceChildren(message, timestamp);
         modal.classList.remove('hidden');
       } else {
@@ -822,7 +918,18 @@
       }
     }
 
-    function clearGlobalAlert() {
+    async function clearGlobalAlert() {
+      const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001');
+      if (!isAdmin) {
+        alert('ब्रॉडकास्ट हटाने का अधिकार केवल एडमिन के पास है।');
+        return;
+      }
+      const { error } = await supabaseClient.from('settings').upsert({ key: 'global_broadcast', value: '' });
+      if (error) {
+        alert(`ब्रॉडकास्ट हटाया नहीं जा सका: ${error.message}`);
+        return;
+      }
+      globalBroadcast = null;
       localStorage.removeItem('ld_global_broadcast');
       closeGlobalModal();
       const dot = document.getElementById('broadcastDot');
@@ -831,14 +938,23 @@
     }
 
     async function publishGlobalBroadcast() {
+      const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001');
+      if (!isAdmin) { alert('ब्रॉडकास्ट भेजने का अधिकार केवल एडमिन के पास है।'); return; }
       const msg = document.getElementById('broadcastInput').value.trim();
-      if(!msg) { alert('कृपया संदेश दर्ज करें!'); return; }
-      localStorage.setItem('ld_global_broadcast', JSON.stringify({ message: msg, time: new Date().toISOString() }));
-      alert('✓ ग्लोबल ब्रॉडकास्ट पूरे नेटवर्क पर लाइव कर दिया गया है!');
-      document.getElementById('broadcastInput').value = "";
+      if (!msg) { alert('कृपया संदेश दर्ज करें!'); return; }
+      const broadcast = { message: msg, time: new Date().toISOString() };
+      const { error } = await supabaseClient.from('settings').upsert({ key: 'global_broadcast', value: JSON.stringify(broadcast) });
+      if (error) {
+        alert(`ब्रॉडकास्ट सेव नहीं हुआ: ${error.message}`);
+        return;
+      }
+      globalBroadcast = broadcast;
+      localStorage.setItem('ld_global_broadcast', JSON.stringify(broadcast));
+      document.getElementById('broadcastInput').value = '';
       const dot = document.getElementById('broadcastDot');
       if (dot) dot.classList.remove('hidden');
-      logActivity("ADMIN", "Published Global Broadcast Notification");
+      alert('✓ ग्लोबल ब्रॉडकास्ट पूरे नेटवर्क पर लाइव कर दिया गया है!');
+      await logActivity('ADMIN', 'Published Global Broadcast Notification');
     }
 
     // ------------------------------------------------------------
@@ -901,18 +1017,14 @@
 
     function calculateSmartScore(days, totalDues, uniqueShopsCount = 1) {
       if (days <= 0 && totalDues <= 0) return 100;
-      const months = days / 30;
-      let amountPenalty = Math.sqrt(totalDues) * 0.5;
-      let timePenalty = months * 1.2;
-      let totalPenalty = amountPenalty + timePenalty;
-      let baseScore = Math.round(100 - totalPenalty);
-      if (uniqueShopsCount >= 2) {
-        let drop = 100 - baseScore;
-        baseScore -= drop; 
-      }
-      if (baseScore < 1) baseScore = 1;
-      if (baseScore > 100) baseScore = 100;
-      return baseScore;
+      const amountPenalty = Math.sqrt(Math.max(0, totalDues)) * 0.5;
+      const timePenalty = days >= 180 ? scoringRules.rule180
+        : days >= 90 ? scoringRules.rule90
+        : days >= 30 ? scoringRules.rule30
+        : (days / 30) * scoringRules.rule30;
+      let baseScore = Math.round(100 - amountPenalty - timePenalty);
+      if (uniqueShopsCount >= 2) baseScore -= (100 - baseScore);
+      return Math.max(1, Math.min(100, baseScore));
     }
 
     async function logActivity(shopId, actionText) {
@@ -931,6 +1043,10 @@
     function closeAppealModal() { document.getElementById('appealModal').classList.add('hidden'); }
     
     async function submitAppeal() {
+      if (isDemoMode) {
+        alert('डेमो मोड में अपील सबमिट नहीं होगी।');
+        return;
+      }
       const phone = document.getElementById('appealCustPhone').value.trim();
       const reason = document.getElementById('appealReason').value.trim();
       if(!phone || !reason) { alert('सभी विवरण भरें!'); return; }
@@ -1040,6 +1156,7 @@
     }
 
     function initDashboard() {
+      if (!isDemoMode) loadSharedSettings();
       document.getElementById('authView').classList.add('hidden');
       document.getElementById('bannerContainer').classList.remove('hidden');
       document.getElementById('mobileBottomNav').classList.remove('hidden');
@@ -1053,6 +1170,7 @@
         renderAdminAll();
       } else {
         document.getElementById('shopkeeperDashboard').classList.remove('hidden');
+        loadShopVault();
         const profile = currentUser;
         const ownerName = profile.owner_name || profile.owner || profile.full_name || profile.name || profile.email?.split('@')[0] || 'नाम उपलब्ध नहीं';
         const storeName = profile.store_name || profile.shop_name || profile.business_name || profile.store || '';
@@ -1089,10 +1207,11 @@
       updateAdminStats();
       renderAnalyticsCharts();
       renderAuditLogsList();
-      renderAdminRechargeRequests(rechargeRes.error);
                                                                                                                                                                                
       filterAdminViews();
       loadAdminAppeals();
+      loadAdminVault();
+      renderAdminRechargeRequests(rechargeRes.error);
     }
 
     function openEditShopModal(id, name, city, phone, pin) {
@@ -1300,6 +1419,23 @@
       renderAdminAll();
     }
 
+    function downloadAdminSampleCSV() {
+      const rows = [
+        ['ShopID', 'Name', 'Mobile', 'Amount', 'Aadhaar', 'PAN', 'Date', 'Notes'],
+        ['SRSAM1234', 'उदाहरण ग्राहक', '9876543210', '1500', '', '', '2025-01-15', 'उदाहरण उधारी']
+      ];
+      const csv = rows.map(row => row.join(',')).join('\r\n');
+      const blob = new Blob(['\\uFEFF', csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'len-den-sample.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
     async function importAdminCSV(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1318,6 +1454,7 @@
               customer_aadhaar: cols[4] ? cols[4].trim() : null,
               customer_pan: cols[5] ? cols[5].trim().toUpperCase() : null,
               created_at: cols[6] ? new Date(cols[6]).toISOString() : new Date().toISOString(),
+              notes: cols[7] ? cols[7].trim() : null,
               status: "pending"
             });
           }
@@ -1333,13 +1470,148 @@
       e.target.value = "";
     }
 
+    async function submitRechargeRequest(event) {
+      event.preventDefault();
+      if (isDemoMode || !currentUser?.shop_id) {
+        alert('डेमो मोड में recharge request नहीं भेजी जा सकती।');
+        return;
+      }
+      const amount = Number(document.getElementById('rechargeAmount').value);
+      const reference = document.getElementById('rechargeReference').value.trim();
+      const status = document.getElementById('rechargeStatusMsg');
+      const button = document.getElementById('rechargeSubmitBtn');
+      if (!Number.isFinite(amount) || amount <= 0) {
+        status.textContent = 'कृपया जमा की गई सही रकम दर्ज करें।';
+        return;
+      }
+
+      const shopName = currentUser.store_name || currentUser.shop_name || currentUser.name || '';
+      const ownerName = currentUser.owner_name || currentUser.owner || currentUser.name || '';
+      const whatsappWindow = window.open('about:blank', '_blank');
+      button.disabled = true;
+      status.textContent = 'Recharge request सेव हो रही है…';
+      const { data, error } = await supabaseClient.from('recharge_requests').insert([{
+        shop_id: currentUser.shop_id,
+        shop_name: shopName,
+        owner_name: ownerName,
+        amount,
+        payment_reference: reference || null,
+        status: 'pending'
+      }]).select('id').single();
+      button.disabled = false;
+
+      if (error) {
+        if (whatsappWindow) whatsappWindow.close();
+        status.textContent = `Request सेव नहीं हुई: ${error.message}`;
+        return;
+      }
+      const message = `Vault recharge payment confirmation\nRequest ID: ${data?.id || '—'}\nShop ID: ${currentUser.shop_id}\nShop: ${shopName || '—'}\nAmount paid: ₹${amount}\nPayment reference: ${reference || 'भुगतान स्क्रीनशॉट WhatsApp में भेजें'}`;
+      const whatsappUrl = `https://wa.me/919813299777?text=${encodeURIComponent(message)}`;
+      if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
+      else window.location.href = whatsappUrl;
+      status.textContent = 'Request Admin को भेज दी गई। WhatsApp में भुगतान screenshot भेजें; जाँच और approval के बाद रकम Vault में आएगी।';
+      event.target.reset();
+      await loadShopVault();
+    }
+
+    function formatVaultAmount(amount) {
+      const value = Number(amount);
+      return Number.isFinite(value) ? `${value < 0 ? 'बकाया ' : 'क्रेडिट '}₹${Math.abs(value).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}` : 'उपलब्ध नहीं';
+    }
+
+    function readVaultBalance(data) {
+      const row = Array.isArray(data) ? data[0] : data;
+      const value = typeof row === 'number' || typeof row === 'string' ? Number(row) : Number(row?.balance ?? row?.vault_balance);
+      return Number.isFinite(value) ? value : null;
+    }
+
+    async function loadShopVault() {
+      const balanceEl = document.getElementById('shopVaultBalance');
+      const statusEl = document.getElementById('shopVaultStatus');
+      if (!balanceEl || isDemoMode || !currentUser || currentUser.role === 'admin') return;
+      balanceEl.textContent = 'लोड हो रहा है…';
+      const { data, error } = await supabaseClient.rpc('wallet_get_balance');
+      const balance = readVaultBalance(data);
+      if (error || balance === null) {
+        balanceEl.textContent = 'लोड नहीं हुआ';
+        if (statusEl) statusEl.textContent = 'Vault backend अभी सेट नहीं है या balance उपलब्ध नहीं है।';
+        console.error('Vault balance load error:', error || 'Invalid balance response');
+        return;
+      }
+      balanceEl.textContent = formatVaultAmount(balance);
+      if (statusEl) statusEl.textContent = 'सभी स्कोर खोज शुल्क और भुगतान इस खाते के ledger में दर्ज होते हैं।';
+    }
+
+    async function loadAdminVault() {
+      const tbody = document.getElementById('adminVaultList');
+      if (!tbody || !currentUser || (currentUser.role !== 'admin' && currentUser.shop_id !== 'JBSMK000001')) return;
+      const { data, error } = await supabaseClient.rpc('wallet_admin_list');
+      if (error) {
+        tbody.innerHTML = '<tr><td colspan="3" class="py-4 text-center text-red-500">Vault backend सेट नहीं है या सूची लोड नहीं हुई।</td></tr>';
+        console.error('Admin vault load error:', error);
+        return;
+      }
+      tbody.innerHTML = (data || []).map(row => {
+        const balance = readVaultBalance(row);
+        const shopId = String(row.shop_id || '');
+        return `<tr><td class="py-3 px-2 font-mono">${shopId}</td><td class="font-bold ${Number(balance) < 0 ? 'text-red-600' : 'text-emerald-700'}">${formatVaultAmount(balance)}</td><td>${Number(balance) < 0 ? 'बकाया' : 'क्रेडिट'}</td></tr>`;
+      }).join('') || '<tr><td colspan="3" class="py-4 text-center text-slate-500">अभी कोई Vault रिकॉर्ड नहीं है।</td></tr>';
+    }
+
+    async function recordVaultCollection() {
+      const status = document.getElementById('adminVaultStatus');
+      if (!currentUser || (currentUser.role !== 'admin' && currentUser.shop_id !== 'JBSMK000001')) {
+        alert('भुगतान दर्ज करने का अधिकार केवल एडमिन के पास है।');
+        return;
+      }
+      const shopId = document.getElementById('vaultCollectionShopId').value.trim().toUpperCase();
+      const amount = Number(document.getElementById('vaultCollectionAmount').value);
+      if (!shopId || !Number.isFinite(amount) || amount <= 0) {
+        alert('दुकान ID और प्राप्त रकम सही भरें।');
+        return;
+      }
+      const { error } = await supabaseClient.rpc('wallet_admin_adjust', {
+        p_shop_id: shopId,
+        p_amount: amount,
+        p_note: 'Admin recorded payment received'
+      });
+      if (error) {
+        if (status) status.textContent = `भुगतान दर्ज नहीं हुआ: ${error.message}`;
+        return;
+      }
+      document.getElementById('vaultCollectionShopId').value = '';
+      document.getElementById('vaultCollectionAmount').value = '';
+      if (status) status.textContent = `₹${amount.toLocaleString('en-IN')} की वसूली ${shopId} के Vault में दर्ज हुई।`;
+      await loadAdminVault();
+    }
+
     async function searchCustomerScore() {
+      if (isDemoMode) {
+        const card = document.getElementById('customerScoreCard');
+        card.classList.remove('hidden');
+        card.className = 'mt-4 p-4 rounded-2xl border border-blue-200 bg-blue-50 text-blue-800';
+        card.textContent = 'डेमो मोड में असली ग्राहक डेटा की खोज बंद है।';
+        return;
+      }
       const searchInput = document.getElementById('customerSearchInput');
       if (!searchInput) return;
       const q = searchInput.value.trim();
       if (!q) return;
       const card = document.getElementById('customerScoreCard');
       card.classList.remove('hidden');
+      card.className = 'mt-4 p-4 rounded-2xl border border-blue-200 bg-blue-50 text-blue-800';
+      card.textContent = '₹1 खोज शुल्क Vault में दर्ज हो रहा है…';
+
+      // The trusted server function records the fee atomically; do not search if the ledger is unavailable.
+      const { data: chargeData, error: chargeError } = await supabaseClient.rpc('wallet_charge_search');
+      const vaultBalance = readVaultBalance(chargeData);
+      if (chargeError || vaultBalance === null) {
+        card.textContent = 'स्कोर खोज अभी उपलब्ध नहीं है: Vault शुल्क दर्ज नहीं हो सका।';
+        console.error('Search fee charge error:', chargeError || 'Invalid balance response');
+        return;
+      }
+      const balanceDisplay = document.getElementById('shopVaultBalance');
+      if (balanceDisplay) balanceDisplay.textContent = formatVaultAmount(vaultBalance);
 
       let query = supabaseClient.from('transactions').select('*');
       if (searchMode === 'MOBILE') query = query.eq('customer_phone', q);
@@ -1400,6 +1672,10 @@
 
     async function handleAddTransaction(e) {
       e.preventDefault();
+      if (isDemoMode) {
+        alert('डेमो मोड में लेन-देन सेव नहीं होगा।');
+        return;
+      }
       const customDate = document.getElementById('txDate').value;
       const { error } = await supabaseClient.from('transactions').insert([{
         shop_id: currentUser.shop_id,
@@ -1422,6 +1698,10 @@
     }
 
     async function clearTransaction(txId) {
+      if (isDemoMode) {
+        alert('डेमो मोड में लेन-देन अपडेट नहीं होगा।');
+        return;
+      }
       if(!confirm("क्लियर करना चाहते हैं?")) return;
       await supabaseClient.from('transactions').update({ status: "cleared", cleared_at: new Date().toISOString() }).eq('id', txId);
       renderShopkeeperView();
@@ -1429,6 +1709,14 @@
     }
 
     async function renderShopkeeperView() {
+      if (isDemoMode) {
+        const tbody = document.getElementById('shopkeeperTxList');
+        const demoDate = new Date().toLocaleDateString('hi-IN');
+        tbody.innerHTML = `
+          <tr class="text-slate-300"><td class="py-3 px-2 font-bold">राहुल कुमार</td><td class="font-mono">9876543210</td><td class="font-mono">—</td><td class="font-bold">₹1,250</td><td>${demoDate}</td><td><span class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold">PENDING</span></td><td>डेमो</td></tr>
+          <tr class="text-slate-300"><td class="py-3 px-2 font-bold">सीमा देवी</td><td class="font-mono">9123456780</td><td class="font-mono">—</td><td class="font-bold">₹800</td><td>${demoDate}</td><td><span class="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-bold">CLEARED</span></td><td>डेमो</td></tr>`;
+        return;
+      }
       const { data: myTxs } = await supabaseClient.from('transactions').select('*').eq('shop_id', currentUser.shop_id).order('created_at', { ascending: false });
       const tbody = document.getElementById('shopkeeperTxList');
       tbody.innerHTML = (myTxs || []).map(t => `
@@ -1446,81 +1734,85 @@
 
     document.addEventListener('DOMContentLoaded', fetchDefaultCustomerBanner);
 
-    async function shareRechargeProof() {
-      const fileInput = document.getElementById('rechargeProofInput');
-      const status = document.getElementById('rechargeStatusMsg');
-      const file = fileInput.files && fileInput.files[0];
-      if (!file || !file.type.startsWith('image/')) {
-        status.textContent = 'पहले भुगतान का इमेज स्क्रीनशॉट चुनें।';
-        status.className = 'text-[11px] text-red-500 mt-3';
-        return;
-      }
-      if (!currentUser || !currentUser.shop_id) return;
-
-      status.textContent = 'रिचार्ज अनुरोध दर्ज हो रहा है...';
-      status.className = 'text-[11px] text-slate-500 mt-3';
-      const whatsappWindow = window.open('about:blank', '_blank');
-      const planDays = Number(document.getElementById('rechargePlanDays').value);
-      const storeName = currentUser.store_name || currentUser.shop_name || currentUser.business_name || '';
-      const ownerName = currentUser.owner_name || currentUser.owner || currentUser.full_name || currentUser.name || currentUser.email || '';
-      const { error } = await supabaseClient.from('recharge_requests').insert([{
-        shop_id: currentUser.shop_id,
-        shop_name: storeName,
-        owner_name: ownerName,
-        plan_days: planDays,
-        proof_filename: file.name,
-        status: 'pending'
-      }]);
-
-      if (error) {
-        if (whatsappWindow) whatsappWindow.close();
-        status.textContent = `अनुरोध सेव नहीं हुआ: ${error.message}. Supabase में recharge_requests टेबल/नीतियाँ जाँचें।`;
-        status.className = 'text-[11px] text-red-500 mt-3';
-        return;
-      }
-
-      const message = `रिचार्ज अनुरोध\nदुकान ID: ${currentUser.shop_id}\nदुकान: ${storeName || 'नाम सेट नहीं'}\nमालिक: ${ownerName}\nप्लान: ${planDays} दिन\nकृपया भुगतान स्क्रीनशॉट सत्यापित करें।`;
-      const whatsappUrl = `https://wa.me/919813299777?text=${encodeURIComponent(message)}`;
-      if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
-      else window.location.href = whatsappUrl;
-      status.textContent = 'WhatsApp में 9813299777 की चैट खुल गई है। चुना हुआ स्क्रीनशॉट चैट में अटैच करके भेजें। भुगतान जाँच के बाद एडमिन ऐप में कन्फर्म करेगा।';
-      status.className = 'text-[11px] text-emerald-700 mt-3';
-      fileInput.value = '';
+    function escapeRechargeText(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
     }
 
     function renderAdminRechargeRequests(loadError) {
       const tbody = document.getElementById('adminRechargeRequestsList');
       if (!tbody) return;
       if (loadError) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-red-500">रिचार्ज अनुरोध लोड नहीं हुए। Supabase recharge_requests टेबल/नीतियाँ जाँचें।</td></tr>`;
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Recharge requests लोड नहीं हुए। Supabase table/permissions जाँचें।</td></tr>';
         return;
       }
       tbody.innerHTML = rawRechargeRequests.length ? rawRechargeRequests.map(request => {
-        const isPending = request.status === 'pending';
-        const shop = [request.shop_name, request.owner_name, request.shop_id].filter(Boolean).join(' / ');
+        const pending = request.status === 'pending';
+        const shop = [request.shop_name, request.owner_name, request.shop_id].filter(Boolean).map(escapeRechargeText).join(' / ');
+        const requestId = escapeRechargeText(request.id);
+        const status = escapeRechargeText(request.status || 'pending');
+        const details = escapeRechargeText(request.payment_reference || 'WhatsApp पर भुगतान जाँचें');
+        const requestedAmount = Number(request.amount) || 0;
         return `<tr>
-          <td class="py-3 px-2">${shop || request.shop_id || '—'}</td>
-          <td>${Number(request.plan_days) || '—'} दिन</td>
-          <td>${request.proof_filename || 'WhatsApp पर जाँचें'}</td>
-          <td>${request.created_at ? new Date(request.created_at).toLocaleString('hi-IN') : '—'}</td>
-          <td>${request.status || 'pending'}</td>
-          <td>${isPending ? `<button type="button" onclick="reviewRechargeRequest('${request.id}', 'approved')" class="bg-emerald-600 text-white px-2 py-1 rounded mr-1">कन्फर्म</button><button type="button" onclick="reviewRechargeRequest('${request.id}', 'rejected')" class="bg-red-600 text-white px-2 py-1 rounded">अस्वीकार</button>` : '—'}</td>
+          <td class="py-3 px-2">${shop || '—'}<div class="text-[10px] text-slate-500">ID: ${requestId}</div></td>
+          <td>₹${requestedAmount.toLocaleString('en-IN')}</td>
+          <td>${details}</td>
+          <td>${request.created_at ? new Date(request.created_at).toLocaleString('hi-IN') : '—'}<div>${status}</div></td>
+          <td>${pending ? `<div class="flex gap-1 min-w-48"><input id="approveRechargeAmount_${requestId}" type="number" min="0.01" step="0.01" value="${requestedAmount}" class="w-24 rounded p-2" aria-label="स्वीकृत रकम"><button type="button" onclick="reviewRechargeRequest('${requestId}')" class="bg-emerald-600 text-white px-2 py-1 rounded">Approve & credit</button><button type="button" onclick="rejectRechargeRequest('${requestId}')" class="bg-red-600 text-white px-2 py-1 rounded">Reject</button></div>` : `₹${Number(request.approved_amount || 0).toLocaleString('en-IN')}`}</td>
         </tr>`;
-      }).join('') : `<tr><td colspan="6" class="text-center py-4 text-slate-500">अभी कोई रिचार्ज अनुरोध नहीं है।</td></tr>`;
+      }).join('') : '<tr><td colspan="5" class="text-center py-4 text-slate-500">अभी कोई recharge request नहीं है।</td></tr>';
     }
 
-    async function reviewRechargeRequest(requestId, newStatus) {
+    async function reviewRechargeRequest(requestId) {
       if (!currentUser || (currentUser.role !== 'admin' && currentUser.shop_id !== 'JBSMK000001')) {
         alert('यह कार्य केवल एडमिन कर सकता है।');
         return;
       }
-      const prompt = newStatus === 'approved'
-        ? 'क्या आपने WhatsApp पर भुगतान स्क्रीनशॉट जाँच लिया है और रिचार्ज कन्फर्म करना चाहते हैं?'
-        : 'क्या आप इस रिचार्ज अनुरोध को अस्वीकार करना चाहते हैं?';
-      if (!confirm(prompt)) return;
-      const { error } = await supabaseClient.from('recharge_requests').update({ status: newStatus }).eq('id', requestId);
+      const request = rawRechargeRequests.find(item => String(item.id) === String(requestId));
+      if (!request || request.status !== 'pending') {
+        alert('यह request अब pending नहीं है। सूची refresh करें।');
+        return;
+      }
+      const amount = Number(document.getElementById(`approveRechargeAmount_${requestId}`)?.value);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        alert('स्वीकृत रकम सही दर्ज करें।');
+        return;
+      }
+      if (!confirm(`WhatsApp पर भुगतान जाँचकर ${request.shop_id} के Vault में ₹${amount} क्रेडिट करें?`)) return;
+
+      const { error: creditError } = await supabaseClient.rpc('wallet_admin_adjust', {
+        p_shop_id: request.shop_id,
+        p_amount: amount,
+        p_note: `Recharge request ${request.id} approved`
+      });
+      if (creditError) {
+        alert(`Vault में रकम क्रेडिट नहीं हुई: ${creditError.message}`);
+        return;
+      }
+      const { error: updateError } = await supabaseClient.from('recharge_requests').update({
+        status: 'approved',
+        approved_amount: amount,
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: currentUser.email || currentUser.shop_id
+      }).eq('id', request.id).eq('status', 'pending');
+      if (updateError) {
+        alert(`Vault में ₹${amount} क्रेडिट हो गई, लेकिन request status अपडेट नहीं हुआ। दोबारा approve न करें; Admin backend से status ठीक करें। विवरण: ${updateError.message}`);
+        await loadAdminVault();
+        return;
+      }
+      await logActivity('ADMIN', `Approved recharge request ${request.id}: ₹${amount} credited to ${request.shop_id}`);
+      await renderAdminAll();
+    }
+
+    async function rejectRechargeRequest(requestId) {
+      if (!currentUser || (currentUser.role !== 'admin' && currentUser.shop_id !== 'JBSMK000001')) {
+        alert('यह कार्य केवल एडमिन कर सकता है।');
+        return;
+      }
+      const request = rawRechargeRequests.find(item => String(item.id) === String(requestId));
+      if (!request || request.status !== 'pending' || !confirm('क्या payment जाँच के बाद इस recharge request को अस्वीकार करना चाहते हैं?')) return;
+      const { error } = await supabaseClient.from('recharge_requests').update({ status: 'rejected' }).eq('id', request.id).eq('status', 'pending');
       if (error) {
-        alert(`रिचार्ज अपडेट नहीं हुआ: ${error.message}`);
+        alert(`Request reject नहीं हुई: ${error.message}`);
         return;
       }
       await renderAdminAll();
@@ -1554,20 +1846,91 @@ function downloadCloudBackup() {
 
 // ================= 4. डेटा सिंक फंक्शन =================
 async function syncCloudData() {
-    alert('डेटा सिंक किया जा रहा है...');
     try {
-        await loadAdminAppeals();
-        await fetchGlobalBanner();
-        await loadMasterDataManually();
-        if (typeof renderAdminAll === 'function') {
-            renderAdminAll();
-        }
+        await renderAdminAll();
         alert('डेटा सफलतापूर्वक सिंक (Sync) हो गया है!');
     } catch (error) {
         console.error('सिंक करने में त्रुटि:', error);
         alert('डेटा सिंक करने में विफल। कृपया इंटरनेट कनेक्शन जांचें।');
     }
 }
+
+    async function loadSharedSettings() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('settings')
+          .select('key, value')
+          .in('key', ['scoring_rules', 'global_broadcast', 'demo_account_days']);
+        if (error) throw error;
+        const settings = Object.fromEntries((data || []).map(row => [row.key, row.value]));
+        if (settings.scoring_rules) {
+          const savedRules = typeof settings.scoring_rules === 'string'
+            ? JSON.parse(settings.scoring_rules)
+            : settings.scoring_rules;
+          scoringRules = {
+            rule30: Number(savedRules.rule30) || 15,
+            rule90: Number(savedRules.rule90) || 35,
+            rule180: Number(savedRules.rule180) || 50
+          };
+          ['rule30', 'rule90', 'rule180'].forEach(key => {
+            const input = document.getElementById(key);
+            if (input) input.value = scoringRules[key];
+          });
+        }
+        const savedDemoDays = Number(settings.demo_account_days);
+        demoAccountDays = Number.isInteger(savedDemoDays) && savedDemoDays >= 1 && savedDemoDays <= 3650 ? savedDemoDays : 5;
+        const demoDaysInput = document.getElementById('adminDemoDays');
+        if (demoDaysInput) demoDaysInput.value = demoAccountDays;
+        updateDemoDaysDisplay();
+
+        const savedBroadcast = settings.global_broadcast;
+        globalBroadcast = typeof savedBroadcast === 'string'
+          ? (savedBroadcast ? JSON.parse(savedBroadcast) : null)
+          : savedBroadcast;
+        const dot = document.getElementById('broadcastDot');
+        if (dot) dot.classList.toggle('hidden', !globalBroadcast?.message);
+      } catch (error) {
+        console.error('सेटिंग लोड करने में त्रुटि:', error);
+      }
+    }
+
+    function updateDemoDaysDisplay() {
+      const display = document.getElementById('shopDemoDaysInfo');
+      if (display) display.textContent = `${demoAccountDays} दिन`;
+    }
+
+    async function saveDemoDays() {
+      const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001');
+      if (!isAdmin) { alert('डेमो अवधि बदलने का अधिकार केवल एडमिन के पास है।'); return; }
+      const days = Number(document.getElementById('adminDemoDays').value);
+      if (!Number.isInteger(days) || days < 1 || days > 3650) {
+        alert('डेमो अवधि 1 से 3650 दिनों के बीच दर्ज करें।');
+        return;
+      }
+      const { error } = await supabaseClient.from('settings').upsert({ key: 'demo_account_days', value: String(days) });
+      if (error) { alert(`डेमो अवधि सेव नहीं हुई: ${error.message}`); return; }
+      demoAccountDays = days;
+      updateDemoDaysDisplay();
+      alert(`✓ डिफ़ॉल्ट डेमो अवधि ${days} दिन सेव हो गई।`);
+    }
+
+    async function saveScoringRules() {
+      const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001');
+      if (!isAdmin) { alert('स्कोरिंग नियम बदलने का अधिकार केवल एडमिन के पास है।'); return; }
+      const rules = {};
+      for (const key of ['rule30', 'rule90', 'rule180']) {
+        const value = Number(document.getElementById(key).value);
+        if (!Number.isFinite(value) || value < 0 || value > 100) {
+          alert('हर penalty 0 से 100 के बीच दर्ज करें।');
+          return;
+        }
+        rules[key] = value;
+      }
+      const { error } = await supabaseClient.from('settings').upsert({ key: 'scoring_rules', value: JSON.stringify(rules) });
+      if (error) { alert(`नियम सेव नहीं हुए: ${error.message}`); return; }
+      scoringRules = rules;
+      alert('✓ स्कोरिंग नियम सेव हो गए हैं और स्कोर में लागू हैं।');
+    }
 
     // --- एडमिन डिफ़ॉल्टर बैनर और डेटा फिक्स लॉजिक ---
 async function fetchDefaultCustomerBanner() {
