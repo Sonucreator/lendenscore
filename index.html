@@ -274,7 +274,7 @@
 
     <!-- 2. SHOPKEEPER DASHBOARD -->
     <div id="shopkeeperDashboard" class="hidden space-y-5">
-      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex flex-wrap justify-between items-center gap-3">
+      <section id="shopWalletSection" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex flex-wrap justify-between items-center gap-3">
         <div>
           <h3 class="text-sm font-bold text-slate-200">दिखावट और वॉल्ट</h3>
           <p class="text-[11px] text-slate-400">ग्राहक खोज: ₹1 • नई ग्राहक एंट्री: ₹1</p>
@@ -290,7 +290,7 @@
           <span id="walletStatusMessage" class="w-full text-[11px] text-slate-500" aria-live="polite"></span>
         </div>
       </section>
-      <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex justify-between items-center">
+      <section id="shopHomeSection" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex justify-between items-center">
         <div>
           <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
           <p class="text-[11px] text-slate-400">सेंट्रल कम्युनिटी रजिस्ट्री • लाइव क्लाउड डेटा सिंक</p>
@@ -374,10 +374,11 @@
         <input type="number" id="adminDefaulterAmount" placeholder="बकाया राशि (रुपये में)..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
     </div>
     <button onclick="updateDefaultCustomerBanner()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm w-full">बैनर अपडेट करें</button>
+    <p id="defaultBannerStatus" class="mt-2 text-xs" aria-live="polite"></p>
 </div>
     <div id="adminDashboard" class="hidden space-y-6">
 
-      <div class="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
+      <div id="adminMasterHeader" class="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
         <div>
           <h2 class="text-sm font-extrabold text-amber-400 flex items-center gap-2">
             <i data-lucide="shield-alert" class="w-4 h-4"></i> सुपर एडमिन मास्टर कंट्रोल
@@ -395,7 +396,7 @@
       </div>
 
       <!-- Shopkeeper Appeals Table in Admin -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
+      <div id="adminAppealsPanel" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
         <h3 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2">
           <i data-lucide="clipboard-list" class="w-4 h-4"></i> शॉपकीपर अपील लिस्ट (Admin Panel)
         </h3>
@@ -416,14 +417,14 @@
       </div>
 
       <!-- Admin Search & Filter Bar -->
-      <section class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-4 shadow-xl">
+      <section id="adminSearchPanel" class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-4 shadow-xl">
         <div class="relative w-full">
           <i data-lucide="search" class="w-4 h-4 text-amber-400 absolute left-4 top-3.5"></i>
           <input type="text" id="adminUniversalSearch" oninput="filterAdminViews()" placeholder="मास्टर सर्च पैनल: नाम, मोबाइल, पहचान, पैन, दुकान कोड दर्ज करें..." class="w-full bg-slate-950 border border-slate-700 rounded-2xl pl-11 pr-4 py-3 text-sm focus:border-amber-400 font-mono text-amber-300 outline-none" />
         </div>
       </section>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div id="adminStatsPanel" class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow">
           <div class="text-[11px] text-slate-400">कुल पंजीकृत दुकानें</div>
           <div id="statShopkeepers" class="text-lg font-black text-amber-400 mt-1 font-mono">0</div>
@@ -466,6 +467,7 @@
                   <th>ईमेल</th>
                   <th>शहर</th>
                   <th>फोन</th>
+                  <th>वॉल्ट बैलेंस</th>
                   <th>स्थिति</th>
                   <th class="text-right pr-2">मास्टर एक्शन</th>
                 </tr>
@@ -751,6 +753,7 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let rawAdminShopkeepers = [];
+    let adminWalletBalances = {};
     let rawAdminTxs = [];
     let rawAdminCustomScores = {};
     let rawAppeals = [];
@@ -760,12 +763,26 @@
 
     function setAppLook(look) {
       const selectedLook = look === 'vyapar' ? 'vyapar' : 'old';
+      const activeAdminId = ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit', 'secSettings']
+        .find(id => !document.getElementById(id).classList.contains('hidden')) || 'secShopkeepers';
+      const activeNav = document.querySelector('#mobileBottomNav [data-nav].is-active')?.dataset.nav || 'home';
       document.body.classList.toggle('theme-vyapar', selectedLook === 'vyapar');
       localStorage.setItem('ld_app_look', selectedLook);
       ['shopkeeperLookSelect', 'adminLookSelect'].forEach(id => {
         const control = document.getElementById(id);
         if (control) control.value = selectedLook;
       });
+      if (currentUser) {
+        if (currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001') {
+          const section = activeAdminId.replace('sec', '').toLowerCase();
+          switchAdminSection(section);
+        } else if (selectedLook === 'vyapar') {
+          setShopkeeperView(activeNav);
+        } else {
+          ['shopWalletSection', 'shopHomeSection', 'shopScoreSection', 'shopAddSection', 'shopLedgerSection']
+            .forEach(id => document.getElementById(id).classList.remove('hidden'));
+        }
+      }
     }
 
     function updateVaultBalance(result) {
@@ -1126,6 +1143,23 @@
       input.focus();
     }
 
+    function setShopkeeperView(destination) {
+      const views = {
+        home: ['shopWalletSection', 'shopHomeSection'],
+        score: ['shopScoreSection'],
+        add: ['shopAddSection'],
+        ledger: ['shopLedgerSection'],
+        more: ['shopWalletSection']
+      };
+      const visibleIds = views[destination] || views.home;
+      ['shopWalletSection', 'shopHomeSection', 'shopScoreSection', 'shopAddSection', 'shopLedgerSection'].forEach(id => {
+        document.getElementById(id).classList.toggle('hidden', !visibleIds.includes(id));
+      });
+      window.scrollTo(0, 0);
+      if (destination === 'score') document.getElementById('customerSearchInput').focus({ preventScroll: true });
+      if (destination === 'add') document.getElementById('txCustName').focus({ preventScroll: true });
+    }
+
     function navigateApp(destination) {
       if (!currentUser) return;
       const isAdmin = currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001';
@@ -1135,18 +1169,16 @@
       });
 
       if (isAdmin) {
-        if (destination === 'score') switchAdminSection('customers');
-        else if (destination === 'ledger') switchAdminSection('transactions');
-        else if (destination === 'more') switchAdminSection('settings');
-        else if (destination === 'add') {
-          switchAdminSection('transactions');
-          document.getElementById('admTxShopCode').focus({ preventScroll: true });
-        } else {
-          document.getElementById('adminDashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        const section = { home: 'shopkeepers', score: 'customers', add: 'transactions', ledger: 'transactions', more: 'settings' }[destination] || 'shopkeepers';
+        switchAdminSection(section);
+        if (destination === 'add') document.getElementById('admTxShopCode').focus({ preventScroll: true });
         return;
       }
 
+      if (document.body.classList.contains('theme-vyapar')) {
+        setShopkeeperView(destination);
+        return;
+      }
       if (destination === 'score') {
         document.getElementById('shopScoreSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
         document.getElementById('customerSearchInput').focus({ preventScroll: true });
@@ -1178,10 +1210,12 @@
         document.getElementById('adminDashboard').classList.remove('hidden');
         document.getElementById('defaultBannerAdminControls').classList.remove('hidden');
         renderAdminAll();
+        switchAdminSection('shopkeepers');
       } else {
         document.getElementById('shopkeeperDashboard').classList.remove('hidden');
         document.getElementById('dashShopTitle').innerText = currentUser.name || displayId;
         renderShopkeeperView();
+        if (document.body.classList.contains('theme-vyapar')) setShopkeeperView('home');
       }
       lucide.createIcons();
     }
@@ -1218,22 +1252,41 @@
     }
 
     function switchAdminSection(sec) {
-      ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit', 'secSettings'].forEach((s, idx) => {
-        document.getElementById(s).classList.toggle('hidden', s !== ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)));
-        document.getElementById('adminTab' + (idx+1)).className = s === ('sec' + sec.charAt(0).toUpperCase() + sec.slice(1)) ? 'pb-2.5 tab-active cursor-pointer' : 'pb-2.5 text-slate-400 cursor-pointer';
+      const activeSection = 'sec' + sec.charAt(0).toUpperCase() + sec.slice(1);
+      ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit', 'secSettings'].forEach((section, idx) => {
+        document.getElementById(section).classList.toggle('hidden', section !== activeSection);
+        document.getElementById('adminTab' + (idx + 1)).className = section === activeSection ? 'pb-2.5 tab-active cursor-pointer' : 'pb-2.5 text-slate-400 cursor-pointer';
       });
+      const compactTabs = document.body.classList.contains('theme-vyapar');
+      ['adminMasterHeader', 'adminAppealsPanel', 'adminSearchPanel', 'adminStatsPanel'].forEach(id => {
+        document.getElementById(id).classList.toggle('hidden', compactTabs);
+      });
+      document.getElementById('defaultBannerAdminControls').classList.toggle('hidden', compactTabs && sec !== 'settings');
+      if (compactTabs) window.scrollTo(0, 0);
       if (sec === 'settings') loadRechargeRequests();
     }
 
     async function renderAdminAll() {
-      const [shopsRes, txsRes, appealsRes, logsRes] = await Promise.all([
+      const [shopsRes, txsRes, appealsRes, logsRes, walletRes] = await Promise.all([
         supabaseClient.from('shopkeepers').select('*').neq('shop_id', 'JBSMK000001').order('created_at', { ascending: false }),
         supabaseClient.from('transactions').select('*').order('created_at', { ascending: false }),
         supabaseClient.from('appeals').select('*').order('created_at', { ascending: false }),
-        supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(50)
+        supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(50),
+        supabaseClient.from('wallet_ledger').select('shop_id, amount, entry_type')
       ]);
 
       rawAdminShopkeepers = shopsRes.data || [];
+      adminWalletBalances = walletRes.error ? null : {};
+      if (!walletRes.error) {
+        (walletRes.data || []).forEach(entry => {
+          const amount = Number(entry.amount || 0);
+          const type = String(entry.entry_type || '').toLowerCase();
+          const debit = /charge|debit|deduct|usage|search|entry/.test(type);
+          adminWalletBalances[entry.shop_id] = (adminWalletBalances[entry.shop_id] || 0) + (debit ? -Math.abs(amount) : amount);
+        });
+      } else {
+        console.error('Admin wallet balances load error:', walletRes.error.message);
+      }
       rawAdminTxs = txsRes.data || [];
       rawAppeals = appealsRes.data || [];
       rawAuditLogs = logsRes.data || rawAuditLogs;
@@ -1364,14 +1417,16 @@
           <td class="text-slate-400">${escapeHTML(s.email || '-')}</td>
           <td class="font-mono text-slate-300 uppercase">${escapeHTML(s.city || 'SAM')}</td>
           <td class="font-mono text-slate-400">${escapeHTML(s.phone || '-')}</td>
+          <td class="font-mono font-bold text-blue-700">${adminWalletBalances ? `₹${Number(adminWalletBalances[s.shop_id] || 0).toLocaleString('en-IN')}` : '—'}</td>
           <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${escapeHTML(status)}</span></td>
           <td class="text-right pr-2 space-x-1">
+            <button onclick="adminCreateRechargeRequest(${jsArg(s.shop_id)}, ${jsArg(s.shop_name || s.business_name || s.name)}, ${jsArg(s.owner_name || s.full_name || s.name)})" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs cursor-pointer">रिचार्ज</button>
             <button onclick="openEditShopModal(${jsArg(s.id)}, ${jsArg(s.name || ownerName)}, ${jsArg(s.city)}, ${jsArg(s.phone)})" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit</button>
             <button onclick="adminToggleBlockShopkeeper(${jsArg(s.id)}, ${jsArg(status)})" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs cursor-pointer">${actionBtnText}</button>
             <button onclick="adminDeleteShopkeeper(${jsArg(s.id)})" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs cursor-pointer">Delete</button>
           </td>
         </tr>`
-      }).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
+      }).join('') || `<tr><td colspan="8" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
     }
 
     function renderFilteredAdminCustomers(query) {
@@ -1429,6 +1484,24 @@
           <td class="text-right pr-2 space-x-1"><button onclick="adminDeleteTx(${jsId})" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-[11px] cursor-pointer">Del</button></td>
         </tr>`;
       }).join('') || `<tr><td colspan="8" class="text-center py-6 text-slate-500">कोई लेन-देन नहीं।</td></tr>`;
+    }
+
+    async function adminCreateRechargeRequest(shopId, shopName, ownerName) {
+      const amount = Number(prompt(`दुकानदार ${shopId} के लिए रिचार्ज राशि (₹) दर्ज करें:`, '100'));
+      if (!Number.isInteger(amount) || amount < 1) return;
+      const { error } = await supabaseClient.from('recharge_requests').insert([{
+        shop_id: shopId,
+        shop_name: shopName || '—',
+        owner_name: ownerName || '—',
+        amount,
+        status: 'pending'
+      }]);
+      if (error) {
+        alert('रिचार्ज अनुरोध नहीं बना: ' + error.message);
+        return;
+      }
+      alert(`₹${amount} का रिचार्ज अनुरोध बना। वॉल्ट में जोड़ने के लिए सेटिंग्स से भुगतान जाँचकर कन्फर्म करें।`);
+      await loadRechargeRequests();
     }
 
     async function adminToggleBlockShopkeeper(id, currentStatus) {
@@ -1647,57 +1720,80 @@
     // --- एडमिन डिफ़ॉल्टर बैनर और डेटा फिक्स लॉजिक ---
 async function fetchDefaultCustomerBanner() {
     try {
-        if (typeof supabaseClient === 'undefined') return;
         const { data, error } = await supabaseClient
             .from('settings')
             .select('value')
             .eq('key', 'default_customer_banner')
-            .single();
+            .maybeSingle();
 
+        if (error) throw error;
+        const value = typeof data?.value === 'string' ? data.value.trim() : '';
         const permBanner = document.getElementById('permanentCustomBanner');
-        if (permBanner && data && data.value) {
-            permBanner.textContent = `⚠️ डिफ़ॉल्ट / डिफ़ॉल्टर सूचना: ${data.value}`;
+        if (permBanner && value) {
+            permBanner.textContent = `⚠️ डिफ़ॉल्ट / डिफ़ॉल्टर सूचना: ${value}`;
         }
+        return value;
     } catch (err) {
-        console.log('बैनर लोड हो रहा है...');
+        console.error('डिफ़ॉल्टर बैनर लोड एरर:', err.message || err);
+        const status = document.getElementById('defaultBannerStatus');
+        if (status && currentUser?.role === 'admin') {
+            status.textContent = `बैनर लोड नहीं हुआ: ${err.message || 'Supabase settings access जाँचें।'}`;
+            status.className = 'mt-2 text-xs text-red-600';
+        }
+        return null;
     }
 }
 
 async function updateDefaultCustomerBanner() {
-    const custName = document.getElementById('adminDefaulterName')?.value.trim();
-    const defAmount = document.getElementById('adminDefaulterAmount')?.value.trim();
+    const nameInput = document.getElementById('adminDefaulterName');
+    const amountInput = document.getElementById('adminDefaulterAmount');
+    const status = document.getElementById('defaultBannerStatus');
+    const custName = nameInput?.value.trim();
+    const defAmount = amountInput?.value.trim();
 
     if (!custName) {
-        alert('कृपया डिफ़ॉल्ट कस्टमर का नाम दर्ज करें।');
+        if (status) {
+            status.textContent = 'कृपया डिफ़ॉल्ट कस्टमर का नाम दर्ज करें।';
+            status.className = 'mt-2 text-xs text-red-600';
+        }
         return;
     }
 
     if (defAmount && (!Number.isFinite(Number(defAmount)) || Number(defAmount) < 0)) {
-        alert('कृपया बकाया राशि सही दर्ज करें।');
+        if (status) {
+            status.textContent = 'कृपया बकाया राशि सही दर्ज करें।';
+            status.className = 'mt-2 text-xs text-red-600';
+        }
         return;
     }
 
     const bannerText = defAmount ? `${custName} - बक़ाया राशि: ₹${defAmount}` : custName;
+    if (status) {
+        status.textContent = 'बैनर सेव किया जा रहा है…';
+        status.className = 'mt-2 text-xs text-slate-500';
+    }
 
     try {
         const { error } = await supabaseClient
             .from('settings')
-            .upsert({ key: 'default_customer_banner', value: bannerText });
+            .upsert({ key: 'default_customer_banner', value: bannerText }, { onConflict: 'key' });
 
-        if (error) {
-            alert(`डिफ़ॉल्टर बैनर सेव नहीं हुआ: ${error.message}`);
-            return;
-        }
+        if (error) throw error;
 
         const permBanner = document.getElementById('permanentCustomBanner');
         if (permBanner) permBanner.textContent = `⚠️ डिफ़ॉल्ट / डिफ़ॉल्टर सूचना: ${bannerText}`;
-        alert('सफलतापूर्वक! डिफ़ॉल्ट कस्टमर/डिफ़ॉल्टर बैनर अपडेट कर दिया गया है।');
-        await fetchDefaultCustomerBanner();
-        document.getElementById('adminDefaulterName').value = '';
-        document.getElementById('adminDefaulterAmount').value = '';
+        if (status) {
+            status.textContent = 'बैनर सफलतापूर्वक सेव और अपडेट हुआ।';
+            status.className = 'mt-2 text-xs text-emerald-700';
+        }
+        nameInput.value = '';
+        amountInput.value = '';
     } catch (err) {
-        console.error('एरर:', err);
-        alert(`डिफ़ॉल्टर बैनर अपडेट नहीं हुआ: ${err.message || 'अज्ञात त्रुटि'}`);
+        console.error('डिफ़ॉल्टर बैनर सेव एरर:', err.message || err);
+        if (status) {
+            status.textContent = `बैनर सेव नहीं हुआ: ${err.message || 'Supabase settings table/RLS policy जाँचें।'}`;
+            status.className = 'mt-2 text-xs text-red-600';
+        }
     }
 }
 
