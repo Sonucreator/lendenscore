@@ -66,6 +66,11 @@
     button.bg-amber-500:hover { background-color: #1d4ed8 !important; }
     .text-amber-400, .text-amber-300 { color: #2563eb !important; }
     .tab-active { border-color: #2563eb !important; color: #2563eb !important; }
+    #permanentCustomBanner {
+      color: #1e40af !important;
+      background-color: #eff6ff !important;
+      border-color: #bfdbfe !important;
+    }
     .border-amber-500\/40 { border-color: #bfdbfe !important; }
     button { transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease; }
     button:hover { filter: brightness(.98); }
@@ -1135,24 +1140,37 @@
       document.getElementById('statTotalDues').innerText = '₹' + totalDues.toLocaleString('en-IN');
     }
 
+    function escapeHTML(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[char]);
+    }
+
     function renderFilteredAdminShopkeepers(query) {
       const tbody = document.getElementById('adminShopkeepersList');
-      tbody.innerHTML = rawAdminShopkeepers.filter(s => !query || s.shop_id.toLowerCase().includes(query) || s.name.toLowerCase().includes(query) || (s.email||'').toLowerCase().includes(query)).map(s => {
-        let statusBadge = s.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
-        let actionBtnColor = s.status === 'pending' ? 'emerald' : 'amber';
-        let actionBtnText = s.status === 'active' ? 'Block' : (s.status === 'pending' ? 'Approve' : 'Unblock');
+      tbody.innerHTML = rawAdminShopkeepers.filter(s => {
+        const searchFields = [s.shop_id, s.name, s.shop_name, s.business_name, s.owner_name, s.email, s.city, s.phone];
+        return !query || searchFields.some(value => String(value ?? '').toLowerCase().includes(query));
+      }).map(s => {
+        const status = s.status || 'pending';
+        const statusBadge = status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : (status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400');
+        const actionBtnColor = status === 'pending' ? 'emerald' : 'amber';
+        const actionBtnText = status === 'active' ? 'Block' : (status === 'pending' ? 'Approve' : 'Unblock');
+        const ownerName = s.owner_name || s.full_name || s.name || '—';
+        const shopName = s.shop_name || s.business_name || '';
+        const jsArg = value => escapeHTML(JSON.stringify(String(value ?? '')));
         return `
         <tr class="text-slate-300">
-          <td class="py-3 px-2 font-mono text-amber-300 font-bold">${s.shop_id}</td>
-          <td><b>${s.name || 'Store'}</b></td>
-          <td class="text-slate-400">${s.email || '-'}</td>
-          <td class="font-mono text-slate-300 uppercase">${s.city || 'SAM'}</td>
-          <td class="font-mono text-slate-400">${s.phone}</td>
-          <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${s.status}</span></td>
+          <td class="py-3 px-2 font-mono text-amber-300 font-bold">${escapeHTML(s.shop_id || '—')}</td>
+          <td>${shopName ? `<b>${escapeHTML(shopName)}</b><span class="block text-slate-400">${escapeHTML(ownerName)}</span>` : `<b>${escapeHTML(ownerName)}</b>`}</td>
+          <td class="text-slate-400">${escapeHTML(s.email || '-')}</td>
+          <td class="font-mono text-slate-300 uppercase">${escapeHTML(s.city || 'SAM')}</td>
+          <td class="font-mono text-slate-400">${escapeHTML(s.phone || '-')}</td>
+          <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${escapeHTML(status)}</span></td>
           <td class="text-right pr-2 space-x-1">
-            <button onclick="openEditShopModal('${s.id}', '${s.name}', '${s.city}', '${s.phone}')" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit</button>
-            <button onclick="adminToggleBlockShopkeeper('${s.id}', '${s.status}')" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs cursor-pointer">${actionBtnText}</button>
-            <button onclick="adminDeleteShopkeeper('${s.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs cursor-pointer">Delete</button>
+            <button onclick="openEditShopModal(${jsArg(s.id)}, ${jsArg(s.name || ownerName)}, ${jsArg(s.city)}, ${jsArg(s.phone)})" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit</button>
+            <button onclick="adminToggleBlockShopkeeper(${jsArg(s.id)}, ${jsArg(status)})" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs cursor-pointer">${actionBtnText}</button>
+            <button onclick="adminDeleteShopkeeper(${jsArg(s.id)})" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs cursor-pointer">Delete</button>
           </td>
         </tr>`
       }).join('') || `<tr><td colspan="7" class="text-center py-6 text-slate-500">कोई रिकॉर्ड नहीं।</td></tr>`;
@@ -1172,7 +1190,7 @@
           if (diff > custMap[key].unpaidDays) custMap[key].unpaidDays = diff;
         }
       });
-      let custList = Object.values(custMap).filter(c => !query || c.name.toLowerCase().includes(query) || c.phone.includes(query) || c.aadhaar.toLowerCase().includes(query) || c.pan.toLowerCase().includes(query));
+      let custList = Object.values(custMap).filter(c => !query || [c.name, c.phone, c.aadhaar, c.pan].some(value => String(value ?? '').toLowerCase().includes(query)));
       tbody.innerHTML = custList.map(c => {
         const uniqueShopsCount = c.shopsSet.size;
         const score = calculateSmartScore(c.unpaidDays, c.dues, uniqueShopsCount);
@@ -1195,17 +1213,24 @@
 
     function renderFilteredAdminTransactions(query) {
       const tbody = document.getElementById('adminTxList');
-      tbody.innerHTML = rawAdminTxs.filter(t => !query || t.shop_id.toLowerCase().includes(query) || t.customer_name.toLowerCase().includes(query) || t.customer_phone.includes(query)).map(t => `
-        <tr class="text-slate-300 ${t.status === 'cleared' ? 'opacity-60 bg-slate-950/40' : ''}">
-          <td class="py-3 px-2 font-mono text-amber-300">${t.shop_id}</td>
-          <td class="font-bold text-white">${t.customer_name}</td>
-          <td class="font-mono text-slate-400">${t.customer_phone}</td>
-          <td class="font-mono text-amber-300/80">${t.customer_aadhaar || t.customer_pan || '-'}</td>
-          <td class="text-amber-400 font-bold font-mono">₹${Number(t.amount).toLocaleString('en-IN')}</td>
-          <td>${new Date(t.created_at).toLocaleDateString('hi-IN')}</td>
-          <td><span class="text-[10px] ${t.status === 'cleared' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-400'} px-2 py-0.5 rounded-full font-bold">${t.status.toUpperCase()}</span></td>
-          <td class="text-right pr-2 space-x-1"><button onclick="adminDeleteTx('${t.id}')" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-[11px] cursor-pointer">Del</button></td>
-        </tr>`).join('') || `<tr><td colspan="8" class="text-center py-6 text-slate-500">कोई लेन-देन नहीं।</td></tr>`;
+      tbody.innerHTML = rawAdminTxs.filter(t => {
+        const searchFields = [t.shop_id, t.customer_name, t.customer_phone, t.customer_aadhaar, t.customer_pan];
+        return !query || searchFields.some(value => String(value ?? '').toLowerCase().includes(query));
+      }).map(t => {
+        const status = t.status || 'pending';
+        const jsId = escapeHTML(JSON.stringify(String(t.id ?? '')));
+        return `
+        <tr class="text-slate-300 ${status === 'cleared' ? 'opacity-60 bg-slate-950/40' : ''}">
+          <td class="py-3 px-2 font-mono text-amber-300">${escapeHTML(t.shop_id || '—')}</td>
+          <td class="font-bold text-white">${escapeHTML(t.customer_name || '—')}</td>
+          <td class="font-mono text-slate-400">${escapeHTML(t.customer_phone || '—')}</td>
+          <td class="font-mono text-amber-300/80">${escapeHTML(t.customer_aadhaar || t.customer_pan || '-')}</td>
+          <td class="text-amber-400 font-bold font-mono">₹${Number(t.amount || 0).toLocaleString('en-IN')}</td>
+          <td>${t.created_at ? new Date(t.created_at).toLocaleDateString('hi-IN') : '—'}</td>
+          <td><span class="text-[10px] ${status === 'cleared' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-400'} px-2 py-0.5 rounded-full font-bold">${escapeHTML(status.toUpperCase())}</span></td>
+          <td class="text-right pr-2 space-x-1"><button onclick="adminDeleteTx(${jsId})" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-[11px] cursor-pointer">Del</button></td>
+        </tr>`;
+      }).join('') || `<tr><td colspan="8" class="text-center py-6 text-slate-500">कोई लेन-देन नहीं।</td></tr>`;
     }
 
     async function adminToggleBlockShopkeeper(id, currentStatus) {
@@ -1421,6 +1446,11 @@ async function updateDefaultCustomerBanner() {
         return;
     }
 
+    if (defAmount && (!Number.isFinite(Number(defAmount)) || Number(defAmount) < 0)) {
+        alert('कृपया बकाया राशि सही दर्ज करें।');
+        return;
+    }
+
     const bannerText = defAmount ? `${custName} - बक़ाया राशि: ₹${defAmount}` : custName;
 
     try {
@@ -1429,16 +1459,19 @@ async function updateDefaultCustomerBanner() {
             .upsert({ key: 'default_customer_banner', value: bannerText });
 
         if (error) {
-            alert('डिफ़ॉल्टर बैनर सेव करने में विफल।');
+            alert(`डिफ़ॉल्टर बैनर सेव नहीं हुआ: ${error.message}`);
             return;
         }
 
+        const permBanner = document.getElementById('permanentCustomBanner');
+        if (permBanner) permBanner.textContent = `⚠️ डिफ़ॉल्ट / डिफ़ॉल्टर सूचना: ${bannerText}`;
         alert('सफलतापूर्वक! डिफ़ॉल्ट कस्टमर/डिफ़ॉल्टर बैनर अपडेट कर दिया गया है।');
-        fetchDefaultCustomerBanner();
+        await fetchDefaultCustomerBanner();
         document.getElementById('adminDefaulterName').value = '';
         document.getElementById('adminDefaulterAmount').value = '';
     } catch (err) {
         console.error('एरर:', err);
+        alert(`डिफ़ॉल्टर बैनर अपडेट नहीं हुआ: ${err.message || 'अज्ञात त्रुटि'}`);
     }
 }
 
