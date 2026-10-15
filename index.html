@@ -227,11 +227,9 @@
       </div>
     </div>
   </header>
-  <!-- ================= SINGLE PERMANENT BANNER ================= -->
-  <div class="max-w-7xl mx-auto px-4 mt-3 w-full">
-    <div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-xl text-sm font-semibold flex justify-between items-center shadow-md">
-      <span>⭐ Default Customer: <b>श्री राधे राधे ज्वेलर्स / डिफ़ॉल्ट ग्राहक</b></span>
-    </div>
+  <!-- Admin-controlled banner is hidden until a signed-in user loads an enabled banner. -->
+  <div id="defaultBannerWrap" class="hidden max-w-7xl mx-auto px-4 mt-3 w-full">
+    <div id="permanentCustomBanner" class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md"></div>
   </div>
 
   <!-- ================= GLOBAL NOTIFICATION MODAL ================= -->
@@ -367,15 +365,6 @@
     </div>
 
     <!-- 3. FULL MASTER ADMIN DASHBOARD -->
-    <div id="defaultBannerAdminControls" class="hidden bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg mt-4">
-    <h3 class="text-md font-bold text-amber-400 mb-3">⚙️ डिफ़ॉल्ट कस्टमर / डिफ़ॉल्टर बैनर सेट करें (केवल एडमिन)</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-        <input type="text" id="adminDefaulterName" placeholder="कस्टमर का नाम..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-        <input type="number" id="adminDefaulterAmount" placeholder="बकाया राशि (रुपये में)..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-    </div>
-    <button onclick="updateDefaultCustomerBanner()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm w-full">बैनर अपडेट करें</button>
-    <p id="defaultBannerStatus" class="mt-2 text-xs" aria-live="polite"></p>
-</div>
     <div id="adminDashboard" class="hidden space-y-6">
 
       <div id="adminMasterHeader" class="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
@@ -392,27 +381,6 @@
           <button onclick="syncCloudData()" class="bg-slate-800 hover:bg-slate-750 text-amber-400 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 transition cursor-pointer">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> डेटा सिंक
           </button>
-        </div>
-      </div>
-
-      <!-- Shopkeeper Appeals Table in Admin -->
-      <div id="adminAppealsPanel" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
-        <h3 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2">
-          <i data-lucide="clipboard-list" class="w-4 h-4"></i> शॉपकीपर अपील लिस्ट (Admin Panel)
-        </h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm text-slate-300">
-            <thead class="bg-slate-800 text-xs uppercase text-slate-400 font-mono">
-              <tr>
-                <th class="py-3 px-3">शॉपकीपर कोड</th>
-                <th class="py-3 px-3">अपील / कारण</th>
-                <th class="py-3 px-3">समय</th>
-              </tr>
-            </thead>
-            <tbody id="adminAppealsTableBody" class="divide-y divide-slate-800/60 font-medium">
-              <tr><td colspan="3" class="text-center py-4 text-slate-500">अपील लोड हो रही हैं...</td></tr>
-            </tbody>
-          </table>
         </div>
       </div>
 
@@ -449,7 +417,44 @@
         <button id="adminTab3" onclick="switchAdminSection('transactions')" class="pb-2.5 text-slate-400 cursor-pointer">बल्क CSV व लेन-देन</button>
         <button id="adminTab4" onclick="switchAdminSection('analytics')" class="pb-2.5 text-slate-400 cursor-pointer">एनालिटिक्स & चार्ट्स</button>
         <button id="adminTab5" onclick="switchAdminSection('audit')" class="pb-2.5 text-slate-400 cursor-pointer">एक्टिविटी लॉग</button>
-        <button id="adminTab6" onclick="switchAdminSection('settings')" class="pb-2.5 text-slate-400 cursor-pointer">इंजन रूल्स & ब्रॉडकास्ट</button>
+        <button id="adminTab6" onclick="switchAdminSection('recharge')" class="pb-2.5 text-slate-400 cursor-pointer">रिचार्ज</button>
+        <button id="adminTab7" onclick="switchAdminSection('settings')" class="pb-2.5 text-slate-400 cursor-pointer">सेटिंग्स</button>
+        <button id="adminTab8" onclick="switchAdminSection('notices')" class="pb-2.5 text-slate-400 cursor-pointer">नोटिस / अपील</button>
+      </div>
+
+      <div id="secNotices" class="hidden space-y-5">
+        <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-3" role="tablist" aria-label="नोटिस प्रबंधन">
+          <button type="button" id="noticeTabAppeals" onclick="switchNoticePanel('appeals')" class="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white" role="tab" aria-selected="true">अपील</button>
+          <button type="button" id="noticeTabDefaulter" onclick="switchNoticePanel('defaulter')" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600" role="tab" aria-selected="false">डिफ़ॉल्टर बैनर</button>
+          <button type="button" id="noticeTabBroadcast" onclick="switchNoticePanel('broadcast')" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600" role="tab" aria-selected="false">ग्लोबल नोटिफिकेशन</button>
+        </div>
+        <div id="noticePanelAppeals" role="tabpanel">
+          <section id="adminAppealsPanel" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
+            <h3 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-4 h-4"></i> दुकानदार अपील</h3>
+            <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead><tr><th class="py-3 px-3">दुकानदार कोड</th><th class="py-3 px-3">अपील / कारण</th><th class="py-3 px-3">समय</th></tr></thead><tbody id="adminAppealsTableBody"><tr><td colspan="3" class="text-center py-4">अपील लोड हो रही हैं...</td></tr></tbody></table></div>
+          </section>
+        </div>
+        <div id="noticePanelDefaulter" class="hidden" role="tabpanel">
+          <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
+            <h2 class="text-sm font-bold text-amber-400">डिफ़ॉल्टर बैनर / नोटिस</h2>
+            <textarea id="adminDefaulterName" rows="2" placeholder="डिफ़ॉल्टर / ग्राहक का संदेश लिखें" class="w-full rounded-xl border p-3 text-sm"></textarea>
+            <div class="flex flex-wrap items-center gap-3">
+              <label class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" id="adminBannerEnabled" class="h-4 w-4" /> बैनर चालू रखें</label>
+              <button type="button" onclick="updateDefaultCustomerBanner()" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white">सेव / एडिट</button>
+              <button type="button" onclick="toggleDefaultCustomerBanner()" class="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white">बैनर चालू / बंद</button>
+              <button type="button" onclick="removeDefaultCustomerBanner()" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-bold text-white">नोटिस हटाएँ</button>
+            </div>
+            <p id="defaultBannerStatus" class="text-xs" aria-live="polite"></p>
+            <p class="text-xs text-slate-500">यह बैनर केवल लॉगिन किए हुए उपयोगकर्ताओं को दिखेगा; लॉगिन स्क्रीन पर नहीं।</p>
+          </section>
+        </div>
+        <div id="noticePanelBroadcast" class="hidden" role="tabpanel">
+          <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
+            <h2 class="text-sm font-bold text-amber-400">ग्लोबल नोटिफिकेशन</h2>
+            <textarea id="broadcastInput" rows="3" placeholder="सभी दुकानदारों के लिए सूचना लिखें..." class="w-full rounded-xl border p-3 text-sm"></textarea>
+            <div class="flex flex-wrap gap-2"><button onclick="publishGlobalBroadcast()" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white">नोटिफिकेशन भेजें</button><button onclick="clearGlobalAlert()" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-bold text-white">नोटिफिकेशन हटाएँ</button></div>
+          </section>
+        </div>
       </div>
 
       <!-- SECTION A: SHOPKEEPERS MASTER -->
@@ -483,10 +488,9 @@
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
           <div class="flex justify-between items-center">
             <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-              <i data-lucide="contact" class="w-4 h-4 text-emerald-400"></i> सभी ग्राहक व अपील रिक्वेस्ट (Dispute Center)
+              <i data-lucide="contact" class="w-4 h-4 text-emerald-400"></i> सभी ग्राहक व स्कोर कंट्रोल
             </h2>
           </div>
-          <div id="adminAppealsBox" class="space-y-2 mb-4"></div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
               <thead class="text-slate-400 uppercase border-b border-slate-800 bg-slate-950/40 font-mono">
@@ -610,7 +614,25 @@
         </section>
       </div>
 
-      <!-- SECTION F: SCORING ENGINE RULES & GLOBAL BROADCAST -->
+      <!-- SECTION F: ADMIN RECHARGE MANAGEMENT -->
+      <div id="secRecharge" class="hidden space-y-5">
+        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
+          <h2 class="text-sm font-bold text-amber-400">किसी भी दुकानदार का वॉल्ट रिचार्ज</h2>
+          <p class="text-xs text-slate-500">यह pending recharge request बनाएगा। भुगतान सत्यापित करने के बाद नीचे से कन्फर्म करें; वॉल्ट क्रेडिट सुरक्षित Supabase RPC से होगा।</p>
+          <form onsubmit="adminCreateRechargeRequestFromForm(event)" class="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <select id="adminRechargeShopSelect" required class="rounded-xl border px-3 py-2 text-sm"><option value="">दुकानदार चुनें</option></select>
+            <input id="adminRechargeAmount" type="number" min="1" step="1" required placeholder="रिचार्ज राशि (₹)" class="rounded-xl border px-3 py-2 text-sm" />
+            <button type="submit" class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white">रिचार्ज अनुरोध बनाएँ</button>
+          </form>
+          <p id="adminRechargeStatus" class="text-xs" aria-live="polite"></p>
+        </section>
+        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
+          <h2 class="text-sm font-bold text-amber-400">रिचार्ज अनुरोध और पुष्टि</h2>
+          <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead><tr><th class="py-2">दुकान का नाम</th><th>मालिक</th><th>दुकान ID</th><th>राशि</th><th>स्थिति</th><th>एक्शन</th></tr></thead><tbody id="adminRechargeRequests"><tr><td colspan="6" class="py-3 text-slate-500">रिचार्ज अनुरोध लोड हो रहे हैं।</td></tr></tbody></table></div>
+        </section>
+      </div>
+
+      <!-- SECTION G: DEFAULTER BANNER, SCORING RULES & BROADCAST -->
       <div id="secSettings" class="hidden space-y-5">
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
           <h2 class="text-sm font-bold text-amber-400">ऐप की दिखावट</h2>
@@ -619,11 +641,6 @@
             <option value="old">पुराना लुक</option>
             <option value="vyapar">नया Vyapar लुक</option>
           </select>
-        </section>
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
-          <h2 class="text-sm font-bold text-amber-400">दुकानदार वॉल्ट रिचार्ज अनुरोध</h2>
-          <p class="text-xs text-slate-500">भुगतान की जाँच के बाद ही अनुरोध कन्फर्म करें; कन्फर्मेशन सुरक्षित सर्वर RPC से होता है।</p>
-          <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead><tr><th class="py-2">दुकान का नाम</th><th>मालिक</th><th>दुकान ID</th><th>राशि</th><th>स्थिति</th><th>एक्शन</th></tr></thead><tbody id="adminRechargeRequests"><tr><td colspan="6" class="py-3 text-slate-500">रिक्वेस्ट लोड करने के लिए सेटिंग खोलें।</td></tr></tbody></table></div>
         </section>
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4">
           <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
@@ -646,13 +663,6 @@
           <button onclick="alert('✓ स्कोरिंग रूल्स सफलतापूर्वक अपडेट हो गए हैं!')" class="bg-slate-800 hover:bg-slate-750 text-amber-400 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer">नियम सेव करें</button>
         </section>
 
-        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
-          <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
-            <i data-lucide="megaphone" class="w-4 h-4"></i> ग्लोबल रिस्क ब्रॉडकास्ट नोटिफिकेशन (Global Risk Broadcast)
-          </h2>
-          <textarea id="broadcastInput" rows="3" placeholder="सभी दुकानदारों के लिए चेतावनी या सूचना यहाँ टाइप करें..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white outline-none focus:border-amber-400"></textarea>
-          <button onclick="publishGlobalBroadcast()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer shadow">पूरे नेटवर्क पर ब्रॉडकास्ट भेजें</button>
-        </section>
       </div>
 
     </div>
@@ -697,8 +707,24 @@
       <h3 class="text-sm font-bold text-amber-400">दुकानदार विवरण संपादित करें (Edit Shopkeeper)</h3>
       <input type="hidden" id="editShopRowId" />
       <div>
-        <label class="block text-[10px] text-slate-400 mb-1">दुकान / मालिक का नाम</label>
+        <label class="block text-[10px] text-slate-400 mb-1">रिकॉर्ड नाम / मालिक</label>
         <input type="text" id="editShopNameInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
+      </div>
+      <div>
+        <label class="block text-[10px] text-slate-400 mb-1">दुकान का नाम</label>
+        <input type="text" id="editShopBusinessNameInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
+      </div>
+      <div>
+        <label class="block text-[10px] text-slate-400 mb-1">मालिक का नाम</label>
+        <input type="text" id="editShopOwnerNameInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
+      </div>
+      <div>
+        <label class="block text-[10px] text-slate-400 mb-1">ईमेल</label>
+        <input type="email" id="editShopEmailInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none" />
+      </div>
+      <div>
+        <label class="block text-[10px] text-slate-400 mb-1">स्थिति</label>
+        <select id="editShopStatusInput" class="w-full rounded-xl border px-3 py-2 text-xs"><option value="pending">Pending</option><option value="active">Active</option><option value="blocked">Blocked</option></select>
       </div>
       <div>
         <label class="block text-[10px] text-slate-400 mb-1">शहर (City)</label>
@@ -707,6 +733,10 @@
       <div>
         <label class="block text-[10px] text-slate-400 mb-1">मोबाइल नंबर</label>
         <input type="tel" id="editShopPhoneInput" maxlength="10" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono" />
+      </div>
+      <div>
+        <label class="block text-[10px] text-slate-400 mb-1">PIN</label>
+        <input type="text" id="editShopPinInput" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono" />
       </div>
       <div class="flex gap-2 pt-2">
         <button onclick="saveShopkeeperEdit()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs cursor-pointer">अपडेट सेव करें</button>
@@ -763,7 +793,7 @@
 
     function setAppLook(look) {
       const selectedLook = look === 'vyapar' ? 'vyapar' : 'old';
-      const activeAdminId = ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit', 'secSettings']
+      const activeAdminId = ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit', 'secRecharge', 'secSettings', 'secNotices']
         .find(id => !document.getElementById(id).classList.contains('hidden')) || 'secShopkeepers';
       const activeNav = document.querySelector('#mobileBottomNav [data-nav].is-active')?.dataset.nav || 'home';
       document.body.classList.toggle('theme-vyapar', selectedLook === 'vyapar');
@@ -841,6 +871,12 @@
         `स्थिति: ${status}`
       ].join('\n');
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+    }
+
+    async function loadGlobalBroadcastIndicator() {
+      const { data, error } = await supabaseClient.from('settings').select('key').eq('key', 'global_broadcast').maybeSingle();
+      const dot = document.getElementById('broadcastDot');
+      if (dot) dot.classList.toggle('hidden', Boolean(error || !data));
     }
 
     function createBackupFileName() {
@@ -926,9 +962,9 @@
       } else if (event === 'SIGNED_OUT') {
         currentUser = null;
         document.getElementById('authView').classList.remove('hidden');
+        document.getElementById('defaultBannerWrap')?.classList.add('hidden');
         document.getElementById('shopkeeperDashboard').classList.add('hidden');
         document.getElementById('adminDashboard').classList.add('hidden');
-        document.getElementById('defaultBannerAdminControls').classList.add('hidden');
         document.getElementById('userBadge').classList.add('hidden');
         document.getElementById('mobileBottomNav').classList.add('hidden');
       }
@@ -941,24 +977,29 @@
     // ------------------------------------------------------------
     // GLOBAL BROADCAST NOTIFICATIONS & POPUPS
     // ------------------------------------------------------------
-    function showGlobalBroadcastNotification() {
-      const data = localStorage.getItem('ld_global_broadcast');
+    async function showGlobalBroadcastNotification() {
+      let obj = null;
+      const { data, error } = await supabaseClient.from('settings').select('value').eq('key', 'global_broadcast').maybeSingle();
+      if (!error && data?.value) {
+        try { obj = typeof data.value === 'string' ? JSON.parse(data.value) : data.value; } catch (_) { obj = { message: String(data.value) }; }
+      }
+      if (!obj) {
+        try { obj = JSON.parse(localStorage.getItem('ld_global_broadcast') || 'null'); } catch (_) {}
+      }
       const modal = document.getElementById('globalNotificationModal');
       const msgDiv = document.getElementById('globalModalMessage');
-
-      if (data && modal && msgDiv) {
-        const obj = JSON.parse(data);
+      const clearButton = modal?.querySelector('[onclick="clearGlobalAlert()"]');
+      if (clearButton) clearButton.classList.toggle('hidden', currentUser?.role !== 'admin');
+      if (obj?.message && modal && msgDiv) {
         const message = document.createElement('p');
         message.className = 'mb-2';
-        message.textContent = obj.message || '';
+        message.textContent = obj.message;
         const timestamp = document.createElement('span');
         timestamp.className = 'text-xs text-slate-400';
-        timestamp.textContent = `समय: ${new Date(obj.time).toLocaleString('hi-IN')}`;
+        timestamp.textContent = obj.time ? `समय: ${new Date(obj.time).toLocaleString('hi-IN')}` : '';
         msgDiv.replaceChildren(message, timestamp);
         modal.classList.remove('hidden');
-      } else {
-        alert('कोई नया ग्लोबल ब्रॉडकास्ट अलर्ट उपलब्ध नहीं है।');
-      }
+      } else alert('कोई नया ग्लोबल नोटिफिकेशन उपलब्ध नहीं है।');
     }
 
     function closeGlobalModal() {
@@ -968,23 +1009,28 @@
       }
     }
 
-    function clearGlobalAlert() {
+    async function clearGlobalAlert() {
+      if (currentUser?.role !== 'admin') return;
+      if (!confirm('ग्लोबल नोटिफिकेशन सभी उपयोगकर्ताओं के लिए हटाएँ?')) return;
+      const { error } = await supabaseClient.from('settings').delete().eq('key', 'global_broadcast');
+      if (error) { alert('नोटिफिकेशन नहीं हटाया गया: ' + error.message); return; }
       localStorage.removeItem('ld_global_broadcast');
       closeGlobalModal();
-      const dot = document.getElementById('broadcastDot');
-      if (dot) dot.classList.add('hidden');
-      alert('✓ ग्लोबल ब्रॉडकास्ट अलर्ट हटा दिया गया है।');
+      document.getElementById('broadcastDot')?.classList.add('hidden');
+      alert('ग्लोबल नोटिफिकेशन हटा दिया गया।');
     }
 
     async function publishGlobalBroadcast() {
       const msg = document.getElementById('broadcastInput').value.trim();
-      if(!msg) { alert('कृपया संदेश दर्ज करें!'); return; }
-      localStorage.setItem('ld_global_broadcast', JSON.stringify({ message: msg, time: new Date().toISOString() }));
-      alert('✓ ग्लोबल ब्रॉडकास्ट पूरे नेटवर्क पर लाइव कर दिया गया है!');
-      document.getElementById('broadcastInput').value = "";
-      const dot = document.getElementById('broadcastDot');
-      if (dot) dot.classList.remove('hidden');
-      logActivity("ADMIN", "Published Global Broadcast Notification");
+      if (!msg) { alert('कृपया संदेश दर्ज करें!'); return; }
+      const notice = { message: msg, time: new Date().toISOString() };
+      const { error } = await supabaseClient.from('settings').upsert({ key: 'global_broadcast', value: JSON.stringify(notice) }, { onConflict: 'key' });
+      if (error) { alert('नोटिफिकेशन प्रकाशित नहीं हुआ: ' + error.message); return; }
+      localStorage.setItem('ld_global_broadcast', JSON.stringify(notice));
+      document.getElementById('broadcastInput').value = '';
+      document.getElementById('broadcastDot')?.classList.remove('hidden');
+      logActivity('ADMIN', 'Published Global Broadcast Notification');
+      alert('ग्लोबल नोटिफिकेशन Supabase में प्रकाशित हुआ।');
     }
 
     // ------------------------------------------------------------
@@ -1197,6 +1243,9 @@
 
     function initDashboard() {
       document.getElementById('authView').classList.add('hidden');
+      document.getElementById('defaultBannerWrap')?.classList.add('hidden');
+      fetchDefaultCustomerBanner();
+      loadGlobalBroadcastIndicator();
       document.getElementById('mobileBottomNav').classList.remove('hidden');
       document.getElementById('userBadge').classList.remove('hidden');
       const displayId = currentUser.shop_id || 'ACTIVE';
@@ -1208,7 +1257,6 @@
 
       if (currentUser.role === 'admin' || displayId === 'JBSMK000001') {
         document.getElementById('adminDashboard').classList.remove('hidden');
-        document.getElementById('defaultBannerAdminControls').classList.remove('hidden');
         renderAdminAll();
         switchAdminSection('shopkeepers');
       } else {
@@ -1220,19 +1268,63 @@
       lucide.createIcons();
     }
 
+    function populateAdminRechargeShops() {
+      const select = document.getElementById('adminRechargeShopSelect');
+      if (!select) return;
+      const selectedId = select.value;
+      select.innerHTML = '<option value="">दुकानदार चुनें</option>' + rawAdminShopkeepers.map(shop => {
+        const label = shop.shop_name || shop.business_name || shop.name || shop.owner_name || shop.shop_id;
+        return `<option value="${escapeHTML(shop.shop_id || '')}">${escapeHTML(label)} — ${escapeHTML(shop.shop_id || '')}</option>`;
+      }).join('');
+      if (selectedId) select.value = selectedId;
+    }
+
+    async function adminCreateRechargeRequestFromForm(event) {
+      event.preventDefault();
+      const shopId = document.getElementById('adminRechargeShopSelect').value;
+      const amount = Number(document.getElementById('adminRechargeAmount').value);
+      const status = document.getElementById('adminRechargeStatus');
+      const shop = rawAdminShopkeepers.find(item => item.shop_id === shopId);
+      if (!shop || !Number.isInteger(amount) || amount < 1) {
+        status.textContent = 'दुकानदार चुनें और ₹1 या उससे अधिक की पूर्ण राशि दर्ज करें।';
+        status.className = 'text-xs text-red-600';
+        return;
+      }
+      status.textContent = 'रिचार्ज अनुरोध बनाया जा रहा है…';
+      status.className = 'text-xs text-slate-500';
+      const { error } = await supabaseClient.from('recharge_requests').insert([{
+        shop_id: shop.shop_id,
+        shop_name: shop.shop_name || shop.business_name || shop.name || '—',
+        owner_name: shop.owner_name || shop.full_name || shop.name || '—',
+        amount,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      }]);
+      if (error) {
+        status.textContent = `अनुरोध नहीं बना: ${error.message}`;
+        status.className = 'text-xs text-red-600';
+        console.error('Admin recharge request error:', error.message);
+        return;
+      }
+      status.textContent = `₹${amount} का अनुरोध बन गया। भुगतान जाँचकर नीचे कन्फर्म करें।`;
+      status.className = 'text-xs text-emerald-700';
+      document.getElementById('adminRechargeAmount').value = '';
+      await loadRechargeRequests();
+    }
+
     async function loadRechargeRequests() {
       const tbody = document.getElementById('adminRechargeRequests');
       if (!tbody) return;
       const { data, error } = await supabaseClient.from('recharge_requests').select('*').order('created_at', { ascending: false }).limit(100);
       if (error) {
-        tbody.innerHTML = '<tr><td colspan="6" class="py-3 text-amber-700">रिचार्ज सूची उपलब्ध नहीं; recharge_requests टेबल की नीति/कॉलम जाँचें।</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="6" class="py-3 text-red-600">सूची लोड नहीं हुई: ${escapeHTML(error.message)} (recharge_requests access/schema जाँचें)</td></tr>`;
         console.error('Recharge list error:', error.message);
         return;
       }
       tbody.innerHTML = (data || []).map(request => {
         const id = String(request.id ?? '');
         const status = String(request.status || 'pending');
-        return `<tr class="border-t"><td class="py-2">${escapeHTML(request.shop_name || '—')}</td><td>${escapeHTML(request.owner_name || '—')}</td><td class="font-mono">${escapeHTML(request.shop_id || '—')}</td><td>₹${Number(request.amount || 0).toLocaleString('en-IN')}</td><td>${escapeHTML(status)}</td><td>${status === 'pending' ? `<button onclick="confirmRechargeRequest(${escapeHTML(JSON.stringify(id))})" class="rounded bg-blue-600 px-2 py-1 text-white">कन्फर्म</button>` : '—'}</td></tr>`;
+        return `<tr class="border-t"><td class="py-2">${escapeHTML(request.shop_name || '—')}</td><td>${escapeHTML(request.owner_name || '—')}</td><td class="font-mono">${escapeHTML(request.shop_id || '—')}</td><td>₹${Number(request.amount || 0).toLocaleString('en-IN')}</td><td>${escapeHTML(status)}</td><td>${status === 'pending' ? `<button onclick="confirmRechargeRequest(${escapeHTML(JSON.stringify(id))})" class="rounded bg-blue-600 px-2 py-1 text-white">भुगतान जाँचकर कन्फर्म</button>` : '—'}</td></tr>`;
       }).join('') || '<tr><td colspan="6" class="py-3 text-slate-500">कोई रिचार्ज अनुरोध नहीं।</td></tr>';
     }
 
@@ -1251,19 +1343,42 @@
       await renderAdminAll();
     }
 
+    function switchNoticePanel(panel) {
+      const panels = ['appeals', 'defaulter', 'broadcast'];
+      panels.forEach(name => {
+        const isActive = name === panel;
+        document.getElementById('noticePanel' + name.charAt(0).toUpperCase() + name.slice(1))?.classList.toggle('hidden', !isActive);
+        const tab = document.getElementById('noticeTab' + name.charAt(0).toUpperCase() + name.slice(1));
+        if (tab) {
+          tab.className = isActive
+            ? 'rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white'
+            : 'rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600';
+          tab.setAttribute('aria-selected', String(isActive));
+        }
+      });
+      if (panel === 'appeals') loadAdminAppeals(rawAppeals);
+      if (panel === 'defaulter') loadDefaultBannerSettings();
+    }
+
     function switchAdminSection(sec) {
       const activeSection = 'sec' + sec.charAt(0).toUpperCase() + sec.slice(1);
-      ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit', 'secSettings'].forEach((section, idx) => {
+      const sections = ['secShopkeepers', 'secCustomers', 'secTransactions', 'secAnalytics', 'secAudit', 'secRecharge', 'secSettings', 'secNotices'];
+      sections.forEach((section, idx) => {
         document.getElementById(section).classList.toggle('hidden', section !== activeSection);
-        document.getElementById('adminTab' + (idx + 1)).className = section === activeSection ? 'pb-2.5 tab-active cursor-pointer' : 'pb-2.5 text-slate-400 cursor-pointer';
+        const tab = document.getElementById('adminTab' + (idx + 1));
+        if (tab) tab.className = section === activeSection ? 'pb-2.5 tab-active cursor-pointer' : 'pb-2.5 text-slate-400 cursor-pointer';
       });
       const compactTabs = document.body.classList.contains('theme-vyapar');
-      ['adminMasterHeader', 'adminAppealsPanel', 'adminSearchPanel', 'adminStatsPanel'].forEach(id => {
+      ['adminMasterHeader', 'adminSearchPanel', 'adminStatsPanel'].forEach(id => {
         document.getElementById(id).classList.toggle('hidden', compactTabs);
       });
-      document.getElementById('defaultBannerAdminControls').classList.toggle('hidden', compactTabs && sec !== 'settings');
       if (compactTabs) window.scrollTo(0, 0);
-      if (sec === 'settings') loadRechargeRequests();
+      if (sec === 'recharge') {
+        populateAdminRechargeShops();
+        loadRechargeRequests();
+      }
+      if (sec === 'notices') switchNoticePanel('appeals');
+      if (sec === 'settings') loadDefaultBannerSettings();
     }
 
     async function renderAdminAll() {
@@ -1299,11 +1414,16 @@
       loadAdminAppeals(rawAppeals);
     }
 
-    function openEditShopModal(id, name, city, phone, pin) {
+    function openEditShopModal(id, name, city, phone, businessName, ownerName, email, status, pin) {
       document.getElementById('editShopRowId').value = id;
       document.getElementById('editShopNameInput').value = name || '';
+      document.getElementById('editShopBusinessNameInput').value = businessName || '';
+      document.getElementById('editShopOwnerNameInput').value = ownerName || '';
+      document.getElementById('editShopEmailInput').value = email || '';
+      document.getElementById('editShopStatusInput').value = status || 'pending';
       document.getElementById('editShopCityInput').value = city || '';
       document.getElementById('editShopPhoneInput').value = phone || '';
+      document.getElementById('editShopPinInput').value = pin || '';
       document.getElementById('editShopModal').classList.remove('hidden');
     }
 
@@ -1316,15 +1436,27 @@
       const name = document.getElementById('editShopNameInput').value.trim();
       const city = document.getElementById('editShopCityInput').value.trim().toUpperCase();
       const phone = document.getElementById('editShopPhoneInput').value.trim();
+      const businessName = document.getElementById('editShopBusinessNameInput').value.trim();
+      const ownerName = document.getElementById('editShopOwnerNameInput').value.trim();
+      const email = document.getElementById('editShopEmailInput').value.trim();
+      const status = document.getElementById('editShopStatusInput').value;
+      const pin = document.getElementById('editShopPinInput').value.trim();
+      const existing = rawAdminShopkeepers.find(shop => String(shop.id) === String(rowId));
+      const changes = { name, city, phone, email, status };
+      if (existing && Object.prototype.hasOwnProperty.call(existing, 'pin')) changes.pin = pin;
+      if (existing && Object.prototype.hasOwnProperty.call(existing, 'shop_name')) changes.shop_name = businessName;
+      if (existing && Object.prototype.hasOwnProperty.call(existing, 'business_name')) changes.business_name = businessName;
+      if (existing && Object.prototype.hasOwnProperty.call(existing, 'owner_name')) changes.owner_name = ownerName;
+      if (existing && Object.prototype.hasOwnProperty.call(existing, 'full_name')) changes.full_name = ownerName;
 
-      const { error } = await supabaseClient.from('shopkeepers').update({ name: name, city: city, phone: phone }).eq('id', rowId);
-      if(!error) {
-        alert('✓ विवरण सफलतापूर्वक अपडेट कर दिया गया है!');
-        closeEditShopModal();
-        renderAdminAll();
-      } else {
-        alert('❌ त्रुटि: ' + error.message);
+      const { error } = await supabaseClient.from('shopkeepers').update(changes).eq('id', rowId);
+      if (error) {
+        alert('अपडेट सेव नहीं हुआ: ' + error.message);
+        return;
       }
+      alert('✓ दुकानदार की उपलब्ध जानकारी अपडेट हुई।');
+      closeEditShopModal();
+      await renderAdminAll();
     }
 
     function openEditCustomerModal(phoneKey, currentName, currentAadhaar, currentPan) {
@@ -1421,7 +1553,7 @@
           <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${escapeHTML(status)}</span></td>
           <td class="text-right pr-2 space-x-1">
             <button onclick="adminCreateRechargeRequest(${jsArg(s.shop_id)}, ${jsArg(s.shop_name || s.business_name || s.name)}, ${jsArg(s.owner_name || s.full_name || s.name)})" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs cursor-pointer">रिचार्ज</button>
-            <button onclick="openEditShopModal(${jsArg(s.id)}, ${jsArg(s.name || ownerName)}, ${jsArg(s.city)}, ${jsArg(s.phone)})" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit</button>
+            <button onclick="openEditShopModal(${jsArg(s.id)}, ${jsArg(s.name)}, ${jsArg(s.city)}, ${jsArg(s.phone)}, ${jsArg(shopName)}, ${jsArg(ownerName)}, ${jsArg(s.email)}, ${jsArg(status)}, ${jsArg(s.pin)})" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">Edit all</button>
             <button onclick="adminToggleBlockShopkeeper(${jsArg(s.id)}, ${jsArg(status)})" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs cursor-pointer">${actionBtnText}</button>
             <button onclick="adminDeleteShopkeeper(${jsArg(s.id)})" class="bg-red-900/60 text-red-300 px-2 py-1 rounded text-xs cursor-pointer">Delete</button>
           </td>
@@ -1494,13 +1626,15 @@
         shop_name: shopName || '—',
         owner_name: ownerName || '—',
         amount,
-        status: 'pending'
+        status: 'pending',
+        created_at: new Date().toISOString()
       }]);
       if (error) {
         alert('रिचार्ज अनुरोध नहीं बना: ' + error.message);
+        console.error('Admin recharge request error:', error.message);
         return;
       }
-      alert(`₹${amount} का रिचार्ज अनुरोध बना। वॉल्ट में जोड़ने के लिए सेटिंग्स से भुगतान जाँचकर कन्फर्म करें।`);
+      alert(`₹${amount} का अनुरोध बना। भुगतान जाँचकर रिचार्ज टैब से कन्फर्म करें।`);
       await loadRechargeRequests();
     }
 
@@ -1512,9 +1646,16 @@
     }
 
     async function adminDeleteShopkeeper(id) {
-      if(!confirm("हटाना चाहते हैं?")) return;
-      await supabaseClient.from('shopkeepers').delete().eq('id', id);
-      renderAdminAll();
+      const shop = rawAdminShopkeepers.find(item => String(item.id) === String(id));
+      const label = shop?.shop_name || shop?.business_name || shop?.name || shop?.shop_id || id;
+      if (!confirm(`क्या आप ${label} (${shop?.shop_id || id}) का दुकानदार रिकॉर्ड हटाना चाहते हैं? यह कार्रवाई वापस नहीं होगी।`)) return;
+      const { error } = await supabaseClient.from('shopkeepers').delete().eq('id', id);
+      if (error) {
+        alert('रिकॉर्ड हटाया नहीं गया: ' + error.message);
+        return;
+      }
+      alert('दुकानदार रिकॉर्ड हटाया गया।');
+      await renderAdminAll();
     }
 
     async function adminAddTransactionDirect(e) {
@@ -1715,87 +1856,94 @@
       lucide.createIcons();
     }
 
-    document.addEventListener('DOMContentLoaded', fetchDefaultCustomerBanner);
-
     // --- एडमिन डिफ़ॉल्टर बैनर और डेटा फिक्स लॉजिक ---
 async function fetchDefaultCustomerBanner() {
     try {
-        const { data, error } = await supabaseClient
-            .from('settings')
-            .select('value')
-            .eq('key', 'default_customer_banner')
-            .maybeSingle();
-
+        const { data, error } = await supabaseClient.from('settings').select('value').eq('key', 'default_customer_banner').maybeSingle();
         if (error) throw error;
-        const value = typeof data?.value === 'string' ? data.value.trim() : '';
-        const permBanner = document.getElementById('permanentCustomBanner');
-        if (permBanner && value) {
-            permBanner.textContent = `⚠️ डिफ़ॉल्ट / डिफ़ॉल्टर सूचना: ${value}`;
+        const raw = typeof data?.value === 'string' ? data.value.trim() : '';
+        let config = data?.value && typeof data.value === 'object'
+          ? { message: String(data.value.message || ''), enabled: Boolean(data.value.enabled) }
+          : { message: raw, enabled: Boolean(raw) };
+        if (raw.startsWith('{')) {
+          try { const parsed = JSON.parse(raw); config = { message: String(parsed.message || ''), enabled: Boolean(parsed.enabled) }; } catch (_) {}
         }
-        return value;
+        const banner = document.getElementById('permanentCustomBanner');
+        const wrap = document.getElementById('defaultBannerWrap');
+        if (banner && wrap) {
+          banner.textContent = config.message ? `⚠️ डिफ़ॉल्टर सूचना: ${config.message}` : '';
+          wrap.classList.toggle('hidden', !(currentUser && config.enabled && config.message));
+        }
+        const editor = document.getElementById('adminDefaulterName');
+        const toggle = document.getElementById('adminBannerEnabled');
+        if (editor && currentUser?.role === 'admin') editor.value = config.message;
+        if (toggle && currentUser?.role === 'admin') toggle.checked = config.enabled;
+        return config;
     } catch (err) {
         console.error('डिफ़ॉल्टर बैनर लोड एरर:', err.message || err);
         const status = document.getElementById('defaultBannerStatus');
         if (status && currentUser?.role === 'admin') {
-            status.textContent = `बैनर लोड नहीं हुआ: ${err.message || 'Supabase settings access जाँचें।'}`;
-            status.className = 'mt-2 text-xs text-red-600';
+          status.textContent = `बैनर लोड नहीं हुआ: ${err.message || 'settings table/RLS जाँचें।'}`;
+          status.className = 'mt-2 text-xs text-red-600';
         }
+        document.getElementById('defaultBannerWrap')?.classList.add('hidden');
         return null;
     }
 }
 
-async function updateDefaultCustomerBanner() {
-    const nameInput = document.getElementById('adminDefaulterName');
-    const amountInput = document.getElementById('adminDefaulterAmount');
-    const status = document.getElementById('defaultBannerStatus');
-    const custName = nameInput?.value.trim();
-    const defAmount = amountInput?.value.trim();
-
-    if (!custName) {
-        if (status) {
-            status.textContent = 'कृपया डिफ़ॉल्ट कस्टमर का नाम दर्ज करें।';
-            status.className = 'mt-2 text-xs text-red-600';
-        }
-        return;
-    }
-
-    if (defAmount && (!Number.isFinite(Number(defAmount)) || Number(defAmount) < 0)) {
-        if (status) {
-            status.textContent = 'कृपया बकाया राशि सही दर्ज करें।';
-            status.className = 'mt-2 text-xs text-red-600';
-        }
-        return;
-    }
-
-    const bannerText = defAmount ? `${custName} - बक़ाया राशि: ₹${defAmount}` : custName;
-    if (status) {
-        status.textContent = 'बैनर सेव किया जा रहा है…';
-        status.className = 'mt-2 text-xs text-slate-500';
-    }
-
-    try {
-        const { error } = await supabaseClient
-            .from('settings')
-            .upsert({ key: 'default_customer_banner', value: bannerText }, { onConflict: 'key' });
-
-        if (error) throw error;
-
-        const permBanner = document.getElementById('permanentCustomBanner');
-        if (permBanner) permBanner.textContent = `⚠️ डिफ़ॉल्ट / डिफ़ॉल्टर सूचना: ${bannerText}`;
-        if (status) {
-            status.textContent = 'बैनर सफलतापूर्वक सेव और अपडेट हुआ।';
-            status.className = 'mt-2 text-xs text-emerald-700';
-        }
-        nameInput.value = '';
-        amountInput.value = '';
-    } catch (err) {
-        console.error('डिफ़ॉल्टर बैनर सेव एरर:', err.message || err);
-        if (status) {
-            status.textContent = `बैनर सेव नहीं हुआ: ${err.message || 'Supabase settings table/RLS policy जाँचें।'}`;
-            status.className = 'mt-2 text-xs text-red-600';
-        }
-    }
+async function loadDefaultBannerSettings() {
+    await fetchDefaultCustomerBanner();
 }
+
+async function updateDefaultCustomerBanner() {
+    const message = document.getElementById('adminDefaulterName')?.value.trim() || '';
+    const enabled = Boolean(document.getElementById('adminBannerEnabled')?.checked);
+    const status = document.getElementById('defaultBannerStatus');
+    if (!message) {
+      if (status) { status.textContent = 'पहले डिफ़ॉल्टर नोटिस लिखें।'; status.className = 'text-xs text-red-600'; }
+      return;
+    }
+    if (status) { status.textContent = 'नोटिस सेव हो रहा है…'; status.className = 'text-xs text-slate-500'; }
+    const { error } = await supabaseClient.from('settings').upsert({ key: 'default_customer_banner', value: JSON.stringify({ message, enabled }) }, { onConflict: 'key' });
+    if (error) {
+      if (status) { status.textContent = `सेव नहीं हुआ: ${error.message}`; status.className = 'text-xs text-red-600'; }
+      return;
+    }
+    const banner = document.getElementById('permanentCustomBanner');
+    if (banner) banner.textContent = `⚠️ डिफ़ॉल्टर सूचना: ${message}`;
+    document.getElementById('defaultBannerWrap')?.classList.toggle('hidden', !(enabled && currentUser));
+    if (status) { status.textContent = enabled ? 'नोटिस सेव और चालू है।' : 'नोटिस सेव है, लेकिन बंद है।'; status.className = 'text-xs text-emerald-700'; }
+}
+
+async function toggleDefaultCustomerBanner() {
+    const editor = document.getElementById('adminDefaulterName');
+    const toggle = document.getElementById('adminBannerEnabled');
+    if (!editor?.value.trim()) await fetchDefaultCustomerBanner();
+    if (!editor?.value.trim()) {
+      const status = document.getElementById('defaultBannerStatus');
+      if (status) { status.textContent = 'पहले डिफ़ॉल्टर नोटिस लिखकर सेव करें।'; status.className = 'text-xs text-red-600'; }
+      return;
+    }
+    toggle.checked = !toggle.checked;
+    await updateDefaultCustomerBanner();
+}
+
+async function removeDefaultCustomerBanner() {
+    if (!confirm('डिफ़ॉल्टर नोटिस पूरी तरह हटाएँ?')) return;
+    const { error } = await supabaseClient.from('settings').delete().eq('key', 'default_customer_banner');
+    const status = document.getElementById('defaultBannerStatus');
+    if (error) {
+      if (status) { status.textContent = `हटाया नहीं गया: ${error.message}`; status.className = 'text-xs text-red-600'; }
+      return;
+    }
+    document.getElementById('adminDefaulterName').value = '';
+    document.getElementById('adminBannerEnabled').checked = false;
+    document.getElementById('permanentCustomBanner').textContent = '';
+    document.getElementById('defaultBannerWrap')?.classList.add('hidden');
+    if (status) { status.textContent = 'डिफ़ॉल्टर नोटिस हटा दिया गया।'; status.className = 'text-xs text-emerald-700'; }
+}
+
+
 
 
   </script>
