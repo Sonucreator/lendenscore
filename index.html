@@ -177,6 +177,23 @@
       box-shadow: 0 4px 12px rgba(37, 99, 235, .3);
     }
     .theme-vyapar .mobile-nav-add svg { width: 1.5rem; height: 1.5rem; }
+    .theme-vyapar #adminSectionNav {
+      position: sticky;
+      top: 4.5rem;
+      z-index: 35;
+      display: flex;
+      flex-wrap: nowrap;
+      gap: .5rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding: .65rem;
+      border: 1px solid #e4e9f1;
+      border-radius: 1rem;
+      background: rgba(255, 255, 255, .97);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, .08);
+      scrollbar-width: thin;
+    }
+    .theme-vyapar #adminSectionNav button { flex: 0 0 auto; padding: .55rem .75rem; }
     @media (min-width: 641px) {
       .theme-vyapar .mobile-bottom-nav:not(.hidden) {
         width: min(540px, calc(100% - 2rem));
@@ -411,7 +428,7 @@
         </div>
       </div>
 
-      <div class="flex flex-wrap border-b border-slate-800 gap-4 text-sm font-semibold">
+      <div id="adminSectionNav" class="flex flex-wrap border-b border-slate-800 gap-4 text-sm font-semibold">
         <button id="adminTab1" onclick="switchAdminSection('shopkeepers')" class="pb-2.5 tab-active cursor-pointer">दुकानदार मास्टर</button>
         <button id="adminTab2" onclick="switchAdminSection('customers')" class="pb-2.5 text-slate-400 cursor-pointer">ग्राहक व स्कोर कंट्रोल</button>
         <button id="adminTab3" onclick="switchAdminSection('transactions')" class="pb-2.5 text-slate-400 cursor-pointer">बल्क CSV व लेन-देन</button>
@@ -879,6 +896,15 @@
       if (dot) dot.classList.toggle('hidden', Boolean(error || !data));
     }
 
+    async function saveSetting(key, value) {
+      const lookup = await supabaseClient.from('settings').select('key').eq('key', key).maybeSingle();
+      if (lookup.error) return { error: lookup.error };
+      if (lookup.data) {
+        return await supabaseClient.from('settings').update({ value }).eq('key', key);
+      }
+      return await supabaseClient.from('settings').insert({ key, value });
+    }
+
     function createBackupFileName() {
       const idCode = currentUser?.shop_id || document.getElementById('shopkeeperDisplayCode')?.textContent || 'ADMIN';
       const prefix = idCode.replace(/[^a-z]/gi, '').slice(0, 2).toUpperCase() || 'ID';
@@ -1024,7 +1050,7 @@
       const msg = document.getElementById('broadcastInput').value.trim();
       if (!msg) { alert('कृपया संदेश दर्ज करें!'); return; }
       const notice = { message: msg, time: new Date().toISOString() };
-      const { error } = await supabaseClient.from('settings').upsert({ key: 'global_broadcast', value: JSON.stringify(notice) }, { onConflict: 'key' });
+      const { error } = await saveSetting('global_broadcast', JSON.stringify(notice));
       if (error) { alert('नोटिफिकेशन प्रकाशित नहीं हुआ: ' + error.message); return; }
       localStorage.setItem('ld_global_broadcast', JSON.stringify(notice));
       document.getElementById('broadcastInput').value = '';
@@ -1372,7 +1398,6 @@
       ['adminMasterHeader', 'adminSearchPanel', 'adminStatsPanel'].forEach(id => {
         document.getElementById(id).classList.toggle('hidden', compactTabs);
       });
-      if (compactTabs) window.scrollTo(0, 0);
       if (sec === 'recharge') {
         populateAdminRechargeShops();
         loadRechargeRequests();
@@ -1904,7 +1929,7 @@ async function updateDefaultCustomerBanner() {
       return;
     }
     if (status) { status.textContent = 'नोटिस सेव हो रहा है…'; status.className = 'text-xs text-slate-500'; }
-    const { error } = await supabaseClient.from('settings').upsert({ key: 'default_customer_banner', value: JSON.stringify({ message, enabled }) }, { onConflict: 'key' });
+    const { error } = await saveSetting('default_customer_banner', JSON.stringify({ message, enabled }));
     if (error) {
       if (status) { status.textContent = `सेव नहीं हुआ: ${error.message}`; status.className = 'text-xs text-red-600'; }
       return;
