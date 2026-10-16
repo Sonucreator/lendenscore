@@ -108,6 +108,76 @@
     .admin-nav .mobile-nav-item svg { width: 1.15rem; height: 1.15rem; }
     body.admin-dashboard-active { padding-bottom: 6rem; }
     #shopScoreSection, #shopAddSection, #shopLedgerSection, #adminDashboard { scroll-margin-top: 5.5rem; }
+    /* Dashboard look switch: restore the original dark palette when selected. */
+    body.dark-theme {
+      background: #020617 !important;
+      color: #e2e8f0 !important;
+    }
+    .dark-theme header,
+    .dark-theme footer {
+      background: rgba(15, 23, 42, .96) !important;
+      border-color: #1e293b !important;
+      color: #94a3b8 !important;
+    }
+    .dark-theme header h1 { color: #f8fafc !important; }
+    .dark-theme main section,
+    .dark-theme #authView,
+    .dark-theme #adminDashboard > div,
+    .dark-theme #adminDashboard section {
+      background-color: #0f172a !important;
+      border-color: #1e293b !important;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, .2) !important;
+    }
+    .dark-theme .bg-slate-950,
+    .dark-theme .bg-slate-950\/40,
+    .dark-theme .bg-slate-950\/30,
+    .dark-theme .bg-slate-900,
+    .dark-theme .bg-slate-900\/90,
+    .dark-theme .bg-slate-900\/50,
+    .dark-theme .bg-slate-800,
+    .dark-theme .bg-slate-800\/50 {
+      background-color: #020617 !important;
+    }
+    .dark-theme .text-white,
+    .dark-theme .text-slate-100,
+    .dark-theme .text-slate-200,
+    .dark-theme .text-slate-300 { color: #e2e8f0 !important; }
+    .dark-theme .text-slate-400,
+    .dark-theme .text-slate-500 { color: #94a3b8 !important; }
+    .dark-theme .border-slate-800,
+    .dark-theme .border-slate-700 { border-color: #334155 !important; }
+    .dark-theme input,
+    .dark-theme textarea,
+    .dark-theme select {
+      background-color: #020617 !important;
+      border-color: #334155 !important;
+      color: #f8fafc !important;
+    }
+    .dark-theme input::placeholder,
+    .dark-theme textarea::placeholder { color: #94a3b8 !important; }
+    .dark-theme .bg-amber-500 { background-color: #f59e0b !important; }
+    .dark-theme button.bg-amber-500:hover { background-color: #fbbf24 !important; }
+    .dark-theme .text-amber-400,
+    .dark-theme .text-amber-300 { color: #fbbf24 !important; }
+    .dark-theme .tab-active { border-color: #f59e0b !important; color: #f59e0b !important; }
+    .dark-theme .border-amber-500\/40 { border-color: rgba(245, 158, 11, .4) !important; }
+    .dark-theme table thead { background: #0f172a !important; }
+    .dark-theme tbody tr:hover { background-color: #1e293b !important; }
+    .dark-theme .mobile-bottom-nav:not(.hidden) {
+      background: rgba(15, 23, 42, .97);
+      border-color: #334155;
+    }
+    .dark-theme .mobile-bottom-nav.admin-nav:not(.hidden) {
+      background: rgba(15, 23, 42, .97);
+      border-color: #334155;
+    }
+    .dark-theme .admin-nav .mobile-nav-item { color: #94a3b8; }
+    .dark-theme .admin-nav .mobile-nav-item.is-active { color: #fbbf24; }
+    .dark-theme .mobile-nav-item.is-active { color: #fbbf24; }
+    .dark-theme .mobile-nav-add span {
+      border-color: #020617;
+      background: #d97706;
+    }
     @media (max-width: 640px) {
       header { padding: .75rem !important; }
       header p { max-width: 190px; line-height: 1.35; }
@@ -245,7 +315,8 @@
           <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
           <p class="text-[11px] text-slate-400">सेंट्रल कम्युनिटी रजिस्ट्री • लाइव क्लाउड डेटा सिंक</p>
         </div>
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
+          <button type="button" id="shopThemeToggle" class="theme-toggle-button px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-slate-200 font-bold text-xs cursor-pointer whitespace-nowrap" onclick="toggleTheme()">🌙 डार्क लुक</button>
           <button onclick="openAppealModal()" class="bg-slate-800 hover:bg-slate-750 border border-slate-700 text-blue-400 font-bold px-3 py-2 rounded-xl text-xs transition cursor-pointer">अपील / सुधार भेजें</button>
         </div>
       </section>
@@ -335,6 +406,7 @@
           <p class="text-[11px] text-slate-400">मास्टर एडमिन एक्सेस एक्टिवेटेड</p>
         </div>
         <div class="flex flex-wrap gap-2">
+          <button type="button" id="adminThemeToggle" class="theme-toggle-button px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-slate-200 font-bold text-xs cursor-pointer whitespace-nowrap" onclick="toggleTheme()">🌙 डार्क लुक</button>
           <button onclick="downloadCloudBackup()" class="bg-blue-950 hover:bg-blue-900 border border-blue-800 text-blue-300 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 transition cursor-pointer">
             <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i> ऑटो बैकअप (JSON)
           </button>
@@ -706,6 +778,21 @@
     let currentUser = null;
     let searchMode = 'ALL';
 
+    function applyTheme(theme) {
+      const isDark = theme === 'dark';
+      document.body.classList.toggle('dark-theme', isDark);
+      document.querySelectorAll('.theme-toggle-button').forEach(button => {
+        button.textContent = isDark ? '☀️ लाइट लुक' : '🌙 डार्क लुक';
+      });
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#020617' : '#f3f6fb');
+    }
+
+    function toggleTheme() {
+      const nextTheme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+      localStorage.setItem('ld_theme', nextTheme);
+      applyTheme(nextTheme);
+    }
+
     function createBackupFileName() {
       const idCode = currentUser?.shop_id || document.getElementById('shopkeeperDisplayCode')?.textContent || 'ADMIN';
       const prefix = idCode.replace(/[^a-z]/gi, '').slice(0, 2).toUpperCase() || 'ID';
@@ -722,6 +809,7 @@
       if (typeof lucide !== 'undefined') {
         lucide.createIcons();
       }
+      applyTheme(localStorage.getItem('ld_theme') || 'light');
       
       // एडमिन पैनल के लिए अपील डेटा लोड करना
       loadAdminAppeals();
