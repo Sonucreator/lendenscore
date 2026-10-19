@@ -103,7 +103,9 @@
     #globalNotificationModal,
     #appealModal,
     #editShopModal,
-    #editCustomerModal {
+    #editCustomerModal,
+    #completeProfileModal,
+    #shopkeeperPreviewModal {
       overflow-y: auto;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
@@ -111,7 +113,9 @@
     #globalNotificationModal > div,
     #appealModal > div,
     #editShopModal > div,
-    #editCustomerModal > div {
+    #editCustomerModal > div,
+    #completeProfileModal > div,
+    #shopkeeperPreviewModal > div {
       max-height: calc(100vh - 2rem);
       max-height: calc(100dvh - 2rem);
       overflow-y: auto;
@@ -338,6 +342,33 @@
       <div id="authStatusMsg" class="mt-4 text-xs font-bold text-center hidden"></div>
     </div>
 
+    <!-- Profile completion is shown after Google login when required shop details are missing. -->
+    <div id="completeProfileModal" class="hidden fixed inset-0 z-[60] bg-slate-950/80 backdrop-blur flex items-center justify-center p-4">
+      <div class="bg-white border border-slate-200 max-w-lg w-full rounded-3xl p-6 space-y-4 shadow-2xl overflow-y-auto">
+        <h2 class="text-lg font-bold text-blue-700">दुकान की प्रोफ़ाइल पूरी करें</h2>
+        <p class="text-sm text-slate-600">डैशबोर्ड आगे बढ़ाने के लिए दुकान का नाम, मालिक का नाम और सही मोबाइल नंबर भरें। जानकारी सेव होने के बाद भी Pending अकाउंट को एडमिन की मंज़ूरी चाहिए।</p>
+        <form onsubmit="submitProfileCompletion(event)" class="space-y-3">
+          <label class="block text-xs font-semibold text-slate-600">दुकान का नाम *
+            <input id="completeProfileShopName" type="text" required maxlength="120" class="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm" placeholder="दुकान का असली नाम" />
+          </label>
+          <label class="block text-xs font-semibold text-slate-600">मालिक का नाम *
+            <input id="completeProfileOwnerName" type="text" required maxlength="120" class="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm" placeholder="मालिक का पूरा नाम" />
+          </label>
+          <label class="block text-xs font-semibold text-slate-600">मोबाइल नंबर *
+            <input id="completeProfilePhone" type="tel" required inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}" class="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-mono" placeholder="10 अंकों का भारतीय मोबाइल नंबर" />
+          </label>
+          <label class="block text-xs font-semibold text-slate-600">शहर
+            <input id="completeProfileCity" type="text" maxlength="100" class="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm" placeholder="शहर" />
+          </label>
+          <p id="completeProfileStatus" class="text-xs" aria-live="polite"></p>
+          <div class="sticky bottom-0 flex gap-2 bg-white py-2">
+            <button id="completeProfileSaveButton" type="submit" class="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white">प्रोफ़ाइल सेव करें</button>
+            <button type="button" onclick="logout()" class="rounded-xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-700">लॉगआउट</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- 2. SHOPKEEPER DASHBOARD -->
     <div id="shopkeeperDashboard" class="hidden space-y-5">
       <section id="shopWalletSection" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl flex flex-wrap justify-between items-center gap-3">
@@ -527,6 +558,17 @@
 
       <!-- SECTION A: SHOPKEEPERS MASTER -->
       <div id="secShopkeepers" class="space-y-5">
+        <section class="rounded-3xl border border-blue-200 bg-blue-50 p-5 shadow-sm space-y-3">
+          <div>
+            <h2 class="text-sm font-bold text-blue-800">Admin Shopkeeper ID: JBSMK00002</h2>
+            <p class="mt-1 text-xs text-slate-600">इस ID को Admin panel से चलाएँ। यह अलग Google-login अकाउंट नहीं है; Admin के transaction tools में इसी दुकान के नाम से रिकॉर्ड जोड़े और देखे जा सकते हैं।</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" onclick="createAdminManagedShopAccount()" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white">ID बनाएँ</button>
+            <button type="button" onclick="operateAdminManagedShopAccount()" class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-bold text-white">Admin panel से चलाएँ</button>
+          </div>
+          <p id="adminManagedShopStatus" class="text-xs text-slate-600" aria-live="polite"></p>
+        </section>
         <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl">
           <h2 class="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
             <i data-lucide="users" class="w-4 h-4 text-blue-400"></i> सभी पंजीकृत दुकानदार (Pending Approvals)
@@ -814,6 +856,20 @@
     </div>
   </div>
 
+  <!-- Admin-only, read-only shopkeeper dashboard preview. -->
+  <div id="shopkeeperPreviewModal" class="hidden fixed inset-0 z-[70] bg-slate-950/80 backdrop-blur flex items-center justify-center p-3 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="shopkeeperPreviewTitle">
+    <div class="max-h-[94vh] max-h-[94dvh] w-full max-w-5xl overflow-y-auto overscroll-contain rounded-2xl bg-white p-4 shadow-2xl sm:p-6">
+      <div class="sticky top-0 z-10 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white py-3">
+        <div>
+          <h2 id="shopkeeperPreviewTitle" class="text-lg font-bold text-slate-900">दुकानदार डैशबोर्ड Preview</h2>
+          <p class="text-xs text-amber-700">Read-only preview — यहाँ से कोई बदलाव या लेन-देन नहीं होगा।</p>
+        </div>
+        <button type="button" onclick="closeShopkeeperPreview()" class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700">बंद करें</button>
+      </div>
+      <div id="shopkeeperPreviewContent" class="space-y-4"></div>
+    </div>
+  </div>
+
   <!-- ================= EDIT CUSTOMER MODAL ================= -->
   <div id="editCustomerModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 max-w-md w-full rounded-3xl p-6 space-y-4 shadow-2xl">
@@ -858,6 +914,7 @@
     let rawAppeals = [];
     let rawAuditLogs = [];
     let currentUser = null;
+    let profileCompletionShopRecord = null;
     let authProcessingUserId = null;
     let searchMode = 'ALL';
     let adminFilterFrame = null;
@@ -972,7 +1029,7 @@
     // DOM LOADED & CORE UI SETUP
     // ------------------------------------------------------------
     document.addEventListener('DOMContentLoaded', () => {
-      const modalElements = ['globalNotificationModal', 'appealModal', 'editShopModal', 'editCustomerModal']
+      const modalElements = ['globalNotificationModal', 'appealModal', 'editShopModal', 'editCustomerModal', 'completeProfileModal', 'shopkeeperPreviewModal']
         .map(id => document.getElementById(id)).filter(Boolean);
       const syncModalScrollLock = () => {
         document.body.classList.toggle('modal-open', modalElements.some(modal => !modal.classList.contains('hidden')));
@@ -1062,7 +1119,7 @@
           alert("✅ आपका अकाउंट रजिस्टर हो गया है!\n\nलेकिन अभी यह पेंडिंग (Pending) है। कृपया एडमिन द्वारा ID एक्टिवेट होने का इंतज़ार करें।");
           await supabaseClient.auth.signOut();
           window.location.reload();
-        } else if (shopRecord.status !== 'active') {
+        } else if (shopRecord.status === 'blocked') {
           const message = shopRecord.status === 'blocked'
             ? "🚫 आपका अकाउंट एडमिन द्वारा ब्लॉक कर दिया गया है।"
             : shopRecord.status === 'pending'
@@ -1071,7 +1128,9 @@
           alert(message);
           await supabaseClient.auth.signOut();
         } else if (!shopkeeperProfileStatus(shopRecord).complete) {
-          alert("आपकी दुकान की जानकारी अधूरी है। एडमिन से दुकान का नाम, मालिक का नाम और सही मोबाइल नंबर अपडेट करवाएँ।");
+          showProfileCompletionForm(shopRecord, userName);
+        } else if (shopRecord.status !== 'active') {
+          alert("⏳ आपकी ID अभी एडमिन की मंज़ूरी का इंतज़ार कर रही है।");
           await supabaseClient.auth.signOut();
         } else {
           currentUser = shopRecord;
@@ -1081,6 +1140,8 @@
       } else if (event === 'SIGNED_OUT') {
         authProcessingUserId = null;
         currentUser = null;
+        profileCompletionShopRecord = null;
+        document.getElementById('completeProfileModal')?.classList.add('hidden');
         document.getElementById('authView').classList.remove('hidden');
         document.getElementById('defaultBannerWrap')?.classList.add('hidden');
         document.getElementById('shopkeeperDashboard').classList.add('hidden');
@@ -1090,6 +1151,78 @@
       }
       }, 0);
     });
+
+    function showProfileCompletionForm(shopRecord, fallbackName = '') {
+      profileCompletionShopRecord = shopRecord;
+      const profile = shopkeeperProfileStatus(shopRecord);
+      document.getElementById('completeProfileShopName').value = profile.shopName || '';
+      document.getElementById('completeProfileOwnerName').value = profile.ownerName || fallbackName || '';
+      document.getElementById('completeProfilePhone').value = profile.phone || '';
+      document.getElementById('completeProfileCity').value = shopRecord.city || '';
+      const status = document.getElementById('completeProfileStatus');
+      status.textContent = 'यह प्रोफ़ाइल अधूरी है। आवश्यक जानकारी भरकर सेव करें।';
+      status.className = 'text-xs text-amber-700';
+      document.getElementById('authView').classList.add('hidden');
+      document.getElementById('completeProfileModal').classList.remove('hidden');
+    }
+
+    async function submitProfileCompletion(event) {
+      event.preventDefault();
+      const shop = profileCompletionShopRecord;
+      const shopName = document.getElementById('completeProfileShopName').value.trim();
+      const ownerName = document.getElementById('completeProfileOwnerName').value.trim();
+      const phone = document.getElementById('completeProfilePhone').value.trim();
+      const city = document.getElementById('completeProfileCity').value.trim().toUpperCase();
+      const status = document.getElementById('completeProfileStatus');
+      const button = document.getElementById('completeProfileSaveButton');
+
+      if (!shop || !shopName || !ownerName || !/^[6-9]\d{9}$/.test(phone)) {
+        status.textContent = 'दुकान का नाम, मालिक का नाम और सही 10 अंकों का भारतीय मोबाइल नंबर भरें।';
+        status.className = 'text-xs text-red-600';
+        return;
+      }
+
+      const changes = { name: ownerName, phone, city };
+      if (Object.prototype.hasOwnProperty.call(shop, 'shop_name')) changes.shop_name = shopName;
+      if (Object.prototype.hasOwnProperty.call(shop, 'business_name')) changes.business_name = shopName;
+      if (Object.prototype.hasOwnProperty.call(shop, 'owner_name')) changes.owner_name = ownerName;
+      if (Object.prototype.hasOwnProperty.call(shop, 'full_name')) changes.full_name = ownerName;
+      if (!Object.prototype.hasOwnProperty.call(shop, 'shop_name') && !Object.prototype.hasOwnProperty.call(shop, 'business_name')) {
+        status.textContent = 'दुकान के नाम वाला फ़ील्ड डेटाबेस में उपलब्ध नहीं है। एडमिन से संपर्क करें।';
+        status.className = 'text-xs text-red-600';
+        return;
+      }
+
+      button.disabled = true;
+      status.textContent = 'प्रोफ़ाइल सेव हो रही है…';
+      status.className = 'text-xs text-slate-500';
+      let updateQuery = supabaseClient.from('shopkeepers').update(changes);
+      updateQuery = shop.id != null ? updateQuery.eq('id', shop.id) : updateQuery.eq('email', shop.email);
+      const { data: updatedShop, error } = await updateQuery.select('*').maybeSingle();
+      button.disabled = false;
+      if (error || !updatedShop) {
+        status.textContent = `प्रोफ़ाइल सेव नहीं हुई${error?.message ? ': ' + error.message : '। कृपया एडमिन से संपर्क करें।'}`;
+        status.className = 'text-xs text-red-600';
+        console.error('Profile completion update error:', error?.message || 'No updated row returned');
+        return;
+      }
+      if (!shopkeeperProfileStatus(updatedShop).complete) {
+        status.textContent = 'प्रोफ़ाइल सेव हुई, लेकिन डेटाबेस में दुकान/मालिक का नाम अपडेट नहीं हुआ। एडमिन से संपर्क करें।';
+        status.className = 'text-xs text-red-600';
+        return;
+      }
+
+      profileCompletionShopRecord = null;
+      document.getElementById('completeProfileModal').classList.add('hidden');
+      if (updatedShop.status === 'active') {
+        currentUser = updatedShop;
+        initDashboard();
+        await logActivity(updatedShop.shop_id, 'Completed shop profile after login');
+      } else {
+        alert('✓ प्रोफ़ाइल सेव हो गई। आपका अकाउंट एडमिन की मंज़ूरी का इंतज़ार कर रहा है।');
+        await supabaseClient.auth.signOut();
+      }
+    }
 
     async function logout() {
       await supabaseClient.auth.signOut();
@@ -1399,6 +1532,72 @@
       lucide.createIcons();
     }
 
+    async function createAdminManagedShopAccount() {
+      const status = document.getElementById('adminManagedShopStatus');
+      if (currentUser?.role !== 'admin') {
+        alert('यह सुविधा केवल Admin के लिए है।');
+        return null;
+      }
+
+      status.textContent = 'JBSMK00002 की जाँच हो रही है…';
+      const { data: existing, error: lookupError } = await supabaseClient
+        .from('shopkeepers').select('*').eq('shop_id', 'JBSMK00002').maybeSingle();
+      if (lookupError) {
+        status.textContent = `ID की जाँच नहीं हुई: ${lookupError.message}`;
+        return null;
+      }
+      if (existing) {
+        if (!rawAdminShopkeepers.some(item => item.shop_id === 'JBSMK00002')) rawAdminShopkeepers.push(existing);
+        status.textContent = 'JBSMK00002 पहले से मौजूद है।';
+        return existing;
+      }
+
+      const shop = {
+        shop_id: 'JBSMK00002',
+        name: 'Admin Test Shop',
+        email: 'admin-managed-jbsmk00002@example.invalid',
+        city: '',
+        phone: '',
+        pin: '',
+        status: 'active'
+      };
+      const template = rawAdminShopkeepers[0] || {};
+      if (Object.prototype.hasOwnProperty.call(template, 'shop_name')) shop.shop_name = 'Admin Test Shop';
+      if (Object.prototype.hasOwnProperty.call(template, 'business_name')) shop.business_name = 'Admin Test Shop';
+      if (Object.prototype.hasOwnProperty.call(template, 'owner_name')) shop.owner_name = 'Admin';
+      if (Object.prototype.hasOwnProperty.call(template, 'full_name')) shop.full_name = 'Admin';
+
+      const { data: created, error } = await supabaseClient
+        .from('shopkeepers').insert([shop]).select('*').single();
+      if (error) {
+        status.textContent = `ID नहीं बनी: ${error.message}`;
+        console.error('Admin-managed shop creation error:', error.message);
+        return null;
+      }
+      if (!rawAdminShopkeepers.some(item => item.shop_id === 'JBSMK00002')) rawAdminShopkeepers.push(created);
+      status.textContent = 'JBSMK00002 बन गई। इसे Admin panel से चलाया जा सकता है।';
+      await renderAdminAll();
+      return created;
+    }
+
+    async function operateAdminManagedShopAccount() {
+      if (currentUser?.role !== 'admin') {
+        alert('यह सुविधा केवल Admin के लिए है।');
+        return;
+      }
+      const shop = await createAdminManagedShopAccount();
+      if (!shop) return;
+      switchAdminSection('transactions');
+      document.getElementById('admTxShopCode').value = 'JBSMK00002';
+      const search = document.getElementById('adminUniversalSearch');
+      if (search) {
+        search.value = 'JBSMK00002';
+        filterAdminViews();
+      }
+      document.getElementById('admTxCustName').focus({ preventScroll: true });
+      document.getElementById('adminManagedShopStatus').textContent = 'JBSMK00002 तैयार है। Admin direct transaction form और सूची अब इसी ID के लिए सेट हैं।';
+    }
+
     function populateAdminRechargeShops() {
       const select = document.getElementById('adminRechargeShopSelect');
       if (!select) return;
@@ -1549,6 +1748,54 @@
       filterAdminViews();
       loadAdminAppeals(rawAppeals);
       return true;
+    }
+
+    function previewShopkeeper(shopId) {
+      if (!currentUser || (currentUser.role !== 'admin' && currentUser.shop_id !== 'JBSMK000001')) {
+        alert('यह preview केवल Admin के लिए उपलब्ध है।');
+        return;
+      }
+      const shop = rawAdminShopkeepers.find(item => String(item.shop_id) === String(shopId));
+      if (!shop) {
+        alert('दुकानदार रिकॉर्ड नहीं मिला। पहले डेटा रिफ्रेश करें।');
+        return;
+      }
+
+      const profile = shopkeeperProfileStatus(shop);
+      const status = shop.status || 'pending';
+      const balance = adminWalletBalances ? Number(adminWalletBalances[shop.shop_id] || 0) : null;
+      const shopTxs = rawAdminTxs.filter(tx => String(tx.shop_id) === String(shop.shop_id));
+      const content = document.getElementById('shopkeeperPreviewContent');
+      const profileWarnings = [];
+      if (!profile.shopName) profileWarnings.push('दुकान का नाम अधूरा है');
+      if (!profile.ownerName) profileWarnings.push('मालिक का नाम अधूरा है');
+      if (!profile.phone || !/^[6-9]\d{9}$/.test(profile.phone)) profileWarnings.push('मोबाइल नंबर अधूरा या अमान्य है');
+
+      document.getElementById('shopkeeperPreviewTitle').textContent = `Shopkeeper Preview — ${shop.shop_id || ''}`;
+      content.innerHTML = `
+        <section class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div class="flex flex-wrap justify-between gap-3">
+            <div><p class="text-xs text-slate-500">दुकान / मालिक</p><h3 class="text-lg font-bold">${escapeHTML(profile.shopName || 'दुकान का नाम उपलब्ध नहीं')}</h3><p class="text-sm text-slate-600">${escapeHTML(profile.ownerName || 'मालिक का नाम उपलब्ध नहीं')}</p></div>
+            <div class="text-sm"><p><b>Shop ID:</b> ${escapeHTML(shop.shop_id || '—')}</p><p><b>फोन:</b> ${escapeHTML(profile.phone || '—')}</p><p><b>स्थिति:</b> ${escapeHTML(status)}</p></div>
+          </div>
+          ${profileWarnings.length ? `<div class="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800"><b>प्रोफ़ाइल जाँच:</b> ${profileWarnings.map(escapeHTML).join(' • ')}</div>` : '<div class="mt-3 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-700">प्रोफ़ाइल की आवश्यक जानकारी पूरी है।</div>'}
+        </section>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <section class="rounded-xl border border-slate-200 p-4"><p class="text-xs text-slate-500">वॉल्ट बैलेंस</p><p class="mt-1 text-xl font-bold">${balance === null ? 'उपलब्ध नहीं' : `₹${balance.toLocaleString('en-IN')}`}</p></section>
+          <section class="rounded-xl border border-slate-200 p-4"><p class="text-xs text-slate-500">कुल लेन-देन</p><p class="mt-1 text-xl font-bold">${shopTxs.length}</p></section>
+          <section class="rounded-xl border border-slate-200 p-4"><p class="text-xs text-slate-500">लंबित बकाया</p><p class="mt-1 text-xl font-bold">₹${shopTxs.filter(tx => tx.status !== 'cleared').reduce((sum, tx) => sum + Number(tx.amount || 0), 0).toLocaleString('en-IN')}</p></section>
+        </div>
+        <section class="overflow-hidden rounded-xl border border-slate-200">
+          <h3 class="border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold">दुकानदार का हिसाब (Read-only)</h3>
+          <div class="overflow-x-auto"><table class="w-full min-w-[600px] text-left text-xs"><thead><tr><th class="p-3">ग्राहक</th><th class="p-3">मोबाइल</th><th class="p-3">रकम</th><th class="p-3">तारीख</th><th class="p-3">स्थिति</th></tr></thead><tbody>
+            ${shopTxs.map(tx => `<tr class="border-t border-slate-100"><td class="p-3">${escapeHTML(tx.customer_name || '—')}</td><td class="p-3 font-mono">${escapeHTML(tx.customer_phone || '—')}</td><td class="p-3">₹${Number(tx.amount || 0).toLocaleString('en-IN')}</td><td class="p-3">${tx.created_at ? escapeHTML(new Date(tx.created_at).toLocaleDateString('hi-IN')) : '—'}</td><td class="p-3">${escapeHTML(tx.status || 'pending')}</td></tr>`).join('') || '<tr><td colspan="5" class="p-5 text-center text-slate-500">इस दुकान के लिए कोई लेन-देन नहीं।</td></tr>'}
+          </tbody></table></div>
+        </section>`;
+      document.getElementById('shopkeeperPreviewModal').classList.remove('hidden');
+    }
+
+    function closeShopkeeperPreview() {
+      document.getElementById('shopkeeperPreviewModal')?.classList.add('hidden');
     }
 
     function openEditShopModal(id, name, city, phone, businessName, ownerName, email, status, pin) {
@@ -1740,6 +1987,7 @@
           <td class="font-mono font-bold text-blue-700">${adminWalletBalances ? `₹${Number(adminWalletBalances[s.shop_id] || 0).toLocaleString('en-IN')}` : '—'}</td>
           <td><span class="text-[10px] ${statusBadge} px-2 py-0.5 rounded-full font-bold uppercase">${escapeHTML(shownStatus)}</span></td>
           <td class="text-right pr-2 space-x-1">
+            <button onclick="previewShopkeeper(${jsArg(s.shop_id)})" class="bg-violet-600 text-white px-2 py-1 rounded text-xs cursor-pointer">Shopkeeper Preview</button>
             <button onclick="adminCreateRechargeRequest(${jsArg(s.shop_id)}, ${jsArg(profile.shopName || s.name)}, ${jsArg(profile.ownerName || s.name)})" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs cursor-pointer">रिचार्ज</button>
             <button onclick="openEditShopModal(${jsArg(s.id)}, ${jsArg(s.name)}, ${jsArg(s.city)}, ${jsArg(profile.phone)}, ${jsArg(profile.shopName)}, ${jsArg(profile.ownerName)}, ${jsArg(s.email)}, ${jsArg(status)}, ${jsArg(s.pin)})" class="bg-blue-600/60 text-blue-300 px-2 py-1 rounded text-xs cursor-pointer">जानकारी भरें</button>
             <button onclick="adminToggleBlockShopkeeper(${jsArg(s.id)}, ${jsArg(status)})" class="bg-${actionBtnColor}-500/20 text-${actionBtnColor}-400 px-2 py-1 rounded text-xs cursor-pointer">${actionBtnText}</button>
