@@ -466,6 +466,11 @@
     <!-- 3. FULL MASTER ADMIN DASHBOARD -->
     <div id="adminDashboard" class="hidden space-y-6">
 
+      <nav class="sticky top-[4.5rem] z-40 flex gap-2 rounded-2xl border border-slate-200 bg-white/95 p-2 shadow-md backdrop-blur" aria-label="Admin navigation">
+        <button type="button" onclick="switchAdminSection('shopkeepers')" class="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white">Admin Panel</button>
+        <button type="button" onclick="operateAdminManagedShopAccount()" class="flex-1 rounded-xl bg-slate-800 px-4 py-3 text-sm font-bold text-white">Admin Shop • JBSMK00002</button>
+      </nav>
+
       <div id="adminMasterHeader" class="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
         <div>
           <h2 class="text-sm font-extrabold text-amber-400 flex items-center gap-2">
