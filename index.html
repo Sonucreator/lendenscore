@@ -18,14 +18,22 @@
   
   <style>
     html {
-      scroll-behavior: smooth;
       -webkit-text-size-adjust: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
     }
     body {
       -webkit-tap-highlight-color: transparent;
       background-color: #020617;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-width: 320px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+    body.modal-open {
+      overflow: hidden;
+      overscroll-behavior: none;
     }
     button, input, select, textarea {
       touch-action: manipulation;
@@ -91,7 +99,15 @@
     footer { color: #69758a !important; background: #fff !important; border-color: #e4e9f1 !important; }
     .mobile-bottom-nav, .mobile-bottom-nav.hidden { display: none; }
     #shopScoreSection, #shopAddSection, #shopLedgerSection, #adminDashboard { scroll-margin-top: 5.5rem; }
-    /* Keep modal content usable on short screens and allow touch scrolling. */
+    /* Keep overlays independent from page scrolling on every viewport size. */
+    #globalNotificationModal,
+    #appealModal,
+    #editShopModal,
+    #editCustomerModal {
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
     #globalNotificationModal > div,
     #appealModal > div,
     #editShopModal > div,
@@ -101,14 +117,10 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
+      margin-top: auto;
+      margin-bottom: auto;
     }
     /* Keep the long shopkeeper edit form within the viewport and its actions reachable. */
-    #editShopModal > div {
-      max-height: calc(100vh - 2rem);
-      max-height: calc(100dvh - 2rem);
-      overflow-y: auto;
-      overscroll-behavior: contain;
-    }
     #editShopModal > div > .flex.gap-2.pt-2 {
       position: sticky;
       bottom: 0;
@@ -960,6 +972,15 @@
     // DOM LOADED & CORE UI SETUP
     // ------------------------------------------------------------
     document.addEventListener('DOMContentLoaded', () => {
+      const modalElements = ['globalNotificationModal', 'appealModal', 'editShopModal', 'editCustomerModal']
+        .map(id => document.getElementById(id)).filter(Boolean);
+      const syncModalScrollLock = () => {
+        document.body.classList.toggle('modal-open', modalElements.some(modal => !modal.classList.contains('hidden')));
+      };
+      const modalObserver = new MutationObserver(syncModalScrollLock);
+      modalElements.forEach(modal => modalObserver.observe(modal, { attributes: true, attributeFilter: ['class'] }));
+      syncModalScrollLock();
+
       setAppLook(localStorage.getItem('ld_app_look') || 'old');
       if (typeof lucide !== 'undefined') {
         lucide.createIcons();
