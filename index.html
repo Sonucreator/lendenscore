@@ -17,10 +17,22 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <style>
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
     body {
       -webkit-tap-highlight-color: transparent;
       background-color: #020617;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-width: 320px;
+    }
+    button, input, select, textarea {
+      touch-action: manipulation;
+    }
+    .overflow-x-auto {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
     }
     .tab-active {
       border-bottom: 2px solid #f59e0b;
@@ -79,6 +91,33 @@
     footer { color: #69758a !important; background: #fff !important; border-color: #e4e9f1 !important; }
     .mobile-bottom-nav, .mobile-bottom-nav.hidden { display: none; }
     #shopScoreSection, #shopAddSection, #shopLedgerSection, #adminDashboard { scroll-margin-top: 5.5rem; }
+    /* Keep modal content usable on short screens and allow touch scrolling. */
+    #globalNotificationModal > div,
+    #appealModal > div,
+    #editShopModal > div,
+    #editCustomerModal > div {
+      max-height: calc(100vh - 2rem);
+      max-height: calc(100dvh - 2rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+    /* Keep the long shopkeeper edit form within the viewport and its actions reachable. */
+    #editShopModal > div {
+      max-height: calc(100vh - 2rem);
+      max-height: calc(100dvh - 2rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    #editShopModal > div > .flex.gap-2.pt-2 {
+      position: sticky;
+      bottom: 0;
+      z-index: 2;
+      margin: 0 -1.5rem -1.5rem;
+      padding: .75rem 1.5rem 1.5rem;
+      background: #fff;
+      border-top: 1px solid #e4e9f1;
+    }
     @media (max-width: 640px) {
       header { padding: .75rem !important; }
       header p { max-width: 190px; line-height: 1.35; }
