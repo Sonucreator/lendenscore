@@ -249,6 +249,58 @@
       scrollbar-width: thin;
     }
     .theme-vyapar #adminSectionNav button { flex: 0 0 auto; padding: .55rem .75rem; }
+
+    /* Optional dark color theme; layout/look selection remains independent. */
+    body.theme-dark {
+      background: #0b1220 !important;
+      color: #e2e8f0 !important;
+    }
+    .theme-dark header, .theme-dark footer {
+      background: rgba(15, 23, 42, .97) !important;
+      border-color: #263449 !important;
+      color: #cbd5e1 !important;
+    }
+    .theme-dark header h1, .theme-dark .text-white, .theme-dark .text-slate-100,
+    .theme-dark .text-slate-200, .theme-dark .text-slate-300 { color: #e2e8f0 !important; }
+    .theme-dark main section, .theme-dark #authView,
+    .theme-dark #adminDashboard > div, .theme-dark #adminDashboard section {
+      background-color: #111c2e !important;
+      border-color: #263449 !important;
+      color: #e2e8f0 !important;
+    }
+    .theme-dark .bg-slate-950,     .theme-dark .bg-slate-950\/40, .theme-dark .bg-slate-950\/30,
+    .theme-dark .bg-slate-900, .theme-dark .bg-slate-900\/90, .theme-dark .bg-slate-900\/50,
+    .theme-dark .bg-slate-800, .theme-dark .bg-slate-800\/50,
+    .theme-dark .bg-white, .theme-dark .bg-white\/95, .theme-dark .bg-slate-50, .theme-dark .bg-slate-100 {
+      background-color: #0b1220 !important;
+    }
+    .theme-dark .text-slate-600, .theme-dark .text-slate-700, .theme-dark .text-slate-800,
+    .theme-dark .text-slate-900 { color: #e2e8f0 !important; }
+    .theme-dark #adminDashboard nav, .theme-dark #adminSectionNav {
+      background-color: #111c2e !important;
+      border-color: #263449 !important;
+    }
+    .theme-dark #editShopModal > div > .flex.gap-2.pt-2 { background: #111c2e; border-color: #263449; }
+    /* Keep the explicitly light color classes from turning dark panels white. */
+    .theme-dark .bg-slate-950, .theme-dark .bg-slate-950\/40, .theme-dark .bg-slate-950\/30,
+    .theme-dark .bg-slate-900, .theme-dark .bg-slate-900\/90, .theme-dark .bg-slate-900\/50,
+    .theme-dark .bg-slate-800, .theme-dark .bg-slate-800\/50 {
+      background-color: #0b1220 !important;
+    }
+    .theme-dark input, .theme-dark textarea, .theme-dark select {
+      background-color: #0b1220 !important;
+      border-color: #334155 !important;
+      color: #e2e8f0 !important;
+    }
+    .theme-dark input::placeholder, .theme-dark textarea::placeholder { color: #94a3b8 !important; }
+    .theme-dark table thead { background: #162338 !important; }
+    .theme-dark tbody tr:hover { background-color: #1a2940 !important; }
+    .theme-dark .mobile-bottom-nav:not(.hidden) {
+      background: rgba(15, 23, 42, .97);
+      border-color: #263449;
+    }
+    .theme-dark .mobile-nav-add span { border-color: #0b1220; }
+
     @media (min-width: 641px) {
       .theme-vyapar .mobile-bottom-nav:not(.hidden) {
         width: min(540px, calc(100% - 2rem));
@@ -278,7 +330,11 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1" aria-label="रंग थीम">
+          <button type="button" onclick="setColorTheme('light')" class="rounded-lg px-2 py-1 text-[10px] font-bold text-slate-600" aria-label="व्हाइट थीम">☀️ <span class="hidden sm:inline">व्हाइट</span></button>
+          <button type="button" onclick="setColorTheme('dark')" class="rounded-lg px-2 py-1 text-[10px] font-bold text-slate-600" aria-label="ब्लैक थीम">🌙 <span class="hidden sm:inline">ब्लैक</span></button>
+        </div>
         <div class="relative flex items-center gap-1">
           <!-- Bell Icon -->
           <button onclick="showGlobalBroadcastNotification()" class="p-2 text-slate-300 hover:text-white relative cursor-pointer">
@@ -383,7 +439,7 @@
             <option value="vyapar">नया Vyapar लुक</option>
           </select>
           <span class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">वॉल्ट: ₹<span id="shopkeeperVaultBalance">—</span></span>
-          <button type="button" onclick="requestWalletRecharge()" class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white">रिचार्ज अनुरोध</button>
+          <button id="shopkeeperRechargeButton" type="button" onclick="requestWalletRecharge()" class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white">रिचार्ज अनुरोध</button>
           <span id="walletStatusMessage" class="w-full text-[11px] text-slate-500" aria-live="polite"></span>
         </div>
       </section>
@@ -392,8 +448,9 @@
           <h3 id="dashShopTitle" class="text-sm font-bold text-slate-200">दुकानदार डैशबोर्ड</h3>
           <p class="text-[11px] text-slate-400">सेंट्रल कम्युनिटी रजिस्ट्री • लाइव क्लाउड डेटा सिंक</p>
         </div>
-        <div class="flex gap-2">
-          <button onclick="openAppealModal()" class="bg-slate-800 hover:bg-slate-750 border border-slate-700 text-blue-400 font-bold px-3 py-2 rounded-xl text-xs transition cursor-pointer">अपील / सुधार भेजें</button>
+        <div class="flex flex-wrap gap-2">
+          <button id="shopkeeperAppealButton" onclick="openAppealModal()" class="bg-slate-800 hover:bg-slate-750 border border-slate-700 text-blue-400 font-bold px-3 py-2 rounded-xl text-xs transition cursor-pointer">अपील / सुधार भेजें</button>
+          <button id="adminManagedShopExit" type="button" onclick="returnToAdminPanel()" class="hidden rounded-xl bg-blue-600 px-3 py-2 text-xs font-bold text-white">← Admin Panel पर लौटें</button>
         </div>
       </section>
 
@@ -923,6 +980,17 @@
     let authProcessingUserId = null;
     let searchMode = 'ALL';
     let adminFilterFrame = null;
+    let adminManagedShopMode = false;
+
+    function setColorTheme(theme) {
+      const selectedTheme = theme === 'dark' ? 'dark' : 'light';
+      document.body.classList.toggle('theme-dark', selectedTheme === 'dark');
+      localStorage.setItem('ld_color_theme', selectedTheme);
+    }
+
+    function displayedShopId() {
+      return adminManagedShopMode ? 'JBSMK00002' : currentUser?.shop_id;
+    }
 
     function setAppLook(look) {
       const selectedLook = look === 'vyapar' ? 'vyapar' : 'old';
@@ -936,7 +1004,11 @@
         if (control) control.value = selectedLook;
       });
       if (currentUser) {
-        if (currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001') {
+        if (adminManagedShopMode) {
+          if (selectedLook === 'vyapar') setShopkeeperView(activeNav);
+          else ['shopWalletSection', 'shopHomeSection', 'shopScoreSection', 'shopAddSection', 'shopLedgerSection']
+            .forEach(id => document.getElementById(id).classList.remove('hidden'));
+        } else if (currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001') {
           const section = activeAdminId.replace('sec', '').toLowerCase();
           switchAdminSection(section);
         } else if (selectedLook === 'vyapar') {
@@ -958,6 +1030,10 @@
     }
 
     async function loadShopkeeperVaultBalance() {
+      if (adminManagedShopMode) {
+        if (adminWalletBalances) updateVaultBalance({ balance: adminWalletBalances['JBSMK00002'] || 0 });
+        return;
+      }
       if (!currentUser?.shop_id || currentUser.role === 'admin') return;
       const { data, error } = await supabaseClient
         .from('wallet_ledger').select('amount, entry_type').eq('shop_id', currentUser.shop_id);
@@ -1043,6 +1119,7 @@
       modalElements.forEach(modal => modalObserver.observe(modal, { attributes: true, attributeFilter: ['class'] }));
       syncModalScrollLock();
 
+      setColorTheme(localStorage.getItem('ld_color_theme') || 'light');
       setAppLook(localStorage.getItem('ld_app_look') || 'old');
       if (typeof lucide !== 'undefined') {
         lucide.createIcons();
@@ -1145,6 +1222,7 @@
       } else if (event === 'SIGNED_OUT') {
         authProcessingUserId = null;
         currentUser = null;
+        adminManagedShopMode = false;
         profileCompletionShopRecord = null;
         document.getElementById('completeProfileModal')?.classList.add('hidden');
         document.getElementById('authView').classList.remove('hidden');
@@ -1477,7 +1555,7 @@
 
     function navigateApp(destination) {
       if (!currentUser) return;
-      const isAdmin = currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001';
+      const isAdmin = !adminManagedShopMode && (currentUser.role === 'admin' || currentUser.shop_id === 'JBSMK000001');
       const nav = document.getElementById('mobileBottomNav');
       nav.querySelectorAll('[data-nav]').forEach(button => {
         button.classList.toggle('is-active', button.dataset.nav === destination);
@@ -1592,15 +1670,38 @@
       }
       const shop = await createAdminManagedShopAccount();
       if (!shop) return;
-      switchAdminSection('transactions');
-      document.getElementById('admTxShopCode').value = 'JBSMK00002';
-      const search = document.getElementById('adminUniversalSearch');
-      if (search) {
-        search.value = 'JBSMK00002';
-        filterAdminViews();
-      }
-      document.getElementById('admTxCustName').focus({ preventScroll: true });
-      document.getElementById('adminManagedShopStatus').textContent = 'JBSMK00002 तैयार है। Admin direct transaction form और सूची अब इसी ID के लिए सेट हैं।';
+      adminManagedShopMode = true;
+      document.getElementById('adminDashboard').classList.add('hidden');
+      document.getElementById('shopkeeperDashboard').classList.remove('hidden');
+      document.getElementById('adminManagedShopExit').classList.remove('hidden');
+      document.getElementById('shopkeeperRechargeButton').classList.add('hidden');
+      document.getElementById('shopkeeperAppealButton').classList.add('hidden');
+      document.getElementById('mobileBottomNav').classList.remove('hidden');
+      document.getElementById('shopkeeperDisplayCode').textContent = 'JBSMK00002';
+      document.getElementById('dashShopTitle').textContent = shop.shop_name || shop.business_name || shop.name || 'Admin Shop';
+      document.getElementById('userBadge').classList.remove('hidden');
+      document.querySelectorAll('#mobileBottomNav [data-nav]').forEach(button => {
+        button.classList.toggle('is-active', button.dataset.nav === 'home');
+      });
+      await renderShopkeeperView();
+      if (document.body.classList.contains('theme-vyapar')) setShopkeeperView('home');
+      else ['shopWalletSection', 'shopHomeSection', 'shopScoreSection', 'shopAddSection', 'shopLedgerSection']
+        .forEach(id => document.getElementById(id).classList.remove('hidden'));
+      window.scrollTo(0, 0);
+    }
+
+    function returnToAdminPanel() {
+      if (!adminManagedShopMode) return;
+      adminManagedShopMode = false;
+      document.getElementById('adminManagedShopExit').classList.add('hidden');
+      document.getElementById('shopkeeperRechargeButton').classList.remove('hidden');
+      document.getElementById('shopkeeperAppealButton').classList.remove('hidden');
+      document.getElementById('shopkeeperDashboard').classList.add('hidden');
+      document.getElementById('adminDashboard').classList.remove('hidden');
+      document.getElementById('mobileBottomNav').classList.add('hidden');
+      document.getElementById('shopkeeperDisplayCode').textContent = currentUser?.shop_id || '';
+      switchAdminSection('shopkeepers');
+      window.scrollTo(0, 0);
     }
 
     function populateAdminRechargeShops() {
@@ -1723,7 +1824,7 @@
         supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(50),
         supabaseClient.from('wallet_ledger').select('shop_id, amount, entry_type')
       ]);
-      const queryError = [shopsRes, txsRes, appealsRes, logsRes, walletRes].find(result => result.error)?.error;
+      const queryError = [shopsRes, txsRes, appealsRes, logsRes].find(result => result.error)?.error;
       if (queryError) {
         console.error('Admin dashboard data load error:', queryError.message);
         alert(`एडमिन डेटा लोड नहीं हुआ: ${queryError.message}`);
@@ -2337,7 +2438,7 @@
             <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800"><span class="text-slate-400 text-[10px] block">कुल बकाया</span><span class="text-base font-black text-amber-400">₹${totalUnpaid.toLocaleString('en-IN')}</span></div>
             <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800"><span class="text-slate-400 text-[10px] block">उधारी उम्र</span><span class="text-xs font-bold">${formatOverdueAge(maxOverdueDays)}</span></div>
           </div>
-          <div class="space-y-1">${pendingList.map((r, i) => `<div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs flex justify-between"><span>उधारी #${i + 1} (${escapeHTML(r.shop_id)}): <b>₹${Number(r.amount || 0).toLocaleString('en-IN')}</b></span>${currentUser && currentUser.shop_id === r.shop_id ? `<button onclick="clearTransaction(decodeURIComponent(${escapeHTML(JSON.stringify(encodeURIComponent(String(r.id ?? ''))))}))" class="bg-emerald-600 text-white px-2 py-1 rounded cursor-pointer">क्लियर</button>` : ''}</div>`).join('')}</div>`;
+          <div class="space-y-1">${pendingList.map((r, i) => `<div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs flex justify-between"><span>उधारी #${i + 1} (${escapeHTML(r.shop_id)}): <b>₹${Number(r.amount || 0).toLocaleString('en-IN')}</b></span>${currentUser && (adminManagedShopMode ? r.shop_id === 'JBSMK00002' : currentUser.shop_id === r.shop_id) ? `<button onclick="clearTransaction(decodeURIComponent(${escapeHTML(JSON.stringify(encodeURIComponent(String(r.id ?? ''))))}))" class="bg-emerald-600 text-white px-2 py-1 rounded cursor-pointer">क्लियर</button>` : ''}</div>`).join('')}</div>`;
       } else {
         card.className = "mt-4 p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 text-emerald-200";
         card.innerHTML = `<h4 class="font-extrabold text-white text-base">स्कोर: ${score} / 100</h4><p class="text-xs text-emerald-400">✓ सुरक्षित रिकॉर्ड (उधारी दी जा सकती है)</p>`;
@@ -2368,21 +2469,36 @@
         alert('सही PAN नंबर दर्ज करें।');
         return;
       }
-      const { data: result, error } = await supabaseClient.rpc('create_shopkeeper_transaction', {
-        p_transaction: transaction,
-        p_credit_cost: 1
-      });
+      let result = null;
+      let error = null;
+      if (adminManagedShopMode) {
+        const response = await supabaseClient.from('transactions').insert([{
+          ...transaction,
+          shop_id: 'JBSMK00002',
+          status: 'pending'
+        }]);
+        error = response.error;
+      } else {
+        const response = await supabaseClient.rpc('create_shopkeeper_transaction', {
+          p_transaction: transaction,
+          p_credit_cost: 1
+        });
+        result = response.data;
+        error = response.error;
+      }
 
       if (error) {
-        alert('लेन-देन सेव नहीं हुआ। वॉल्ट में कम से कम ₹1 बैलेंस और सुरक्षित बिलिंग सेवा आवश्यक है।');
+        alert(adminManagedShopMode
+          ? 'लेन-देन सेव नहीं हुआ। Admin database permission जाँचें।'
+          : 'लेन-देन सेव नहीं हुआ। वॉल्ट में कम से कम ₹1 बैलेंस और सुरक्षित बिलिंग सेवा आवश्यक है।');
         console.error('Transaction/vault error:', error.message);
         return;
       }
-      if (!updateVaultBalance(result)) await loadShopkeeperVaultBalance();
-      renderShopkeeperView();
-      logActivity(currentUser.shop_id, "Added single transaction (₹1 vault charge)");
+      if (!adminManagedShopMode && !updateVaultBalance(result)) await loadShopkeeperVaultBalance();
+      await renderShopkeeperView();
+      logActivity(displayedShopId(), adminManagedShopMode ? 'Admin added transaction for JBSMK00002' : 'Added single transaction (₹1 vault charge)');
       e.target.reset();
-      alert("✓ लेन-देन दर्ज हुआ और वॉल्ट से ₹1 चार्ज हुआ!");
+      alert(adminManagedShopMode ? '✓ Admin Shop में लेन-देन दर्ज हुआ।' : '✓ लेन-देन दर्ज हुआ और वॉल्ट से ₹1 चार्ज हुआ!');
     }
 
     async function clearTransaction(txId) {
@@ -2396,11 +2512,17 @@
         return;
       }
       await renderShopkeeperView();
-      await logActivity(currentUser.shop_id, 'Cleared transaction');
+      await logActivity(displayedShopId(), adminManagedShopMode ? 'Admin cleared transaction for JBSMK00002' : 'Cleared transaction');
     }
 
     async function renderShopkeeperView() {
-      const { data: myTxs } = await supabaseClient.from('transactions').select('*').eq('shop_id', currentUser.shop_id).order('created_at', { ascending: false });
+      const shopId = displayedShopId();
+      const { data: myTxs, error } = await supabaseClient.from('transactions').select('*').eq('shop_id', shopId).order('created_at', { ascending: false });
+      if (error) {
+        console.error('Shopkeeper ledger load error:', error.message);
+        document.getElementById('shopkeeperTxList').innerHTML = `<tr><td colspan="7" class="py-6 text-center text-red-600">हिसाब लोड नहीं हुआ: ${escapeHTML(error.message)}</td></tr>`;
+        return;
+      }
       const tbody = document.getElementById('shopkeeperTxList');
       tbody.innerHTML = (myTxs || []).map(t => {
         const customerName = t.customer_name || '—';
